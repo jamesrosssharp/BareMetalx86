@@ -11,7 +11,7 @@ secondstage.bin: secondstage.asm
 	nasm -f bin -o secondstage.bin secondstage.asm
 
 fd.img: bl.asm secondstage.bin payload.bin
-	nasm -f bin -o fd.bin bl.asm
+	nasm -f bin -o fd.img bl.asm
 	
 
 run:	fd.img
