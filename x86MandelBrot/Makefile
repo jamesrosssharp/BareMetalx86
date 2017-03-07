@@ -15,7 +15,7 @@ fd.img: bl.asm secondstage.bin payload.bin
 	
 
 run:	fd.img
-	@qemu-system-i386 -vga std -drive file=fd.img,index=0,if=floppy,format=raw
+	@qemu-system-i386 -vga cirrus -drive file=fd.img,index=0,if=floppy,format=raw
 
 clean:  
 	rm fd.img secondstage.bin payload.bin main.o

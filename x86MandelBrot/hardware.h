@@ -7,6 +7,6 @@
 	     			"mov %ax, %gs\n"		\
 	     			"mov %ax, %fs\n"		\
 	     			"mov %ax, %ss\n"		\
-	     			"mov $0x8fff0, %esp\n");
+	     			"mov $0x9fff0, %esp\n");
 
 
