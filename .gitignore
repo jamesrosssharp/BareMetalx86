@@ -1,0 +1,8 @@
+twoStageBootloader/fd.img
+twoStageBootloader/main.o
+twoStageBootloader/payload.bin
+twoStageBootloader/secondstage.bin
+x86MandelBrot/fd.img
+x86MandelBrot/main.o
+x86MandelBrot/payload.bin
+x86MandelBrot/secondstage.bin

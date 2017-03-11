@@ -3,7 +3,7 @@
 
 int gSomeGlobal = 320*200;
 
-#define MAX_ITER 254
+#define MAX_ITER 255
 
 typedef struct complex_t
 {
@@ -43,12 +43,20 @@ int start(void)
 	// THIS HAS TO BE THE FIRST THING WE DO.
 	INIT_REGISTERS;
 
-	setPalette();
+
+	// crash the system
+
+	//float foo = 5.0;
+
+	//float blah = foo / 0.0;
 
 	// clear the video mem, and test that our globals work.
 	char *vidMem = (char*)VIDEOMEM;
 	for (int i = 0; i < gSomeGlobal; i ++)
 		vidMem[i] = 0x00;
+
+
+	setPalette();
 
 
 	// generate a nice mandelbrot set
@@ -63,6 +71,9 @@ int start(void)
 		else
 			renderQuadraticJulia();
 
+		//for (int i = 0; i < 255; i ++)
+		//	putPixel(i, 0, i);
+		
 
 		sleep();
 
@@ -287,21 +298,119 @@ int randGen()
 void setPalette()
 {
 
+	struct palette_entry 
+	{
+		int r;
+		int g;
+		int b;
+	};
+
+	struct palette_entry palette[] = 
+	{
+		{255, 0, 0},
+		{0,  0, 255},
+		{0,  255, 0},
+		{255, 0, 255},
+		{192, 28, 128},
+		{128, 64, 192},
+		{64, 64, 128},
+		{64, 128, 64},
+
+		{0,  0, 64},
+		{0,  0, 128},
+		{0,  0, 255},
+
+		{0,  64, 128},
+		{0,  128, 64},
+		{0,  255,  0},
+
+		{64, 128, 64},
+		{128, 64, 128},
+		{255, 0, 255},
+
+		{200, 14, 192},
+		{192, 20, 140},
+		{192, 28, 128},
+
+		{180, 40, 160},
+		{140, 50, 170},
+		{128, 64, 192},
+
+
+		{90, 64, 150},
+		{70, 64, 140},
+		{64, 64, 128},
+
+		{64, 80, 90},
+		{64, 100, 70},
+		{64, 128, 64},
+
+		{128,64,32},
+		{192,32,16},
+		{255, 0, 0},
+
+		{255, 255, 255}
+	};
+
+
 	// set palette index
 	outp(0x03c8, 0);
 
-	
-	outp(0x03c9, 255);
-	outp(0x03c9, 255);
-	outp(0x03c9, 255);	
+	outp(0x03c9, 0);
+	outp(0x03c9, 0);
+	outp(0x03c9, 0);
+
+	const int iter_count = sizeof(palette) / 
+				sizeof(struct palette_entry) - 1; 
+
+	int cols = 0;
+
+	for (int i = 0; i < iter_count; i ++)
+	{
+
+		struct palette_entry p1 = palette[i];
+		struct palette_entry p2 = palette[i + 1];
+
+
+		const int count = 256 / iter_count; 
+
+		for (int j = 0; j < count; j++)
+		{	
+
+			float rf = (float)p1.r + ((float)p2.r - (float)p1.r) * ((float)j / ((float)count + 1.0));
+			float gf = (float)p1.g + ((float)p2.g - (float)p1.g) * ((float)j / ((float)count + 1.0));
+			float bf = (float)p1.b + ((float)p2.b - (float)p1.b) * ((float)j / ((float)count + 1.0));
+
+
+			char r = (int)(rf / 4.0);
+			char g = (int)(gf / 4.0);
+			char b = (int)(bf / 4.0);
+
+			outp(0x03c9, r);
+			outp(0x03c9, g);
+			outp(0x03c9, b);
+
+			cols++;
+
+			if (cols > 254)
+				break;
+
+		}
+
+	}
+
 }
 
 void outp(unsigned short port, unsigned char byte)
 {
 	__asm__ volatile (
+	    " push %%eax \n"
+	    " push %%edx \n"
 	    " mov %%eax, %0 \n" // these instructions are quite irrelevant 
 	    " mov %%edx, %1 \n" // if you look at the disassembly.
 	    " out %%al, %%dx \n"
+	    " pop %%edx \n"
+	    " pop %%eax \n"
 		:
 		: "r" ((unsigned int)byte),
 		  "r" ((unsigned int)port)
