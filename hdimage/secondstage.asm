@@ -253,7 +253,9 @@ A20Done:
 	lidt [idt_ptr]
 	lgdt [gdt_ptr]
 	
-	; initialise all segments
+	; make doubly sure interrupts are disabled
+	
+	cli
 
 	; go into protected mode
 
