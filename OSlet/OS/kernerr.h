@@ -1,0 +1,5 @@
+#pragma once
+
+#define ERROR_NO_MEMORY 1
+#define ERROR_DOES_NOT_EXIST 2
+#define ERROR_INVALID_PARAMETER 3
