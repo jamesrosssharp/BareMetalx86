@@ -12,7 +12,7 @@ stage1_5.bin: Bootloader/stage1_5.asm
 hd.img: Bootloader/bl.asm stage1_5.bin payload.bin
 	cd Bootloader && nasm -f bin -o ../hd.img bl.asm
 	
-fd.vmdk: hd.img
+hd.vmdk: hd.img
 	@VBoxManage internalcommands createrawvmdk -filename hd.vmdk -rawdisk hd.img 
 
 run:	hd.img

@@ -3,8 +3,8 @@ LIB = libbios.a
 all:	$(LIB)
 
 
-HEADERS = bda.h bios.h
-OBJS = bda.o
+HEADERS = bda.h bios.h biosmem.h
+OBJS = bda.o biosmem.o
 
 libbios.a:	$(OBJS) $(HEADERS)
 	ar rc $(LIB) $(OBJS)

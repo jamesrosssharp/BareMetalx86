@@ -56,10 +56,10 @@ int console_addConsole(enum ConsoleType type, ...)
 		}
 	}
 
-	info->init();
 
 	gConsoles[gNumConsoles ++] = info;
 
+	info->init();
 
 	va_end(arg);
 

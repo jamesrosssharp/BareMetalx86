@@ -57,7 +57,8 @@ int vgaConsole_init(void)
 	gConsoleRow = 0;
 	gConsoleCol = 0;
 
-	vgaConsole_puts("VGA Console initialised.\n");
+	//vgaConsole_puts("VGA Console initialised.\n");
+	kprintf("VGA Console at %x\n", gConsolePort);
 
 	return 0;
 
@@ -75,45 +76,45 @@ void vgaConsole_putch(char c)
 
 	if (c == '\n')
 	{
-		gConsoleRow = 0;
-		gConsoleCol ++;
-		if (gConsoleCol > gConsoleHeight)
-			gConsoleCol = 0;
+		gConsoleCol = 0;
+		gConsoleRow ++;
+		if (gConsoleRow > gConsoleHeight)
+			gConsoleRow = 0;
+
+
 	}
 	else
 	{
 		char *vidMem = (char*)VIDEO_MEM;
 
-		int offset = (gConsoleRow + gConsoleCol*gConsoleWidth) * 2;
+		int offset = (gConsoleCol + gConsoleRow*gConsoleWidth) << 1;
  
 		vidMem[offset] = c;
 		vidMem[offset + 1] = CONSOLE_COLOR;
 
-		gConsoleRow ++;
+		unsigned short position = offset >> 1;
+ 
+    		// cursor LOW port to vga INDEX register
+    		outByte(0x3d4, 0x0F);
+    		outByte(0x3d4 + 1, (unsigned char)(position&0xFF));
+    		// cursor HIGH port to vga INDEX register
+    		outByte(0x3d4, 0x0E);
+    		outByte(0x3d4 + 1, (unsigned char )((position>>8)&0xFF));
+	
+		gConsoleCol ++;
 
-		if (gConsoleRow > gConsoleWidth)
+		if (gConsoleCol > gConsoleWidth)
 		{
-			gConsoleRow = 0;
-			gConsoleCol ++;
+			gConsoleCol = 0;
+			gConsoleRow ++;
 
-			if (gConsoleCol > gConsoleHeight)
+			if (gConsoleRow > gConsoleHeight)
 			{
-		  		gConsoleCol = 0;
+		  		gConsoleRow = 0;
 			}
 		}
 	}
 
-	// Set the cursor
-
-	unsigned short position = (gConsoleRow*gConsoleWidth) + gConsoleCol;
- 
-    	// cursor LOW port to vga INDEX register
-    	outByte(gConsolePort, 0x0F);
-    	outByte(gConsolePort + 1, (unsigned char)(position&0xFF));
-    	// cursor HIGH port to vga INDEX register
-    	outByte(gConsolePort, 0x0E);
-    	outByte(gConsolePort + 1, (unsigned char )((position>>8)&0xFF));
-	
 
 }
 

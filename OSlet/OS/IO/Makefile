@@ -4,8 +4,8 @@ LIB = libio.a
 all:	$(LIB)
 
 
-HEADERS = io.h port.h
-OBJS = port.o
+HEADERS = io.h port.h cpu.h realmodeint.h
+OBJS = port.o cpu.o realmodeint.o
 
 libio.a:	$(OBJS) $(HEADERS)
 	ar rc $(LIB) $(OBJS)
