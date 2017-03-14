@@ -9,17 +9,21 @@ kernel.bin:	Boot/boot.o main.o  libkern.a
 main.o:	main.c $(HEADERS)
 	gcc -m32 -fno-stack-protector -c main.c -o main.o
 
-libkern.a:	Console/libconsole.a BIOS/libbios.a	IO/libio.a
+LIBS =  Boot/boot.o Console/libconsole.a BIOS/libbios.a IO/libio.a	\
+	Gfx/libgfx.a
+
+libkern.a:	$(LIBS)
 	@printf "CREATE libkern.a\n \
     		ADDLIB Console/libconsole.a\n	\
     		ADDLIB BIOS/libbios.a\n	\
     		ADDLIB IO/libio.a\n	\
+		ADDLIB Gfx/libgfx.a\n	\
 		SAVE\n		\
     		END" | ar -M
 	ranlib libkern.a
 
 
-.PHONY: Boot/boot.o Console/libconsole.a BIOS/libbios.a IO/libio.a
+.PHONY:	$(LIBS)
 
 Boot/boot.o:	
 	make -C Boot
@@ -32,6 +36,9 @@ BIOS/libbios.a:
 
 IO/libio.a:
 	make -C IO
+
+Gfx/libgfx.a:
+	make -C Gfx
 
 clean:
 	rm *.a *.o

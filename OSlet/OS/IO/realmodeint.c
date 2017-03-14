@@ -11,13 +11,13 @@ bool	io_realModeInt(unsigned char interrupt, struct RegisterDescription* inRegis
 
 	int ret;
 
-	kprintf("calling real mode wrapper EAX=%08x EBX=%08x ECX=%08x EDX=%08x \n", 
-			inRegisters->EAX,  inRegisters->EBX,  inRegisters->ECX,  inRegisters->EDX );
+	//kprintf("calling real mode wrapper EAX=%08x EBX=%08x ECX=%08x EDX=%08x \n", 
+	//		inRegisters->EAX,  inRegisters->EBX,  inRegisters->ECX,  inRegisters->EDX );
 
 	ret = boot_realModeIntWrapper(interrupt, inRegisters, outRegisters);	
 
-	kprintf("back in protected mode EAX=%08x EBX=%08x ECX=%08x EDX=%08x \n", 
-		outRegisters->EAX,  outRegisters->EBX,  outRegisters->ECX,  outRegisters->EDX);
+	//kprintf("back in protected mode EAX=%08x EBX=%08x ECX=%08x EDX=%08x \n", 
+	//	outRegisters->EAX,  outRegisters->EBX,  outRegisters->ECX,  outRegisters->EDX);
 
 	return (ret != 0);
 

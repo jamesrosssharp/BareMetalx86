@@ -19,12 +19,16 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 	struct RegisterDescription in = {0};
 	struct RegisterDescription out = {0};
 
+	out.EBX = 0;
+
+	unsigned long long int totalMemory = 0;
+
 	for (int i = 0; i < MAX_MEMORY_ENTRIES; i++)
 	{
 	
 		in.EAX = 0xE820;
 		in.EDX = 0x534D4150;
-		in.EBX = 0;
+		in.EBX = out.EBX;
 		in.ECX = 24;
 
 		in.ES = (((int)curEntry) & 0xffff0000) >> 4;
@@ -37,11 +41,29 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 			kprintf("Failed to detect memory.\n");
 			return false;
 		}
+		else
+		{
+			kprintf("Found memory: base 0x%08x%08x size 0x%08x%08x flags: 0x%x\n", 
+				(unsigned int)(curEntry->baseAddress >> 32), (unsigned int)(curEntry->baseAddress & 0xffffffff),
+				(unsigned int)(curEntry->size >> 32), (unsigned int)(curEntry->size & 0xffffffff),
+				curEntry->type	
+			);
 
-		break;
+		}
+
+		if (curEntry->type == 1)
+		{
+			totalMemory += curEntry->size;
+		}
+
+		if (out.EBX == 0)
+			break;
+
+		curEntry ++;
 
 	}
 
+	kprintf("Detected memory (%d MiB)\n", (int)(totalMemory / 1024 / 1024));
 
 	return true;
 }

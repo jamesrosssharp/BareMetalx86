@@ -194,6 +194,8 @@ void convertInt(int num, int base, bool padWithZeros, int preferredLength)
 	if (base == 0)
 		return;
 
+
+
 	const int bufferSize = 32;
 
 	char outputBuffer[bufferSize];
@@ -205,10 +207,19 @@ void convertInt(int num, int base, bool padWithZeros, int preferredLength)
 	
 	int idx = 0;
 
-	while (num != 0)
+
+	unsigned int unsignedNum = (unsigned int)num;
+
+	if (num < 0 && base == 10)
 	{
-		outputBuffer[idx] = convertBuffer[(num % base)];
-		num /= base;
+		unsignedNum = (unsigned int)-num;
+		console_putch('-');	
+	} 
+
+	while (unsignedNum != 0)
+	{
+		outputBuffer[idx] = convertBuffer[(unsignedNum % base)];
+		unsignedNum /= base;
 		
 		idx ++;
 	}

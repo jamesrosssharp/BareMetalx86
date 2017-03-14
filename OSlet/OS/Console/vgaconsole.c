@@ -16,6 +16,8 @@ void vgaConsole_clear(void);
 void vgaConsole_putch(char c);
 void vgaConsole_puts(const char* str);
 
+void vgaConsole_moveCursor(int x, int y);
+
 /*	Globals		*/
 
 struct ConsoleInfo gConsoleInfo = {
@@ -71,6 +73,21 @@ void vgaConsole_clear(void)
 		vidMem[i] = 0x00;
 }
 
+
+void vgaConsole_moveCursor(int x, int y)
+{
+
+		unsigned short position = y*gConsoleWidth + x;
+ 
+    		// cursor LOW port to vga INDEX register
+    		outByte(0x3d4, 0x0F);
+    		outByte(0x3d4 + 1, (unsigned char)(position&0xFF));
+    		// cursor HIGH port to vga INDEX register
+    		outByte(0x3d4, 0x0E);
+    		outByte(0x3d4 + 1, (unsigned char )((position>>8)&0xFF));
+	
+}
+
 void vgaConsole_putch(char c)
 {
 
@@ -78,9 +95,35 @@ void vgaConsole_putch(char c)
 	{
 		gConsoleCol = 0;
 		gConsoleRow ++;
-		if (gConsoleRow > gConsoleHeight)
-			gConsoleRow = 0;
+		if (gConsoleRow >= gConsoleHeight)
+		{
 
+			// back scroll buffer
+
+			char *dest = (char*)VIDEO_MEM;
+
+			for (int i = 1; i < gConsoleHeight; i ++)
+				for (int j = 0; j < gConsoleWidth; j ++)
+				{
+					dest[((i-1)*gConsoleWidth + j)*2] = dest[(i*gConsoleWidth + j)*2];
+					dest[((i-1)*gConsoleWidth + j)*2 + 1] = dest[(i*gConsoleWidth + j)*2 + 1];
+				}
+
+			for (int i = 0; i < gConsoleWidth; i++)
+			{
+				dest[((gConsoleHeight - 1)*gConsoleWidth + i)*2] = 0;
+				dest[((gConsoleHeight - 1)*gConsoleWidth + i)*2 + 1] = 0;
+			}
+
+			gConsoleRow = gConsoleHeight - 1;
+		
+			dest[(gConsoleRow*gConsoleWidth + gConsoleCol)*2 + 1] = CONSOLE_COLOR;
+
+			vgaConsole_moveCursor(gConsoleCol, gConsoleRow);
+
+		}
+
+		
 
 	}
 	else
@@ -92,15 +135,6 @@ void vgaConsole_putch(char c)
 		vidMem[offset] = c;
 		vidMem[offset + 1] = CONSOLE_COLOR;
 
-		unsigned short position = offset >> 1;
- 
-    		// cursor LOW port to vga INDEX register
-    		outByte(0x3d4, 0x0F);
-    		outByte(0x3d4 + 1, (unsigned char)(position&0xFF));
-    		// cursor HIGH port to vga INDEX register
-    		outByte(0x3d4, 0x0E);
-    		outByte(0x3d4 + 1, (unsigned char )((position>>8)&0xFF));
-	
 		gConsoleCol ++;
 
 		if (gConsoleCol > gConsoleWidth)

@@ -2,6 +2,7 @@
 #include "Console/console.h"
 #include "BIOS/bios.h"
 #include "IO/io.h"
+#include "Gfx/gfx.h"
 
 void main(void)
 {
@@ -35,6 +36,9 @@ void main(void)
 
 	bios_detectMemory(&memMap, &memMapSize);
 
+	// Detect VESA modes
+
+	gfx_detectVESAModes();
 
 die:
 	asm("hlt");
