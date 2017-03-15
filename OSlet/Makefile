@@ -16,7 +16,7 @@ hd.vmdk: hd.img
 	@VBoxManage internalcommands createrawvmdk -filename hd.vmdk -rawdisk hd.img 
 
 run:	hd.img
-	@qemu-system-i386 -vga cirrus -drive file=hd.img,index=0,format=raw
+	@qemu-system-i386 -vga std -drive file=hd.img,index=0,format=raw
 
 bochs: hd.img
 	@bochs 'ata0-master: type=disk, path="hd.img", cylinders=2, heads=16, spt=63' 'boot: disk'

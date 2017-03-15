@@ -5,8 +5,13 @@
 
 #define MAX_VESA_MODES	256
 
+#define CONVERT_REAL_MODE_ADDRESS(x)	((x & 0xffff0000) >> 12) | (x & 0x0000ffff)
+
 struct 	VESAInfo gVESAInfo;
 
+struct 	ModeInfo gVESAModeInfo[MAX_VESA_MODES];
+
+int	gTotalSupportedVESAModes;
 
 bool	gfx_detectVESAModes()
 {
@@ -36,13 +41,44 @@ bool	gfx_detectVESAModes()
 	);
 
 	kprintf("OEM String: %s\n",
-		(unsigned char*)(((gVESAInfo.OEMStringPtr & 0xffff0000) >> 12)
-			 | (gVESAInfo.OEMStringPtr & 0x0000ffff) ));
-	kprintf("Total memory: %d\n",gVESAInfo.TotalMemory);
+		(unsigned char*)( CONVERT_REAL_MODE_ADDRESS(gVESAInfo.OEMStringPtr)));
+	kprintf("Total memory: %d kB\n",gVESAInfo.TotalMemory * 64);
 
-	kprintf("Video mode ptr: %x\n", gVESAInfo.VideoModePtr);
+	unsigned short* modes = (unsigned short*)(CONVERT_REAL_MODE_ADDRESS(gVESAInfo.VideoModePtr));
 
-	kprintf("Detected VESA modes.\n");
+	gTotalSupportedVESAModes = 0;
+
+	struct ModeInfo* modeInfo = gVESAModeInfo;
+
+	while(*modes != 0xffff && gTotalSupportedVESAModes < MAX_VESA_MODES)
+	{
+
+		// Get mode info
+
+		in.ES = (((int)modeInfo) & 0xffff0000) >> 4;
+		in.EDI = (((int)modeInfo) & 0x0000ffff); 
+		in.EAX = 0x4f01;	
+		in.ECX = (unsigned int)*modes;
+
+		io_realModeInt(0x10, &in, &out);	
+
+		if (out.EAX & 0x0000ff00)
+		{
+			kprintf("Could not get mode info block");
+			return false;
+		}
+
+		kprintf("Detected mode: 0x%x %dx%d, %dbpp\n", *modes, 
+				modeInfo->XResolution, 
+				modeInfo->YResolution,
+				modeInfo->BitsPerPixel);
+		modes ++;
+		gTotalSupportedVESAModes ++;
+		modeInfo ++;
+	}
+
+
+	kprintf("Detected %d VESA modes.\n", gTotalSupportedVESAModes);
 
 	return true;
 }
