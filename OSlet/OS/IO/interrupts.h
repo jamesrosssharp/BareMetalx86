@@ -10,6 +10,11 @@
 #define IDT_GATE_TYPE_386_INTERRUPT_GATE	0x0e
 #define IDT_GATE_TYPE_386_TRAP_GATE		0x0f
 
+#define IDT_MAKE_TYPE(type, present, dpl, storageSeg) \
+			type | ((present&1) << 7) | \
+			((dpl & 3) << 5) | \
+			((storageSeg & 1) << 4)
+
 struct __attribute__((packed)) IDTEntry 
 {
 	unsigned short offsetLo;

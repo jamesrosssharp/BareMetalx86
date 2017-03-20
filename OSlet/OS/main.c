@@ -44,8 +44,10 @@ void main(void)
 	// and enable interrupts
 
 	io_initAndRemapPIC();
+	io_initInterrupts();
+	io_enableInterrupts();
 
 die:
-	asm("hlt");
+	//asm("hlt");
 	goto die;
 }

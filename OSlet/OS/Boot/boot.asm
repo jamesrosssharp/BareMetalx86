@@ -419,7 +419,7 @@ LoadCS:
 	align 32
 
 %macro jmpTableEntry 2
-	%if ((0BFFD82FFh >> %1) & 1) | (%1 > 32) ; mask for interrupts without error code
+	%if ((0BFFD82FFh >> %1) & 1) | (%1 >= 32) ; mask for interrupts without error code
 		push byte 0	; push error code of zero
 	%else
 		nop		; pad out to 6 bytes
@@ -527,7 +527,10 @@ ISR:
 
 	call	io_handleInterrupt
 
-	add esp, 8	; pop arguments from the stack
+	;add esp, 8	; pop arguments from the stack
+	
+	pop ebx
+	pop eax
 
 	; restore registers
 
@@ -545,7 +548,54 @@ ISR:
 	pop ebx
 	pop eax
 
+	add esp,8
+
 	sti
 
 	iret
+
+;========================== Load IDT from C ==========================
+
+	global	boot_loadIDT
+
+boot_loadIDT:
+
+	push ebp
+
+	mov ebp, esp
+
+	push eax
+
+	mov eax, [ebp + 08h]
+
+	mov [kernel_idt_ptr + 2], eax
+
+	mov eax, 256*8	; IDT extent
+
+	mov [kernel_idt_ptr], ax
+
+	lidt [kernel_idt_ptr]
+
+	pop eax
+	pop ebp
+
+	ret
+
+	global boot_enableInterrupts
+
+boot_enableInterrupts:
+
+	sti
+
+	ret
+
+	global boot_disableInterrupts
+
+boot_disableInterrupts:
+
+	cli
+
+	ret
+
+
 

@@ -80,7 +80,7 @@ void	io_remapPICs(unsigned char masterVectorOffset, unsigned char slaveVectorOff
 {
 	// Init PIC and remap vector offsets 
 
-	kprintf("Remapping PICs...");
+	kprintf("Remapping PICs...\n");
 
 	outByte(PIC_MASTER_PORT_CMD, PIC_ICW1_INIT | PIC_ICW1_ICW4);
 	io_smallDelay();
