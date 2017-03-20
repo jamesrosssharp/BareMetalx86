@@ -40,6 +40,11 @@ void main(void)
 
 	gfx_detectVESAModes();
 
+	// Remap interrupt controller, install interrupt handlers
+	// and enable interrupts
+
+	io_initAndRemapPIC();
+
 die:
 	asm("hlt");
 	goto die;

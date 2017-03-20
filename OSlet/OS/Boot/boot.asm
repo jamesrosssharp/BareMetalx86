@@ -44,6 +44,8 @@ set_cs:
 	finit			; Should really do this once we have detected
 				; that the CPU has an FPU
 
+	cld			; clear direction flag
+
 	jmp	main
 
 ;======================		Kernel gdt and idt
@@ -155,10 +157,6 @@ boot_realModeIntWrapper:
 	push   fs
 	push   gs
  
-  	;mov    eax,DWORD PTR [ebp+0x8]	;	Interrupt to call 
-  	;mov    ebx,DWORD PTR [ebp+0xc]	;	In registers
-  	;mov    ecx,DWORD PTR [ebp+0x10]	;	Out registers
- 	
 	;	Copy in registers to register structure
 
 	mov	eax, [ebp + 0ch]
@@ -411,3 +409,143 @@ LoadCS:
 	jmp eax
 
 	align 4
+
+;========================= Interrupt jump table ===========================
+
+
+	global boot_interruptJumpTable	
+	extern io_handleInterrupt	
+
+	align 32
+
+%macro jmpTableEntry 2
+	%if ((0BFFD82FFh >> %1) & 1) | (%1 > 32) ; mask for interrupts without error code
+		push byte 0	; push error code of zero
+	%else
+		nop		; pad out to 6 bytes
+		nop
+	%endif
+
+	push byte %1			; 68 xx
+	jmp %2			; eb yy
+%endmacro
+
+
+%macro jmpTableSection 2
+	%assign i %1
+	%rep %2
+		jmpTableEntry i, %%drain
+	%assign i i+1
+	%endrep
+%%drain:
+	jmp ISR
+%endmacro
+
+	align 8
+
+boot_interruptJumpTable:
+
+%assign j 0
+%rep 12
+	jmpTableSection j, 20
+	align 8
+%assign j j + 20
+%endrep
+
+	jmpTableSection j, 16	; 12 * 20 = 240 + 16 = 256
+
+ISR:
+	; preserve all registers
+
+	cli
+
+	push eax
+	push ebx
+	push ecx
+	push edx
+
+	push ds
+	push es
+	push fs
+	push gs
+
+	push edi
+	push esi
+	push ebp
+
+
+	; Stack layout
+	;	---------------- <- old ESP
+	;	|   Old EFLAGS |   
+	;	----------------
+	;	|   Old CS     |   
+	;	----------------
+	;	|   Old IP     |   
+	;	---------------- 
+	;       |  Error code  |    
+	;	---------------- < 30
+	;	|  Interrupt   |    
+	;	---------------- < 2c
+	;	|  EAX         |    
+	;	---------------- 
+	;	|  EBX         |    
+	;	----------------
+	;	|  ECX         |    
+	;	---------------- < 20
+	;	|  EDX         |    
+	;	----------------
+	;	|  DS          |    
+	;	----------------
+	;	|  ES	       |    
+	;	----------------
+	;	|  FS          |    
+	;	---------------- < 10
+	;	|  GS          |    
+	;	---------------- < c
+	;	|  EDI         |    
+	;	---------------- < 8
+	;	|  ESI         |   
+	;	---------------- <--- 4
+	;	|  EBP         |    
+	;	---------------- <--- ESP
+
+
+	; set up stack frame for call to ISR
+
+	mov eax, [esp + 02ch]	; interrupt
+	mov ebx, [esp + 030h]   ; error code
+	
+	and eax, 000000ffh	; because two byte push sign extends, clear
+				; extension.
+
+	push eax	; first argument
+	push ebx	; second argument
+	
+	cld
+
+	; call ISR
+
+	call	io_handleInterrupt
+
+	add esp, 8	; pop arguments from the stack
+
+	; restore registers
+
+	pop ebp
+	pop esi
+	pop edi
+	
+	pop gs
+	pop fs
+	pop es
+	pop ds
+
+	pop edx
+	pop ecx
+	pop ebx
+	pop eax
+
+	sti
+
+	iret
+

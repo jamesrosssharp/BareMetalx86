@@ -13,3 +13,18 @@ void outByte(unsigned short port, char byte)
 
 }
 
+char inByte(unsigned short port)
+{
+
+	char inByte = 0;
+
+  	__asm__ volatile (
+            " in %%dx, %%al \n"
+                : "=a" (inByte)
+                : "d" (port)
+		:
+            );
+
+	return inByte;
+}
+
