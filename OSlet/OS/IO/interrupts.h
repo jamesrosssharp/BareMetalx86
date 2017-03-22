@@ -24,5 +24,13 @@ struct __attribute__((packed)) IDTEntry
 	unsigned short offsetHi;
 };
 
+enum InterruptControlMode
+{
+	INTERRUPTCONTROL_NOINIT,
+	INTERRUPTCONTROL_PIC,
+	INTERRUPTCONTROL_APIC
+};
+
 typedef void (* ISRCallback)(int interrupt, int errorCode);
 
+bool io_initInterrupts(enum InterruptControlMode interruptControl);

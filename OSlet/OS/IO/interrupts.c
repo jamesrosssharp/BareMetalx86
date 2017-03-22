@@ -13,11 +13,27 @@ extern void boot_loadIDT(void* IDT);
 extern void boot_enableInterrupts();
 extern void boot_disableInterrupts();
 
+enum	InterruptControlMode	gInterruptControlMode = INTERRUPTCONTROL_NOINIT;
+
 // 
 //	Prepare IDT and jump table offsets, but do not enable interrupts.
 //	
-bool io_initInterrupts()
+bool io_initInterrupts(enum InterruptControlMode interruptControl)
 {
+	
+	gInterruptControlMode = interruptControl;
+
+	if (interruptControl == INTERRUPTCONTROL_PIC)
+	{
+		// Initialise PIC and remap it.
+		io_initAndRemapPIC();	
+	}
+	else
+	{
+		return false;
+	}
+
+
 	// init the idt
 
 	kprintf("Init'ing IDT...\n");	
@@ -41,6 +57,7 @@ bool io_initInterrupts()
 
 	boot_loadIDT(idtEntries);
 
+	return true;
 }
 
 void io_enableInterrupts()
@@ -61,17 +78,15 @@ bool io_addInterruptHandler(unsigned char interrupt, ISRCallback handler)
 void io_handleInterrupt(int errorCode, int interrupt)
 {
 
-	kprintf("Interrupt: %x %x\n", interrupt, errorCode);
+	//kprintf("Interrupt: %x %x\n", interrupt, errorCode);
 
-	// dirty hack
-
-	if (interrupt == 0x21)
-		inByte(0x60);
-
-	if (interrupt >= 32 && interrupt < 48)
+	if (gInterruptControlMode == INTERRUPTCONTROL_PIC)
 	{
-		outByte(0x20, 0x20);
-	}
+		io_acknowledgeInterruptPIC(interrupt);
+	}	
+
+	//if (interrupt == 0x21)
+	//	inByte(0x60);
 
 }
 

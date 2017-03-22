@@ -31,6 +31,9 @@ unsigned char gRealModeSlavePICInterruptMask = 0;
 unsigned char gProtectedModeMasterPICInterruptMask = 0;
 unsigned char gProtectedModeSlavePICInterruptMask = 0;
 
+unsigned char gCurrentMasterPICVectorOffset = PIC_MASTER_RM_VECTOR_OFFSET;
+unsigned char gCurrentSlavePICVectorOffset = PIC_SLAVE_RM_VECTOR_OFFSET;
+
 static	void	io_smallDelay();
 static  void	io_remapPICs(unsigned char masterVectorOffset, unsigned char slaveVectorOffset);
 
@@ -105,5 +108,25 @@ void	io_remapPICs(unsigned char masterVectorOffset, unsigned char slaveVectorOff
 
 	outByte(PIC_SLAVE_PORT_DATA, PIC_ICW4_8086);
 	io_smallDelay();	
+
+	gCurrentMasterPICVectorOffset = masterVectorOffset;
+	gCurrentSlavePICVectorOffset = slaveVectorOffset;
+
+}
+
+void io_acknowledgeInterruptPIC(unsigned char interrupt)
+{
+
+	if (interrupt >= gCurrentSlavePICVectorOffset &&
+	    interrupt < gCurrentSlavePICVectorOffset + 8)
+	{
+		outByte(PIC_SLAVE_PORT_CMD, 0x20);
+		outByte(PIC_MASTER_PORT_CMD, 0x20);
+	}
+	else if (interrupt >= gCurrentMasterPICVectorOffset &&
+		 interrupt < gCurrentMasterPICVectorOffset + 8)
+	{
+		outByte(PIC_MASTER_PORT_CMD, 0x20);
+	}
 
 }
