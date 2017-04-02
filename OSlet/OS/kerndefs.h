@@ -9,6 +9,7 @@
 
 #define IS_POWER_OF_TWO(x) (x & (x-1))
 
+#define COUNTOF(x) (sizeof(x) / sizeof(x[0]))
 
 // If we are unit testing the code, need special defines
 
