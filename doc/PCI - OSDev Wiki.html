@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html dir="ltr" class="client-js" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>PCI - OSDev Wiki</title>
+<meta charset="UTF-8">
+<meta name="generator" content="MediaWiki 1.18.0">
+<link rel="shortcut icon" href="http://wiki.osdev.org/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="http://wiki.osdev.org/opensearch_desc.php" title="OSDev Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="http://wiki.osdev.org/api.php?action=rsd">
+<link rel="alternate" type="application/atom+xml" title="OSDev Wiki Atom feed" href="http://wiki.osdev.org/index.php?title=Special:RecentChanges&amp;feed=atom">
+<link rel="stylesheet" href="PCI%20-%20OSDev%20Wiki_files/load.css">
+<style type="text/css" media="all">.mw-collapsible-toggle{float:right} li .mw-collapsible-toggle{float:none} .mw-collapsible-toggle-li{list-style:none}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:4250852ed2349a0d4d0fc6509a3e7d4c */
+</style><style type="text/css" media="all">.js-messagebox{margin:1em 5%;padding:0.5em 2.5%;border:1px solid #ccc;background-color:#fcfcfc;font-size:0.8em}.js-messagebox .js-messagebox-group{margin:1px;padding:0.5em 2.5%;border-bottom:1px solid #ddd}.js-messagebox .js-messagebox-group:last-child{border-bottom:thin none transparent}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:8b08bdc91c52a9ffba396dccfb5b473c */
+</style><meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="PCI%20-%20OSDev%20Wiki_files/load_002.css">
+<style>a:lang(ar),a:lang(ckb),a:lang(fa),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}a.new,#quickbar a.new{color:#ba0000}
+
+/* cache key: wikidb:resourceloader:filter:minify-css:4:c88e2bcd56513749bec09a7e29cb3ffa */
+</style>
+<script src="PCI%20-%20OSDev%20Wiki_files/load_005.php"></script><script src="PCI%20-%20OSDev%20Wiki_files/load_002.php"></script>
+<script>if(window.mw){
+	mw.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "PCI", "wgTitle": "PCI", "wgCurRevisionId": 19379, "wgArticleId": 1485, "wgIsArticle": true, "wgAction": "view", "wgUserName": null, "wgUserGroups": ["*"], "wgCategories": ["Buses"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script><script>if(window.mw){
+	mw.loader.load(["mediawiki.page.startup"]);
+}
+</script><script type="text/javascript" src="PCI%20-%20OSDev%20Wiki_files/load.php"></script>
+<style type="text/css">/*<![CDATA[*/
+.source-c {line-height: normal;}
+.source-c li, .source-c pre {
+	line-height: normal; border: 0px none white;
+}
+/**
+ * GeSHi Dynamically Generated Stylesheet
+ * --------------------------------------
+ * Dynamically generated stylesheet for c
+ * CSS class: source-c, CSS id: 
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ * --------------------------------------
+ */
+.c.source-c .de1, .c.source-c .de2 {font: normal normal 1em/1.2em monospace; margin:0; padding:0; background:none; vertical-align:top;}
+.c.source-c  {font-family:monospace;}
+.c.source-c .imp {font-weight: bold; color: red;}
+.c.source-c li, .c.source-c .li1 {font-weight: normal; vertical-align:top;}
+.c.source-c .ln {width:1px;text-align:right;margin:0;padding:0 2px;vertical-align:top;}
+.c.source-c .li2 {font-weight: bold; vertical-align:top;}
+.c.source-c .kw1 {color: #b1b100;}
+.c.source-c .kw2 {color: #000000; font-weight: bold;}
+.c.source-c .kw3 {color: #000066;}
+.c.source-c .kw4 {color: #993333;}
+.c.source-c .co1 {color: #666666; font-style: italic;}
+.c.source-c .co2 {color: #339933;}
+.c.source-c .coMULTI {color: #808080; font-style: italic;}
+.c.source-c .es0 {color: #000099; font-weight: bold;}
+.c.source-c .es1 {color: #000099; font-weight: bold;}
+.c.source-c .es2 {color: #660099; font-weight: bold;}
+.c.source-c .es3 {color: #660099; font-weight: bold;}
+.c.source-c .es4 {color: #660099; font-weight: bold;}
+.c.source-c .es5 {color: #006699; font-weight: bold;}
+.c.source-c .br0 {color: #009900;}
+.c.source-c .sy0 {color: #339933;}
+.c.source-c .st0 {color: #ff0000;}
+.c.source-c .nu0 {color: #0000dd;}
+.c.source-c .nu6 {color: #208080;}
+.c.source-c .nu8 {color: #208080;}
+.c.source-c .nu12 {color: #208080;}
+.c.source-c .nu16 {color:#800080;}
+.c.source-c .nu17 {color:#800080;}
+.c.source-c .nu18 {color:#800080;}
+.c.source-c .nu19 {color:#800080;}
+.c.source-c .me1 {color: #202020;}
+.c.source-c .me2 {color: #202020;}
+.c.source-c .ln-xtra, .c.source-c li.ln-xtra, .c.source-c div.ln-xtra {background-color: #ffc;}
+.c.source-c span.xtra { display:block; }
+
+/*]]>*/
+</style>
+<style type="text/css">/*<![CDATA[*/
+@import "/index.php?title=MediaWiki:Geshi.css&usemsgcache=yes&action=raw&ctype=text/css&smaxage=18000";
+/*]]>*/
+</style><!--[if lt IE 7]><style type="text/css">body{behavior:url("/skins/vector/csshover.min.htc")}</style><![endif]--></head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-PCI action-view skin-vector">
+		<div id="mw-page-base" class="noprint"></div>
+		<div id="mw-head-base" class="noprint"></div>
+		<!-- content -->
+		<div id="content">
+			<a id="top"></a>
+			<div id="mw-js-message" style="display:none;" class="js-messagebox"></div>
+						<!-- firstHeading -->
+			<h1 id="firstHeading" class="firstHeading">PCI</h1>
+			<!-- /firstHeading -->
+			<!-- bodyContent -->
+			<div id="bodyContent">
+								<!-- tagline -->
+				<div id="siteSub">From OSDev Wiki</div>
+				<!-- /tagline -->
+								<!-- subtitle -->
+				<div id="contentSub"></div>
+				<!-- /subtitle -->
+																<!-- jumpto -->
+				<div id="jump-to-nav">
+					Jump to: <a href="#mw-head">navigation</a>,
+					<a href="#p-search">search</a>
+				</div>
+				<!-- /jumpto -->
+								<!-- bodycontent -->
+				<div dir="ltr" class="mw-content-ltr" lang="en"><table id="toc" class="toc"><tbody><tr><td><div id="toctitle"><h2>Contents</h2><span class="toctoggle">&nbsp;[<a href="#" class="internal" id="togglelink">hide</a>]&nbsp;</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#The_PCI_Bus"><span class="tocnumber">1</span> <span class="toctext">The PCI Bus</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Configuration_Space"><span class="tocnumber">2</span> <span class="toctext">Configuration Space</span></a>
+<ul>
+<li class="toclevel-2 tocsection-3"><a href="#Configuration_Space_Access_Mechanism_.231"><span class="tocnumber">2.1</span> <span class="toctext">Configuration Space Access Mechanism #1</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="#Configuration_Space_Access_Mechanism_.232"><span class="tocnumber">2.2</span> <span class="toctext">Configuration Space Access Mechanism #2</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="#Memory_Mapped_PCI_Configuration_Space_Access"><span class="tocnumber">2.3</span> <span class="toctext">Memory Mapped PCI Configuration Space Access</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="#Detecting_Configuration_Space_Access_Mechanism.2Fs"><span class="tocnumber">2.4</span> <span class="toctext">Detecting Configuration Space Access Mechanism/s</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="#PCI_Device_Structure"><span class="tocnumber">2.5</span> <span class="toctext">PCI Device Structure</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="#Base_Address_Registers"><span class="tocnumber">2.6</span> <span class="toctext">Base Address Registers</span></a></li>
+<li class="toclevel-2 tocsection-9"><a href="#Class_Codes"><span class="tocnumber">2.7</span> <span class="toctext">Class Codes</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-10"><a href="#Enumerating_PCI_Buses"><span class="tocnumber">3</span> <span class="toctext">Enumerating PCI Buses</span></a>
+<ul>
+<li class="toclevel-2 tocsection-11"><a href="#.22Brute_Force.22_Scan"><span class="tocnumber">3.1</span> <span class="toctext">"Brute Force" Scan</span></a></li>
+<li class="toclevel-2 tocsection-12"><a href="#Recursive_Scan"><span class="tocnumber">3.2</span> <span class="toctext">Recursive Scan</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="#Recursive_Scan_With_Bus_Configuration"><span class="tocnumber">3.3</span> <span class="toctext">Recursive Scan With Bus Configuration</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-14"><a href="#IRQ_Handling"><span class="tocnumber">4</span> <span class="toctext">IRQ Handling</span></a></li>
+<li class="toclevel-1 tocsection-15"><a href="#Multifunction_Devices"><span class="tocnumber">5</span> <span class="toctext">Multifunction Devices</span></a></li>
+<li class="toclevel-1 tocsection-16"><a href="#Disclaimer"><span class="tocnumber">6</span> <span class="toctext">Disclaimer</span></a></li>
+<li class="toclevel-1 tocsection-17"><a href="#References"><span class="tocnumber">7</span> <span class="toctext">References</span></a></li>
+<li class="toclevel-1 tocsection-18"><a href="#See_Also"><span class="tocnumber">8</span> <span class="toctext">See Also</span></a>
+<ul>
+<li class="toclevel-2 tocsection-19"><a href="#External_Links"><span class="tocnumber">8.1</span> <span class="toctext">External Links</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></tbody></table>
+<h2> <span class="mw-headline" id="The_PCI_Bus">The PCI Bus</span></h2>
+<p>The PCI (<a rel="nofollow" class="external text" href="http://en.wikipedia.org/wiki/Conventional_PCI">Peripheral Component Interconnect</a>)
+ bus was defined to establish a high performance and low cost local bus 
+that would remain through several generations of products. By combining a
+ transparent upgrade path from 132 MB/s (32-bit at 33 MHz) to 528 MB/s 
+(64-bit at 66 MHz) and both 5 volt and 3.3 volt signalling environments,
+ the PCI bus meets the needs of both low end desktop systems as well as 
+that of high-end LAN servers. The PCI bus component and add-in card 
+interface is processor independent, enabling an efficient transition to 
+future processors, as well as use with multiple processor architectures.
+ The disadvantage of the PCI bus is the limited number of electrical 
+loads it can drive. A single PCI bus can drive a maximum of 10 loads. 
+(Remember when counting the number of loads on the bus, a connector 
+counts as one load and the PCI device counts as another, and sometimes 
+two.)
+</p><p><br>
+</p>
+<h2> <span class="mw-headline" id="Configuration_Space">Configuration Space</span></h2>
+<p>The PCI specification provides for totally software driven 
+initialization and configuration of each device (or target) on the PCI 
+Bus via a separate Configuration Address Space. All PCI devices, except 
+host bus bridges, are required to provide 256 bytes of configuration 
+registers for this purpose.
+</p><p>Configuration read/write cycles are used to access the 
+Configuration Space of each target device. A target is selected during a
+ configuration access when its IDSEL signal is asserted. The IDSEL acts 
+as the classic "chip select" signal. During the address phase of the 
+configuration cycle, the processor can address one of 64 32-bit 
+registers within the configuration space by placing the required 
+register number on address lines 2 through 7 (AD[7..2]) and the byte 
+enable lines.
+</p><p>PCI devices are inherently little-endian, meaning all multiple 
+byte fields have the least significant values at the lower addresses. 
+This requires a big-endian processor, such as a Power PC, to perform the
+ proper byte-swapping of data read from or written to the PCI device, 
+including any accesses to the Configuration Address Space.
+</p><p>Systems must provide a mechanism that allows access to the PCI 
+configuration space, as most CPUs do not have any such mechanism. This 
+task is usually performed by the Host to PCI Bridge (Host Bridge). Two 
+distinct mechanisms are defined to allow the software to generate the 
+required configuration accesses. Configuration mechanism #1 is the 
+preferred method, while mechanism #2 is provided for backward 
+compatibility. Only configuration mechanism #1 will be described here, 
+as it is the only access mechanism that will be used in the future.
+</p><p><br>
+</p>
+<h3> <span class="mw-headline" id="Configuration_Space_Access_Mechanism_.231">Configuration Space Access Mechanism #1</span></h3>
+<p>Two 32-bit I/O locations are used, the first location (0xCF8) is 
+named CONFIG_ADDRESS, and the second (0xCFC) is called CONFIG_DATA. 
+CONFIG_ADDRESS specifies the configuration address that is required to 
+be accesses, while accesses to CONFIG_DATA will actually generate the 
+configuration access and will transfer the data to or from the 
+CONFIG_DATA register.
+</p><p>The CONFIG_ADDRESS is a 32-bit register with the format shown in 
+following figure. Bit 31 is an enable flag for determining when accesses
+ to CONFIG_DATA should be translated to configuration cycles. Bits 23 
+through 16 allow the configuration software to choose a specific PCI bus
+ in the system. Bits 15 through 11 select the specific device on the PCI
+ Bus. Bits 10 through 8 choose a specific function in a device (if the 
+device supports multiple functions). 
+</p><p>The least significant byte selects the offset into the 256-byte 
+configuration space available through this method. Since all reads and 
+writes must be both 32-bits and aligned to work on all implementations, 
+the two lowest bits of CONFIG_ADDRESS must always be zero, with the 
+remaining six bits allowing you to choose each of the 64 32-bit words. 
+If you don't need all 32 bits, you'll have to perform the unaligned 
+access in software by aligning the address, followed by masking and 
+shifting the answer.
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> 31
+</th>
+<th> 30 - 24
+</th>
+<th> 23 - 16
+</th>
+<th> 15 - 11
+</th>
+<th> 10 - 8
+</th>
+<th> 7 - 2
+</th>
+<th> 1 - 0
+</th></tr>
+<tr>
+<td> Enable Bit
+</td>
+<td> Reserved
+</td>
+<td> Bus Number
+</td>
+<td> Device Number
+</td>
+<td> Function Number
+</td>
+<td> Register Number
+</td>
+<td> 00
+</td></tr></tbody></table>
+<p>The following code segment illustrates the use of configuration 
+mechanism #1 to read 16-bit fields from configuration space. Note that 
+this segment, the functions sysOutLong and sysInLong are assembly 
+language functions that make use of the OUTL and INL Pentium assembly 
+language instructions. 
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"> <span class="kw4">uint16_t</span> pciConfigReadWord <span class="br0">(</span><span class="kw4">uint8_t</span> bus<span class="sy0">,</span> <span class="kw4">uint8_t</span> slot<span class="sy0">,</span>
+                             <span class="kw4">uint8_t</span> func<span class="sy0">,</span> <span class="kw4">uint8_t</span> offset<span class="br0">)</span>
+ <span class="br0">{</span>
+    <span class="kw4">uint32_t</span> address<span class="sy0">;</span>
+    <span class="kw4">uint32_t</span> lbus  <span class="sy0">=</span> <span class="br0">(</span><span class="kw4">uint32_t</span><span class="br0">)</span>bus<span class="sy0">;</span>
+    <span class="kw4">uint32_t</span> lslot <span class="sy0">=</span> <span class="br0">(</span><span class="kw4">uint32_t</span><span class="br0">)</span>slot<span class="sy0">;</span>
+    <span class="kw4">uint32_t</span> lfunc <span class="sy0">=</span> <span class="br0">(</span><span class="kw4">uint32_t</span><span class="br0">)</span>func<span class="sy0">;</span>
+    <span class="kw4">uint16_t</span> tmp <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+&nbsp;
+    <span class="coMULTI">/* create configuration address as per Figure 1 */</span>
+    address <span class="sy0">=</span> <span class="br0">(</span><span class="kw4">uint32_t</span><span class="br0">)</span><span class="br0">(</span><span class="br0">(</span>lbus <span class="sy0">&lt;&lt;</span> <span class="nu0">16</span><span class="br0">)</span> <span class="sy0">|</span> <span class="br0">(</span>lslot <span class="sy0">&lt;&lt;</span> <span class="nu0">11</span><span class="br0">)</span> <span class="sy0">|</span>
+              <span class="br0">(</span>lfunc <span class="sy0">&lt;&lt;</span> <span class="nu0">8</span><span class="br0">)</span> <span class="sy0">|</span> <span class="br0">(</span>offset <span class="sy0">&amp;</span> <span class="nu12">0xfc</span><span class="br0">)</span> <span class="sy0">|</span> <span class="br0">(</span><span class="br0">(</span><span class="kw4">uint32_t</span><span class="br0">)</span><span class="nu12">0x80000000</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="coMULTI">/* write out the address */</span>
+    sysOutLong <span class="br0">(</span><span class="nu12">0xCF8</span><span class="sy0">,</span> address<span class="br0">)</span><span class="sy0">;</span>
+    <span class="coMULTI">/* read in the data */</span>
+    <span class="coMULTI">/* (offset &amp; 2) * 8) = 0 will choose the first word of the 32 bits register */</span>
+    tmp <span class="sy0">=</span> <span class="br0">(</span><span class="kw4">uint16_t</span><span class="br0">)</span><span class="br0">(</span><span class="br0">(</span>sysInLong <span class="br0">(</span><span class="nu12">0xCFC</span><span class="br0">)</span> <span class="sy0">&gt;&gt;</span> <span class="br0">(</span><span class="br0">(</span>offset <span class="sy0">&amp;</span> <span class="nu0">2</span><span class="br0">)</span> <span class="sy0">*</span> <span class="nu0">8</span><span class="br0">)</span><span class="br0">)</span> <span class="sy0">&amp;</span> <span class="nu12">0xffff</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw1">return</span> <span class="br0">(</span>tmp<span class="br0">)</span><span class="sy0">;</span>
+ <span class="br0">}</span></pre></div></div>
+<p>When a configuration access attempts to select a device that does not
+ exist, the host bridge will complete the access without error, dropping
+ all data on writes and returning all ones on reads. The following code 
+segment illustrates the read of a non-existent device.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"> <span class="kw4">uint16_t</span> pciCheckVendor<span class="br0">(</span><span class="kw4">uint8_t</span> bus<span class="sy0">,</span> <span class="kw4">uint8_t</span> slot<span class="br0">)</span>
+ <span class="br0">{</span>
+    <span class="kw4">uint16_t</span> vendor<span class="sy0">,</span> device<span class="sy0">;</span>
+    <span class="coMULTI">/* try and read the first configuration register. Since there are no */</span>
+    <span class="coMULTI">/* vendors that == 0xFFFF, it must be a non-existent device. */</span>
+    <span class="kw1">if</span> <span class="br0">(</span><span class="br0">(</span>vendor <span class="sy0">=</span> pciConfigReadWord<span class="br0">(</span>bus<span class="sy0">,</span>slot<span class="sy0">,</span><span class="nu0">0</span><span class="sy0">,</span><span class="nu0">0</span><span class="br0">)</span><span class="br0">)</span> <span class="sy0">!=</span> <span class="nu12">0xFFFF</span><span class="br0">)</span> <span class="br0">{</span>
+       device <span class="sy0">=</span> pciConfigReadWord<span class="br0">(</span>bus<span class="sy0">,</span>slot<span class="sy0">,</span><span class="nu0">0</span><span class="sy0">,</span><span class="nu0">2</span><span class="br0">)</span><span class="sy0">;</span>
+       . . .
+    <span class="br0">}</span> <span class="kw1">return</span> <span class="br0">(</span>vendor<span class="br0">)</span><span class="sy0">;</span>
+ <span class="br0">}</span></pre></div></div>
+<p><br>
+</p>
+<h3> <span class="mw-headline" id="Configuration_Space_Access_Mechanism_.232">Configuration Space Access Mechanism #2</span></h3>
+<p>This configuration space access mechanism was deprecated in PCI 
+version 2.0. This means it's only likely to exist on hardware from 
+around 1992 (when PCI 1.0 was introduced) to 1993 (when PCI 2.0 was 
+introduced), which limits it to 80486 and early Pentium motherboards.
+</p><p>For access mechanism #2, the IO port at 0x0CF8 is an 8-bit port 
+and is used to enable/disable the access mechanism and set the function 
+number. It has the following format:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> 7 - 4
+</th>
+<th> 3 - 1
+</th>
+<th> 0
+</th></tr>
+<tr>
+<td> Key (0 = access mechanism disabled, non-zero = access mechanism enabled)
+</td>
+<td> Function number
+</td>
+<td> Special cycle enabled if set
+</td></tr></tbody></table>
+<p>The IO port at 0x0CFA (the "Forwarding Register") is also an 8-bit 
+port, and is used to set the bus number for subsequent PCI configuration
+ space accesses.
+</p><p>Once the access mechanism has been enabled; accesses to IO ports 
+0xC000 to 0xCFFF are used to access PCI configuration space. The IO port
+ number has the following format:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> 15 - 12
+</th>
+<th> 11 - 8
+</th>
+<th> 7 - 2
+</th>
+<th> 1 - 0
+</th></tr>
+<tr>
+<td> Must be 1100b
+</td>
+<td> Device number
+</td>
+<td> Register index
+</td>
+<td> Must be zero
+</td></tr></tbody></table>
+<p>Note that this limits the system to 16 devices per PCI bus.
+</p><p><br>
+</p>
+<h3> <span class="mw-headline" id="Memory_Mapped_PCI_Configuration_Space_Access">Memory Mapped PCI Configuration Space Access</span></h3>
+<p>PCI Express introduced a new way to access PCI configuration space, 
+where it's simply memory mapped and no IO ports are used. This access 
+mechanism is described in <a href="http://wiki.osdev.org/PCI_Express" title="PCI Express">PCI Express</a>.
+</p><p>Note that systems that do provide the memory mapped access 
+mechanism are also required to support PCI access mechanism #1 for 
+backward compatibility.
+</p><p><br>
+</p>
+<h3> <span class="mw-headline" id="Detecting_Configuration_Space_Access_Mechanism.2Fs">Detecting Configuration Space Access Mechanism/s</span></h3>
+<p>In general there are 4 cases:
+</p>
+<ul><li> computer doesn't support PCI (either the computer is too old, 
+or your OS is being run at some time in the future after PCI has been 
+superseded)
+</li><li> computer supports mechanism #2
+</li><li> computer supports mechanism #1 but doesn't support the memory mapped access mechanism
+</li><li> computer supports both mechanism #1 and the memory mapped access mechanism
+</li></ul>
+<p>For BIOS systems, "int 0x1A, BX=0xB101 (PCI BIOS presence check)" 
+will tell you if the system uses mechanism #1 or mechanism #2. If this 
+function doesn't exist you can't be sure if the computer supports PCI or
+ not. If it says mechanism #1 is supported you won't know if the memory 
+mapped access mechanism is also supported or not.
+</p><p>For UEFI systems, it's extremely safe to assume that mechanism #2
+ is not supported; and you can test to see if the computer supports PCI 
+or not by checking to see if the "PCI bus support" protocol exists. If 
+PCI is supported, there's no easy way to determine if (e.g.) the 
+computer supports mechanism #1 or not.
+</p><p>For both BIOS and UEFI systems, you can check the ACPI tables to determine if the memory mapped access mechanism is supported.
+</p><p>This leaves a few cases uncovered (e.g. where you don't know if 
+whether mechanism #1 or #2 are supported despite trying all of the 
+above). For these cases the only option left is manual probing. This 
+means 2 specific tests - whether mechanism #1 is supported, and if not 
+whether mechanism #2 is supported. Please note that manual probing has 
+risks; in that if there is no PCI (e.g. the system only has ISA) the IO 
+port accesses might cause undefined behaviour (especially on systems 
+where the ISA bus ignores highest 6 bits of the IO port address, where 
+accessing IO port 0x0CF8 is the same as accessing IO port 0x00F8).
+</p><p><br>
+</p>
+<h3> <span class="mw-headline" id="PCI_Device_Structure"> PCI Device Structure </span></h3>
+<p>The PCI Specification defines the organization of the 256-byte 
+Configuration Space registers and imposes a specific template for the 
+space. Figures 2 &amp; 3 show the layout of the 256-byte Configuration 
+space. All PCI compliant devices must support the Vendor ID, Device ID, 
+Command and Status, Revision ID, Class Code and Header Type fields. 
+Implementation of the other registers is optional, depending upon the 
+devices functionality.
+</p><p><br>
+The following field descriptions are common to all Header Types:
+</p>
+<ul><li> <b>Device ID:</b> Identifies the particular device. Where valid IDs are allocated by the vendor.
+</li><li> <b>Vendor ID:</b> Identifies the manufacturer of the device. Where valid IDs are allocated by PCI-SIG (the list is <a rel="nofollow" class="external text" href="https://pcisig.com/membership/member-companies">here</a>)
+ to ensure uniqueness and 0xFFFF is an invalid value that will be 
+returned on read accesses to Configuration Space registers of 
+non-existent devices.
+</li><li> <b>Status:</b> A register used to record status information for PCI bus related events.
+</li><li> <b>Command:</b> Provides control over a device's ability to 
+generate and respond to PCI cycles. Where the only functionality 
+guaranteed to be supported by all devices is, when a 0 is written to 
+this register, the device is disconnected from the PCI bus for all 
+accesses except Configuration Space access.
+</li><li> <b>Class Code:</b> A read-only register that specifies the type of function the device performs.
+</li><li> <b>Subclass:</b> A read-only register that specifies the specific function the device performs.
+</li><li> <b>Prog IF:</b> A read-only register that specifies a register-level programming interface the device has, if it has any at all.
+</li><li> <b>Revision ID:</b> Specifies a revision identifier for a particular device. Where valid IDs are allocated by the vendor.
+</li><li> <b>BIST:</b> Represents that status and allows control of a devices BIST (built-in self test).
+</li><li> <b>Header Type:</b> Identifies the layout of the rest of the 
+header beginning at byte 0x10 of the header and also specifies whether 
+or not the device has multiple functions. Where a value of 0x00 
+specifies a general device, a value of 0x01 specifies a PCI-to-PCI 
+bridge, and a value of 0x02 specifies a CardBus bridge. If bit 7 of this
+ register is set, the device has multiple functions; otherwise, it is a 
+single function device.
+</li><li> <b>Latency Timer:</b> Specifies the latency timer in units of PCI bus clocks.
+</li><li> <b>Cache Line Size:</b> Specifies the system cache line size 
+in 32-bit units. A device can limit the number of cacheline sizes it can
+ support, if a unsupported value is written to this field, the device 
+will behave as if a value of 0 was written.
+</li></ul>
+<p>This table is applicable if the Header Type is 00h. (Figure 2)
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> register (offset) </th>
+<th> bits 31-24 </th>
+<th> bits 23-16 </th>
+<th> bits 15-8 </th>
+<th> bits 7-0
+</th></tr>
+<tr>
+<th> 00
+</th>
+<td colspan="2"> Device ID
+</td>
+<td colspan="2"> Vendor ID
+</td></tr>
+<tr>
+<th> 04
+</th>
+<td colspan="2"> Status
+</td>
+<td colspan="2"> Command
+</td></tr>
+<tr>
+<th> 08
+</th>
+<td> Class code </td>
+<td> Subclass </td>
+<td> Prog IF </td>
+<td> Revision ID
+</td></tr>
+<tr>
+<th> 0C
+</th>
+<td> BIST
+</td>
+<td> Header type
+</td>
+<td> Latency Timer
+</td>
+<td> Cache Line Size
+</td></tr>
+<tr>
+<th> 10
+</th>
+<td colspan="4"> Base address #0 (BAR0)
+</td></tr>
+<tr>
+<th> 14
+</th>
+<td colspan="4"> Base address #1 (BAR1)
+</td></tr>
+<tr>
+<th> 18
+</th>
+<td colspan="4"> Base address #2 (BAR2)
+</td></tr>
+<tr>
+<th> 1C
+</th>
+<td colspan="4"> Base address #3 (BAR3)
+</td></tr>
+<tr>
+<th> 20
+</th>
+<td colspan="4"> Base address #4 (BAR4)
+</td></tr>
+<tr>
+<th> 24
+</th>
+<td colspan="4"> Base address #5 (BAR5)
+</td></tr>
+<tr>
+<th> 28
+</th>
+<td colspan="4"> Cardbus CIS Pointer
+</td></tr>
+<tr>
+<th> 2C
+</th>
+<td colspan="2"> Subsystem ID
+</td>
+<td colspan="2"> Subsystem Vendor ID
+</td></tr>
+<tr>
+<th> 30
+</th>
+<td colspan="4"> Expansion ROM base address
+</td></tr>
+<tr>
+<th> 34
+</th>
+<td colspan="3"> Reserved
+</td>
+<td> Capabilities Pointer
+</td></tr>
+<tr>
+<th> 38
+</th>
+<td colspan="4"> Reserved
+</td></tr>
+<tr>
+<th> 3C
+</th>
+<td> Max latency </td>
+<td> Min Grant </td>
+<td> Interrupt PIN </td>
+<td> Interrupt Line
+</td></tr></tbody></table>
+<p>The following field descriptions apply if the Header Type is 0x00:
+</p>
+<ul><li> <b>CardBus CIS Pointer:</b> Points to the Card Information Structure and is used by devices that share silicon between CardBus and PCI.
+</li></ul>
+<ul><li> <b>Interrupt Line:</b> Specifies which input of the system 
+interrupt controllers the device's interrupt pin is connected to and is 
+implemented by any device that makes use of an interrupt pin. For the 
+x86 architecture this register corresponds to the PIC IRQ numbers 0-15 
+(and not I/O APIC IRQ numbers) and a value of 0xFF defines no 
+connection.
+</li></ul>
+<ul><li> <b>Interrupt Pin:</b> Specifies which interrupt pin the device 
+uses. Where a value of 0x01 is INTA#, 0x02 is INTB#, 0x03 is INTC#, 0x04
+ is INTD#, and 0x00 means the device does not use an interrupt pin.
+</li></ul>
+<ul><li> <b>Max Latency:</b> A read-only register that specifies how often the device needs access to the PCI bus (in 1/4 microsecond units).
+</li></ul>
+<ul><li> <b>Min Grant:</b> A read-only register that specifies the burst
+ period length, in 1/4 microsecond units, that the device needs 
+(assuming a 33 MHz clock rate).
+</li></ul>
+<ul><li> <b>Capabilities Pointer:</b> Points to a linked list of new 
+capabilities implemented by the device. Used if bit 4 of the status 
+register (Capabilities List bit) is set to 1. The bottom two bits are 
+reserved and should be masked before the Pointer is used to access the 
+Configuration Space.
+</li></ul>
+<p><br>
+This table is applicable if the Header Type is 01h (PCI-to-PCI bridge) (Figure 3)
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> register (offset) </th>
+<th> bits 31-24 </th>
+<th> bits 23-16 </th>
+<th> bits 15-8 </th>
+<th> bits 7-0
+</th></tr>
+<tr>
+<th> 00
+</th>
+<td colspan="2"> Device ID
+</td>
+<td colspan="2"> Vendor ID
+</td></tr>
+<tr>
+<th> 04
+</th>
+<td colspan="2"> Status
+</td>
+<td colspan="2"> Command
+</td></tr>
+<tr>
+<th> 08
+</th>
+<td> Class code </td>
+<td> Subclass </td>
+<td> Prog IF </td>
+<td> Revision ID
+</td></tr>
+<tr>
+<th> 0C
+</th>
+<td> BIST
+</td>
+<td> Header type
+</td>
+<td> Latency Timer
+</td>
+<td> Cache Line Size
+</td></tr>
+<tr>
+<th> 10
+</th>
+<td colspan="4"> Base address #0 (BAR0)
+</td></tr>
+<tr>
+<th> 14
+</th>
+<td colspan="4"> Base address #1 (BAR1)
+</td></tr>
+<tr>
+<th> 18
+</th>
+<td> Secondary Latency Timer
+</td>
+<td> Subordinate Bus Number
+</td>
+<td> Secondary Bus Number
+</td>
+<td> Primary Bus Number
+</td></tr>
+<tr>
+<th> 1C
+</th>
+<td colspan="2"> Secondary Status
+</td>
+<td> I/O Limit
+</td>
+<td> I/O Base
+</td></tr>
+<tr>
+<th> 20
+</th>
+<td colspan="2"> Memory Limit
+</td>
+<td colspan="2"> Memory Base
+</td></tr>
+<tr>
+<th> 24
+</th>
+<td colspan="2"> Prefetchable Memory Limit
+</td>
+<td colspan="2"> Prefetchable Memory Base
+</td></tr>
+<tr>
+<th> 28
+</th>
+<td colspan="4"> Prefetchable Base Upper 32 Bits
+</td></tr>
+<tr>
+<th> 2C
+</th>
+<td colspan="4"> Prefetchable Limit Upper 32 Bits
+</td></tr>
+<tr>
+<th> 30
+</th>
+<td colspan="2"> I/O Limit Upper 16 Bits
+</td>
+<td colspan="2"> I/O Base Upper 16 Bits
+</td></tr>
+<tr>
+<th> 34
+</th>
+<td colspan="3"> Reserved
+</td>
+<td> Capability Pointer
+</td></tr>
+<tr>
+<th> 38
+</th>
+<td colspan="4"> Expansion ROM base address
+</td></tr>
+<tr>
+<th> 3C
+</th>
+<td colspan="2"> Bridge Control </td>
+<td> Interrupt PIN </td>
+<td> Interrupt Line
+</td></tr></tbody></table>
+<p><br>
+Here is the layout of the Header Type register:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> Bit 7 </th>
+<th> Bits 6 to 0
+</th></tr>
+<tr>
+<th> MF
+</th>
+<td> Header Type
+</td></tr></tbody></table>
+<p><b>MF</b> - If MF = 1 Then this device has multiple functions.
+</p><p><b>Header Type</b> - 00h Standard Header - 01h PCI-to-PCI Bridge - 02h CardBus Bridge
+</p><p><br>
+Here is the layout of the BIST register:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> Bit 7 </th>
+<th> Bit 6 </th>
+<th> Bits 4 and 5 </th>
+<th> Bits 0 to 3
+</th></tr>
+<tr>
+<td> BIST Capable </td>
+<td> Start BIST </td>
+<td> Reserved </td>
+<td> Completion Code
+</td></tr></tbody></table>
+<p><b>BIST Capable</b> - Will return 1 the device supports BIST.
+</p><p><b>Start BIST</b> - When set to 1 the BIST is invoked. This bit 
+is reset when BIST completes. If BIST does not complete after 2 seconds 
+the device should be failed by system software.
+</p><p><b>Completion Code</b> - Will return 0, after BIST execution, if the test completed successfully.
+</p><p>This table is applicable if the Header Type is 02h (PCI-to-CardBus bridge)
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> register (offset) </th>
+<th> bits 31-24 </th>
+<th> bits 23-16 </th>
+<th> bits 15-8 </th>
+<th> bits 7-0
+</th></tr>
+<tr>
+<th> 00
+</th>
+<td colspan="2"> Device ID
+</td>
+<td colspan="2"> Vendor ID
+</td></tr>
+<tr>
+<th> 04
+</th>
+<td colspan="2"> Status
+</td>
+<td colspan="2"> Command
+</td></tr>
+<tr>
+<th> 08
+</th>
+<td> Class code </td>
+<td> Subclass </td>
+<td> Prog IF </td>
+<td> Revision ID
+</td></tr>
+<tr>
+<th> 0C
+</th>
+<td> BIST
+</td>
+<td> Header type
+</td>
+<td> Latency Timer
+</td>
+<td> Cache Line Size
+</td></tr>
+<tr>
+<th> 10
+</th>
+<td colspan="4"> CardBus Socket/ExCa base address
+</td></tr>
+<tr>
+<th> 14
+</th>
+<td colspan="2"> Secondary status
+</td>
+<td> Reserved
+</td>
+<td> Offset of capabilities list
+</td></tr>
+<tr>
+<th> 18
+</th>
+<td> CardBus latency timer
+</td>
+<td> Subordinate bus number
+</td>
+<td> CardBus bus number
+</td>
+<td> PCI bus number
+</td></tr>
+<tr>
+<th> 1C
+</th>
+<td colspan="4"> Memory Base Address 0
+</td></tr>
+<tr>
+<th> 20
+</th>
+<td colspan="4"> Memory Limit 0
+</td></tr>
+<tr>
+<th> 24
+</th>
+<td colspan="4"> Memory Base Address 1
+</td></tr>
+<tr>
+<th> 28
+</th>
+<td colspan="4"> Memory Limit 1
+</td></tr>
+<tr>
+<th> 2C
+</th>
+<td colspan="4"> I/O Base Address 0
+</td></tr>
+<tr>
+<th> 30
+</th>
+<td colspan="4"> I/O Limit 0
+</td></tr>
+<tr>
+<th> 34
+</th>
+<td colspan="4"> I/O Base Address 1
+</td></tr>
+<tr>
+<th> 38
+</th>
+<td colspan="4"> I/O Limit 1
+</td></tr>
+<tr>
+<th> 3C
+</th>
+<td colspan="2"> Bridge Control
+</td>
+<td> Interrupt PIN
+</td>
+<td> Interrupt Line
+</td></tr>
+<tr>
+<th> 40
+</th>
+<td colspan="2"> Subsystem Vendor ID
+</td>
+<td colspan="2"> Subsystem Device ID
+</td></tr>
+<tr>
+<th> 44
+</th>
+<td colspan="4"> 16-bit PC Card legacy mode base address
+</td></tr></tbody></table>
+<p>Here is the layout of the Command register:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> Bits 11 to 15 </th>
+<th> Bit 10 </th>
+<th> Bit 9 </th>
+<th> Bit 8 </th>
+<th> Bit 7 </th>
+<th> Bit 6 </th>
+<th> Bit 5 </th>
+<th> Bit 4 </th>
+<th> Bit 3 </th>
+<th> Bit 2 </th>
+<th> Bit 1 </th>
+<th> Bit 0
+</th></tr>
+<tr>
+<td> Reserved
+</td>
+<td> Interupt Disable
+</td>
+<td> Fast Back-to-Back Enable
+</td>
+<td> SERR# Enable
+</td>
+<td> Reserved
+</td>
+<td> Parity Error Response
+</td>
+<td> VGA Palette Snoop
+</td>
+<td> Memory Write and Invalidate Enable
+</td>
+<td> Special Cycles
+</td>
+<td> Bus Master
+</td>
+<td> Memory Space
+</td>
+<td> I/O Space
+</td></tr></tbody></table>
+<p><b>Interrupt Disable</b> - If set to 1 the assertion of the devices INTx# signal is disabled; otherwise, assertion of the signal is enabled.
+</p><p><b>Fast Back-Back Enable</b> - If set to 1 indicates a device is 
+allowed to generate fast back-to-back transactions; otherwise, fast 
+back-to-back transactions are only allowed to the same agent.
+</p><p><b>SERR# Enable</b> - If set to 1 the SERR# driver is enabled; otherwise, the driver is disabled.
+</p><p><b>Bit 7</b> - As of revision 3.0 of the PCI local bus 
+specification this bit is hardwired to 0. In earlier versions of the 
+specification this bit was used by devices and may have been hardwired 
+to 0, 1, or implemented as a read/write bit.
+</p><p><b>Parity Error Response</b> - If set to 1 the device will take 
+its normal action when a parity error is detected; otherwise, when an 
+error is detected, the device will set bit 15 of the Status register 
+(Detected Parity Error Status Bit), but will not assert the PERR# 
+(Parity Error) pin and will continue operation as normal.
+</p><p><b>VGA Palette Snoop</b> - If set to 1 the device does not 
+respond to palette register writes and will snoop the data; otherwise, 
+the device will trate palette write accesses like all other accesses.
+</p><p><b>Memory Write and Invalidate Enable</b> - If set to 1 the 
+device can generate the Memory Write and Invalidate command; otherwise, 
+the Memory Write command must be used.
+</p><p><b>Special Cycles</b> - If set to 1 the device can monitor Special Cycle operations; otherwise, the device will ignore them.
+</p><p><b>Bus Master</b> - If set to 1 the device can behave as a bus master; otherwise, the device can not generate PCI accesses.
+</p><p><b>Memory Space</b> - If set to 1 the device can respond to Memory Space accesses; otherwise, the device's response is disabled.
+</p><p><b>I/O Space</b> - If set to 1 the device can respond to I/O Space accesses; otherwise, the device's response is disabled.
+</p><p><br>
+Here is the layout of the Status register:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> Bit 15 </th>
+<th> Bit 14 </th>
+<th> Bit 13 </th>
+<th> Bit 12 </th>
+<th> Bit 11 </th>
+<th> Bits 9 and 10 </th>
+<th> Bit 8 </th>
+<th> Bit 7 </th>
+<th> Bit 6 </th>
+<th> Bit 5 </th>
+<th> Bit 4 </th>
+<th> Bit 3 </th>
+<th> Bits 0 to 2
+</th></tr>
+<tr>
+<td> Detected Parity Error
+</td>
+<td> Signaled System Error
+</td>
+<td> Received Master Abort
+</td>
+<td> Received Target Abort
+</td>
+<td> Signaled Target Abort
+</td>
+<td> DEVSEL Timing
+</td>
+<td> Master Data Parity Error
+</td>
+<td> Fast Back-to-Back Capable
+</td>
+<td> Reserved
+</td>
+<td> 66 MHz Capable
+</td>
+<td> Capabilities List
+</td>
+<td> Interrupt Status
+</td>
+<td> Reserved
+</td></tr></tbody></table>
+<p><b>Detected Parity Error</b> - This bit will be set to 1 whenever the device detects a parity error, even if parity error handling is disabled.
+</p><p><b>Signalled System Error</b> - This bit will be set to 1 whenever the device asserts SERR#.
+</p><p><b>Received Master Abort</b> - This bit will be set to 1, by a 
+master device, whenever its transaction (except for Special Cycle 
+transactions) is terminated with Master-Abort.
+</p><p><b>Received Target Abort</b> - This bit will be set to 1, by a master device, whenever its transaction is terminated with Target-Abort.
+</p><p><b>Signalled Target Abort</b> - This bit will be set to 1 whenever a target device terminates a transaction with Target-Abort.
+</p><p><b>DEVSEL Timing</b> - Read only bits that represent the slowest 
+time that a device will assert DEVSEL# for any bus command except 
+Configuration Space read and writes. Where a value of 0x00 represents 
+fast timing, a value of 0x01 represents medium timing, and a value of 
+0x02 represents slow timing.
+</p><p><b>Master Data Parity Error</b> - This bit is only set when the 
+following conditions are met. The bus agent asserted PERR# on a read or 
+observed an assertion of PERR# on a write, the agent setting the bit 
+acted as the bus master for the operation in which the error occurred, 
+and bit 6 of the Command register (Parity Error Response bit) is set to 
+1.
+</p><p><b>Fast Back-to-Back Capable</b> - If set to 1 the device can 
+accept fast back-to-back transactions that are not from the same agent; 
+otherwise, transactions can only be accepted from the same agent.
+</p><p><b>Bit 6</b> - As of revision 3.0 of the PCI local bus 
+specification this bit is reserved. In revision 2.1 of the specification
+ this bit was used to indicate whether or not a device supported User 
+Definable Features.
+</p><p><b>66 MHz Capable</b> - If set to 1 the device is capable of running at 66 MHz; otherwise, the device runs at 33 MHz.
+</p><p><b>Capabilities List</b> - If set to 1 the device implements the 
+pointer for a New Capabilities Linked list at offset 0x34; otherwise, 
+the linked list is not available.
+</p><p><b>Interrupt Status</b> - Represents the state of the device's 
+INTx# signal. If set to 1 and bit 10 of the Command register (Interrupt 
+Disable bit) is set to 0 the signal will be asserted; otherwise, the 
+signal will be ignored.
+</p><p><br>
+Recall that the PCI devices follow little ENDIAN ordering. The lower 
+addresses contain the least significant portions of the field. Software 
+to manipulate this structure must take particular care that the 
+endian-ordering follows the PCI devices, not the CPUs.
+</p>
+<h3> <span class="mw-headline" id="Base_Address_Registers"> Base Address Registers </span></h3>
+<p>Base address Registers (or BARs) can be used to hold memory addresses
+ used by the device, or offsets for port addresses. Typically, memory 
+address BARs need to be located in physical ram while I/O space BARs can
+ reside at any memory address (even beyond physical memory). To 
+distinguish between them, you can check the value of the lowest bit. The
+ following tables describe the two types of BARs:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+<caption>Memory Space BAR Layout
+</caption>
+<tbody><tr>
+<th> 31 - 4
+</th>
+<th> 3
+</th>
+<th> 2 - 1
+</th>
+<th> 0
+</th></tr>
+<tr>
+<td> 16-Byte Aligned Base Address
+</td>
+<td> Prefetchable
+</td>
+<td> Type
+</td>
+<td> Always 0
+</td></tr></tbody></table>
+<p><br>
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+<caption>I/O Space BAR Layout
+</caption>
+<tbody><tr>
+<th>31 - 2
+</th>
+<th>1
+</th>
+<th>0
+</th></tr>
+<tr>
+<td> 4-Byte Aligned Base Address
+</td>
+<td> Reserved
+</td>
+<td> Always 1
+</td></tr></tbody></table>
+<p><br>
+The Type field of the Memory Space BAR Layout specifies the size of the 
+base register and where in memory it can be mapped. If it has a value of
+ 0x00 then the base register is 32-bits wide and can be mapped anywhere 
+in the 32-bit Memory Space. A value of 0x02 means the base register is 
+64-bits wide and can be mapped anywhere in the 64-bit Memory Space (A 
+64-bit base address register consumes 2 of the base address registers 
+available). A value of 0x01 is reserved as of revision 3.0 of the PCI 
+Local Bus Specification. In earlier versions it was used to support 
+memory space below 1MB (16-bit wide base register that can be mapped 
+anywhere in the 16-bit Memory Space).
+</p><p>When you want to retrieve the actual base address of a BAR, be 
+sure to mask the lower bits. For 16-Bit Memory Space BARs, you calculate
+ (BAR[x] &amp; 0xFFF0). For 32-Bit Memory Space BARs, you calculate 
+(BAR[x] &amp; 0xFFFFFFF0). For 64-Bit Memory Space BARs, you calculate 
+((BAR[x] &amp; 0xFFFFFFF0) + ((BAR[x+1] &amp; 0xFFFFFFFF) &lt;&lt; 32)) 
+For I/O Space BARs, you calculate (BAR[x] &amp; 0xFFFFFFFC).
+</p><p>To determine the amount of address space needed by a PCI device, 
+you must save the original value of the BAR, write a value of all 1's to
+ the register, then read it back. The amount of memory can then be 
+determined by masking the information bits, performing a bitwise NOT 
+('~' in C), and incrementing the value by 1. The original value of the 
+BAR should then be restored. The BAR register is naturally aligned and 
+as such you can only modify the bits that are set. For example, if a 
+device utilizes 16 MB it will have BAR0 filled with 0xFF000000 
+(0x01000000 after decoding) and you can only modify the upper 8-bits. <a rel="nofollow" class="external autonumber" href="http://www.pcisig.com/reflector/msg05233.html">[1]</a>
+</p>
+<h3> <span class="mw-headline" id="Class_Codes"> Class Codes </span></h3>
+<p>The Class Code, Subclass, and Prog IF registers are used to identify 
+the device's type, the device's function, and the device's 
+register-level programming interface, respectively.
+</p><p>The following table represents the possible device types:
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> Class Code </th>
+<th> Description
+</th></tr>
+<tr>
+<td> 0x00 </td>
+<td> Device was built prior definition of the class code field
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> Mass Storage Controller
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> Network Controller
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> Display Controller
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> Multimedia Controller
+</td></tr>
+<tr>
+<td> 0x05 </td>
+<td> Memory Controller
+</td></tr>
+<tr>
+<td> 0x06 </td>
+<td> Bridge Device
+</td></tr>
+<tr>
+<td> 0x07 </td>
+<td> Simple Communication Controllers
+</td></tr>
+<tr>
+<td> 0x08 </td>
+<td> Base System Peripherals
+</td></tr>
+<tr>
+<td> 0x09 </td>
+<td> Input Devices
+</td></tr>
+<tr>
+<td> 0x0A </td>
+<td> Docking Stations
+</td></tr>
+<tr>
+<td> 0x0B </td>
+<td> Processors
+</td></tr>
+<tr>
+<td> 0x0C </td>
+<td> Serial Bus Controllers
+</td></tr>
+<tr>
+<td> 0x0D </td>
+<td> Wireless Controllers
+</td></tr>
+<tr>
+<td> 0x0E </td>
+<td> Intelligent I/O Controllers
+</td></tr>
+<tr>
+<td> 0x0F </td>
+<td> Satellite Communication Controllers
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> Encryption/Decryption Controllers
+</td></tr>
+<tr>
+<td> 0x11 </td>
+<td> Data Acquisition and Signal Processing Controllers
+</td></tr>
+<tr>
+<td> 0x12 - 0xFE </td>
+<td> Reserved
+</td></tr>
+<tr>
+<td> 0xFF </td>
+<td> Device does not fit any defined class.
+</td></tr></tbody></table>
+<p><br>
+The following table represents the possible device functions
+</p>
+<table style="margin-top:1em; margin-bottom:1em; background:#f9f9f9; border:1px #aaa solid; border-collapse:collapse; {{{1}}}" border="2" cellspacing="0" cellpadding="4">
+
+<tbody><tr>
+<th> Class Code </th>
+<th> Subclass </th>
+<th> Prog IF </th>
+<th> Description
+</th></tr>
+<tr>
+<td rowspan="2"> 0x00
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> Any device except for VGA-Compatible devices
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> VGA-Compatible Device
+</td></tr>
+<tr>
+<td rowspan="11"> 0x01
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> SCSI Bus Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x-- </td>
+<td> IDE Controller
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> Floppy Disk Controller
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> 0x00 </td>
+<td> IPI Bus Controller
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> 0x00 </td>
+<td> RAID Controller
+</td></tr>
+<tr>
+<td rowspan="2"> 0x05
+</td>
+<td> 0x20 </td>
+<td> ATA Controller (Single DMA)
+</td></tr>
+<tr>
+<td> 0x30 </td>
+<td> ATA Controller (Chained DMA)
+</td></tr>
+<tr>
+<td rowspan="2"> 0x06
+</td>
+<td> 0x00 </td>
+<td> Serial ATA (Vendor Specific Interface)
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> Serial ATA (AHCI 1.0)
+</td></tr>
+<tr>
+<td> 0x07 </td>
+<td> 0x00 </td>
+<td> Serial Attached SCSI (SAS)
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Mass Storage Controller
+</td></tr>
+<tr>
+<td rowspan="8"> 0x02
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> Ethernet Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> Token Ring Controller
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> FDDI Controller
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> 0x00 </td>
+<td> ATM Controller
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> 0x00 </td>
+<td> ISDN Controller
+</td></tr>
+<tr>
+<td> 0x05 </td>
+<td> 0x00 </td>
+<td> WorldFip Controller
+</td></tr>
+<tr>
+<td> 0x06 </td>
+<td> 0x-- </td>
+<td> PICMG 2.14 Multi Computing
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Network Controller
+</td></tr>
+<tr>
+<td rowspan="5"> 0x03
+</td>
+<td rowspan="2"> 0x00
+</td>
+<td> 0x00 </td>
+<td> VGA-Compatible Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 8512-Compatible Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> XGA Controller
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> 3D Controller (Not VGA-Compatible)
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Display Controller
+</td></tr>
+<tr>
+<td rowspan="4"> 0x04
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> Video Device
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> Audio Device
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> Computer Telephony Device
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Multimedia Device
+</td></tr>
+<tr>
+<td rowspan="3"> 0x05
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> RAM Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> Flash Controller
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Memory Controller
+</td></tr>
+<tr>
+<td rowspan="14"> 0x06
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> Host Bridge
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> ISA Bridge
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> EISA Bridge
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> 0x00 </td>
+<td> MCA Bridge
+</td></tr>
+<tr>
+<td rowspan="2"> 0x04
+</td>
+<td> 0x00 </td>
+<td> PCI-to-PCI Bridge
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> PCI-to-PCI Bridge (Subtractive Decode)
+</td></tr>
+<tr>
+<td> 0x05 </td>
+<td> 0x00 </td>
+<td> PCMCIA Bridge
+</td></tr>
+<tr>
+<td> 0x06 </td>
+<td> 0x00 </td>
+<td> NuBus Bridge
+</td></tr>
+<tr>
+<td> 0x07 </td>
+<td> 0x00 </td>
+<td> CardBus Bridge
+</td></tr>
+<tr>
+<td> 0x08 </td>
+<td> 0x-- </td>
+<td> RACEway Bridge
+</td></tr>
+<tr>
+<td rowspan="2"> 0x09
+</td>
+<td> 0x40 </td>
+<td> PCI-to-PCI Bridge (Semi-Transparent, Primary)
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> PCI-to-PCI Bridge (Semi-Transparent, Secondary)
+</td></tr>
+<tr>
+<td> 0x0A </td>
+<td> 0x00 </td>
+<td> InfiniBrand-to-PCI Host Bridge
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Bridge Device
+</td></tr>
+<tr>
+<td rowspan="21"> 0x07
+</td>
+<td rowspan="7"> 0x00
+</td>
+<td> 0x00 </td>
+<td> Generic XT-Compatible Serial Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 16450-Compatible Serial Controller
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 16550-Compatible Serial Controller
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> 16650-Compatible Serial Controller
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> 16750-Compatible Serial Controller
+</td></tr>
+<tr>
+<td> 0x05 </td>
+<td> 16850-Compatible Serial Controller
+</td></tr>
+<tr>
+<td> 0x06 </td>
+<td> 16950-Compatible Serial Controller
+</td></tr>
+<tr>
+<td rowspan="5"> 0x01
+</td>
+<td> 0x00 </td>
+<td> Parallel Port
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> Bi-Directional Parallel Port
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> ECP 1.X Compliant Parallel Port
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> IEEE 1284 Controller
+</td></tr>
+<tr>
+<td> 0xFE </td>
+<td> IEEE 1284 Target Device
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> Multiport Serial Controller
+</td></tr>
+<tr>
+<td rowspan="5"> 0x03
+</td>
+<td> 0x00 </td>
+<td> Generic Modem
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> Hayes Compatible Modem (16450-Compatible Interface)
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> Hayes Compatible Modem (16550-Compatible Interface)
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> Hayes Compatible Modem (16650-Compatible Interface)
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> Hayes Compatible Modem (16750-Compatible Interface)
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> 0x00 </td>
+<td> IEEE 488.1/2 (GPIB) Controller
+</td></tr>
+<tr>
+<td> 0x05 </td>
+<td> 0x00 </td>
+<td> Smart Card
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Communications Device
+</td></tr>
+<tr>
+<td rowspan="15"> 0x08
+</td>
+<td rowspan="5"> 0x00
+</td>
+<td> 0x00 </td>
+<td> Generic 8259 PIC
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> ISA PIC
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> EISA PIC
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> I/O APIC Interrupt Controller
+</td></tr>
+<tr>
+<td> 0x20 </td>
+<td> I/O(x) APIC Interrupt Controller
+</td></tr>
+<tr>
+<td rowspan="3"> 0x01
+</td>
+<td> 0x00 </td>
+<td> Generic 8237 DMA Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> ISA DMA Controller
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> EISA DMA Controller
+</td></tr>
+<tr>
+<td rowspan="3"> 0x02
+</td>
+<td> 0x00 </td>
+<td> Generic 8254 System Timer
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> ISA System Timer
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> EISA System Timer
+</td></tr>
+<tr>
+<td rowspan="2"> 0x03
+</td>
+<td> 0x00 </td>
+<td> Generic RTC Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> ISA RTC Controller
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> 0x00 </td>
+<td> Generic PCI Hot-Plug Controller
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other System Peripheral
+</td></tr>
+<tr>
+<td rowspan="7"> 0x09
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> Keyboard Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> Digitizer
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> Mouse Controller
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> 0x00 </td>
+<td> Scanner Controller
+</td></tr>
+<tr>
+<td rowspan="2"> 0x04
+</td>
+<td> 0x00 </td>
+<td> Gameport Controller (Generic)
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> Gameport Contrlller (Legacy)
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Input Controller
+</td></tr>
+<tr>
+<td rowspan="2"> 0x0A
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> Generic Docking Station
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Docking Station
+</td></tr>
+<tr>
+<td rowspan="7"> 0x0B
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> 386 Processor
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> 486 Processor
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> Pentium Processor
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> 0x00 </td>
+<td> Alpha Processor
+</td></tr>
+<tr>
+<td> 0x20 </td>
+<td> 0x00 </td>
+<td> PowerPC Processor
+</td></tr>
+<tr>
+<td> 0x30 </td>
+<td> 0x00 </td>
+<td> MIPS Processor
+</td></tr>
+<tr>
+<td> 0x40 </td>
+<td> 0x00 </td>
+<td> Co-Processor
+</td></tr>
+<tr>
+<td rowspan="18"> 0x0C
+</td>
+<td rowspan="2"> 0x00
+</td>
+<td> 0x00 </td>
+<td> IEEE 1394 Controller (FireWire)
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> IEEE 1394 Controller (1394 OpenHCI Spec)
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> ACCESS.bus
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> SSA
+</td></tr>
+<tr>
+<td rowspan="6"> 0x03
+</td>
+<td> 0x00 </td>
+<td> USB (Universal Host Controller Spec)
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> USB (Open Host Controller Spec)
+</td></tr>
+<tr>
+<td> 0x20 </td>
+<td> USB2 Host Controller (Intel Enhanced Host Controller Interface)
+</td></tr>
+<tr>
+<td> 0x30 </td>
+<td> USB3 <a href="http://wiki.osdev.org/XHCI" title="XHCI" class="mw-redirect">XHCI</a> Controller
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> Unspecified USB Controller
+</td></tr>
+<tr>
+<td> 0xFE </td>
+<td> USB (Not Host Controller)
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> 0x00 </td>
+<td> Fibre Channel
+</td></tr>
+<tr>
+<td> 0x05 </td>
+<td> 0x00 </td>
+<td> SMBus
+</td></tr>
+<tr>
+<td> 0x06 </td>
+<td> 0x00 </td>
+<td> InfiniBand
+</td></tr>
+<tr>
+<td rowspan="3"> 0x07
+</td>
+<td> 0x00 </td>
+<td> IPMI SMIC Interface
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> IPMI Kybd Controller Style Interface
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> IPMI Block Transfer Interface
+</td></tr>
+<tr>
+<td> 0x08 </td>
+<td> 0x00 </td>
+<td> SERCOS Interface Standard (IEC 61491)
+</td></tr>
+<tr>
+<td> 0x09 </td>
+<td> 0x00 </td>
+<td> CANbus
+</td></tr>
+<tr>
+<td rowspan="8"> 0x0D
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> iRDA Compatible Controller
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> Consumer IR Controller
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> 0x00 </td>
+<td> RF Controller
+</td></tr>
+<tr>
+<td> 0x11 </td>
+<td> 0x00 </td>
+<td> Bluetooth Controller
+</td></tr>
+<tr>
+<td> 0x12 </td>
+<td> 0x00 </td>
+<td> Broadband Controller
+</td></tr>
+<tr>
+<td> 0x20 </td>
+<td> 0x00 </td>
+<td> Ethernet Controller (802.11a)
+</td></tr>
+<tr>
+<td> 0x21 </td>
+<td> 0x00 </td>
+<td> Ethernet Controller (802.11b)
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Wireless Controller
+</td></tr>
+<tr>
+<td rowspan="2"> 0x0E
+</td>
+<td rowspan="2"> 0x00
+</td>
+<td> 0x-- </td>
+<td> I20 Architecture
+</td></tr>
+<tr>
+<td> 0x00 </td>
+<td> Message FIFO
+</td></tr>
+<tr>
+<td rowspan="4"> 0x0F
+</td>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> TV Controller
+</td></tr>
+<tr>
+<td> 0x02 </td>
+<td> 0x00 </td>
+<td> Audio Controller
+</td></tr>
+<tr>
+<td> 0x03 </td>
+<td> 0x00 </td>
+<td> Voice Controller
+</td></tr>
+<tr>
+<td> 0x04 </td>
+<td> 0x00 </td>
+<td> Data Controller
+</td></tr>
+<tr>
+<td rowspan="3"> 0x10
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> Network and Computing Encrpytion/Decryption
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> 0x00 </td>
+<td> Entertainment Encryption/Decryption
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Encryption/Decryption
+</td></tr>
+<tr>
+<td rowspan="5"> 0x11
+</td>
+<td> 0x00 </td>
+<td> 0x00 </td>
+<td> DPIO Modules
+</td></tr>
+<tr>
+<td> 0x01 </td>
+<td> 0x00 </td>
+<td> Performance Counters
+</td></tr>
+<tr>
+<td> 0x10 </td>
+<td> 0x00 </td>
+<td> Communications Syncrhonization Plus Time and Frequency Test/Measurment
+</td></tr>
+<tr>
+<td> 0x20 </td>
+<td> 0x00 </td>
+<td> Management Card
+</td></tr>
+<tr>
+<td> 0x80 </td>
+<td> 0x00 </td>
+<td> Other Data Acquisition/Signal Processing Controller
+</td></tr></tbody></table>
+<h2> <span class="mw-headline" id="Enumerating_PCI_Buses"> Enumerating PCI Buses </span></h2>
+<p>There are 3 ways to enumerate devices on PCI buses. The first way is 
+"brute force", checking every device on every PCI bus (regardless of 
+whether the PCI bus exists or not). The second way avoids a lot of work 
+by figuring out valid bus numbers while it scans, and is a little more 
+complex as it involves recursion. For both of these methods you rely on 
+something (firmware) to have configured PCI buses properly (setting up 
+PCI to PCI bridges to forward request from one bus to another). The 
+third method is like the second method, except that you configure PCI 
+bridges while you're doing it.
+</p><p>For all 3 methods, you need to be able to check if a specific 
+device on a specific bus is present and if it is multi-function or not. 
+Pseudo-code might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"> <span class="kw4">void</span> checkDevice<span class="br0">(</span><span class="kw4">uint8_t</span> bus<span class="sy0">,</span> <span class="kw4">uint8_t</span> device<span class="br0">)</span> <span class="br0">{</span>
+     <span class="kw4">uint8_t</span> <span class="kw2">function</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+&nbsp;
+     vendorID <span class="sy0">=</span> getVendorID<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span><span class="sy0">;</span>
+     <span class="kw1">if</span><span class="br0">(</span>vendorID <span class="sy0">==</span> <span class="nu12">0xFFFF</span><span class="br0">)</span> <span class="kw1">return</span><span class="sy0">;</span>        <span class="co1">// Device doesn't exist</span>
+     checkFunction<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span><span class="sy0">;</span>
+     headerType <span class="sy0">=</span> getHeaderType<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span><span class="sy0">;</span>
+     <span class="kw1">if</span><span class="br0">(</span> <span class="br0">(</span>headerType <span class="sy0">&amp;</span> <span class="nu12">0x80</span><span class="br0">)</span> <span class="sy0">!=</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+         <span class="coMULTI">/* It is a multi-function device, so check remaining functions */</span>
+         <span class="kw1">for</span><span class="br0">(</span><span class="kw2">function</span> <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span> <span class="kw2">function</span> <span class="sy0">&lt;</span> <span class="nu0">8</span><span class="sy0">;</span> <span class="kw2">function</span><span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span>
+             <span class="kw1">if</span><span class="br0">(</span>getVendorID<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span> <span class="sy0">!=</span> <span class="nu12">0xFFFF</span><span class="br0">)</span> <span class="br0">{</span>
+                 checkFunction<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span><span class="sy0">;</span>
+             <span class="br0">}</span>
+         <span class="br0">}</span>
+     <span class="br0">}</span>
+ <span class="br0">}</span>
+&nbsp;
+ <span class="kw4">void</span> checkFunction<span class="br0">(</span><span class="kw4">uint8_t</span> bus<span class="sy0">,</span> <span class="kw4">uint8_t</span> device<span class="sy0">,</span> <span class="kw4">uint8_t</span> <span class="kw2">function</span><span class="br0">)</span> <span class="br0">{</span>
+ <span class="br0">}</span></pre></div></div>
+<p>Please note that if you don't check bit 7 of the header type and scan
+ all functions, then some single-function devices will report details 
+for "function 0" for every function.
+</p>
+<h3> <span class="mw-headline" id=".22Brute_Force.22_Scan"> "Brute Force" Scan </span></h3>
+<p>For the brute force method, the remaining code is relatively simple. Pseudo-code might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"> <span class="kw4">void</span> checkAllBuses<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+     <span class="kw4">uint8_t</span> bus<span class="sy0">;</span>
+     <span class="kw4">uint8_t</span> device<span class="sy0">;</span>
+&nbsp;
+     <span class="kw1">for</span><span class="br0">(</span>bus <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> bus <span class="sy0">&lt;</span> <span class="nu0">256</span><span class="sy0">;</span> bus<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span>
+         <span class="kw1">for</span><span class="br0">(</span>device <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> device <span class="sy0">&lt;</span> <span class="nu0">32</span><span class="sy0">;</span> device<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span>
+             checkDevice<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="br0">)</span><span class="sy0">;</span>
+         <span class="br0">}</span>
+     <span class="br0">}</span>
+ <span class="br0">}</span></pre></div></div>
+<p>For this method, there are 32 devices per bus and 256 buses, so you call "checkDevice()" 8192 times.
+</p><p><br>
+</p>
+<h3> <span class="mw-headline" id="Recursive_Scan"> Recursive Scan </span></h3>
+<p>The first step for the recursive scan is to implement a function that scans one bus. Pseudo-code might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"> <span class="kw4">void</span> checkBus<span class="br0">(</span><span class="kw4">uint8_t</span> bus<span class="br0">)</span> <span class="br0">{</span>
+     <span class="kw4">uint8_t</span> device<span class="sy0">;</span>
+&nbsp;
+     <span class="kw1">for</span><span class="br0">(</span>device <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> device <span class="sy0">&lt;</span> <span class="nu0">32</span><span class="sy0">;</span> device<span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span>
+         checkDevice<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="br0">)</span><span class="sy0">;</span>
+     <span class="br0">}</span>
+ <span class="br0">}</span></pre></div></div>
+<p>The next step is to add code in "checkFunction()" that detects if the
+ function is a PCI to PCI bridge. If the device is a PCI to PCI bridge 
+then you want to extract the "secondary bus number" from the bridge's 
+configuration space and call "checkBus()" with the number of the bus on 
+the other side of the bridge.
+</p><p>Pseudo-code might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"> <span class="kw4">void</span> checkFunction<span class="br0">(</span><span class="kw4">uint8_t</span> bus<span class="sy0">,</span> <span class="kw4">uint8_t</span> device<span class="sy0">,</span> <span class="kw4">uint8_t</span> <span class="kw2">function</span><span class="br0">)</span> <span class="br0">{</span>
+     <span class="kw4">uint8_t</span> baseClass<span class="sy0">;</span>
+     <span class="kw4">uint8_t</span> subClass<span class="sy0">;</span>
+     <span class="kw4">uint8_t</span> secondaryBus<span class="sy0">;</span>
+&nbsp;
+     baseClass <span class="sy0">=</span> getBaseClass<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span><span class="sy0">;</span>
+     subClass <span class="sy0">=</span> getSubClass<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span><span class="sy0">;</span>
+     <span class="kw1">if</span><span class="br0">(</span> <span class="br0">(</span>baseClass <span class="sy0">==</span> <span class="nu12">0x06</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="br0">(</span>subClass <span class="sy0">==</span> <span class="nu12">0x04</span><span class="br0">)</span> <span class="br0">)</span> <span class="br0">{</span>
+         secondaryBus <span class="sy0">=</span> getSecondaryBus<span class="br0">(</span>bus<span class="sy0">,</span> device<span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span><span class="sy0">;</span>
+         checkBus<span class="br0">(</span>secondaryBus<span class="br0">)</span><span class="sy0">;</span>
+     <span class="br0">}</span>
+ <span class="br0">}</span></pre></div></div>
+<p>The final step is to handle systems with multiple PCI host 
+controllers correctly. Start by checking if the device at bus 0, device 0
+ is a multi-function device. If it's not a multi-function device, then 
+there is only one PCI host controller and bus 0, device 0, function 0 
+will be the PCI host controller responsible for bus 0. If it is a 
+multifunction device, then bus 0, device 0, function 0 will be the PCI 
+host controller responsible for bus 0; bus 0, device 0, function 1 will 
+be the PCI host controller responsible for bus 1, etc (up to the number 
+of functions supported).
+</p><p>Pseudo-code might look like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="c source-c"><pre class="de1"> <span class="kw4">void</span> checkAllBuses<span class="br0">(</span><span class="kw4">void</span><span class="br0">)</span> <span class="br0">{</span>
+     <span class="kw4">uint8_t</span> <span class="kw2">function</span><span class="sy0">;</span>
+     <span class="kw4">uint8_t</span> bus<span class="sy0">;</span>
+&nbsp;
+     headerType <span class="sy0">=</span> getHeaderType<span class="br0">(</span><span class="nu0">0</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="nu0">0</span><span class="br0">)</span><span class="sy0">;</span>
+     <span class="kw1">if</span><span class="br0">(</span> <span class="br0">(</span>headerType <span class="sy0">&amp;</span> <span class="nu12">0x80</span><span class="br0">)</span> <span class="sy0">==</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span>
+         <span class="coMULTI">/* Single PCI host controller */</span>
+         checkBus<span class="br0">(</span><span class="nu0">0</span><span class="br0">)</span><span class="sy0">;</span>
+     <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+         <span class="coMULTI">/* Multiple PCI host controllers */</span>
+         <span class="kw1">for</span><span class="br0">(</span><span class="kw2">function</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> <span class="kw2">function</span> <span class="sy0">&lt;</span> <span class="nu0">8</span><span class="sy0">;</span> <span class="kw2">function</span><span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span>
+             <span class="kw1">if</span><span class="br0">(</span>getVendorID<span class="br0">(</span><span class="nu0">0</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">)</span> <span class="sy0">!=</span> <span class="nu12">0xFFFF</span><span class="br0">)</span> <span class="kw2">break</span><span class="sy0">;</span>
+             bus <span class="sy0">=</span> <span class="kw2">function</span><span class="sy0">;</span>
+             checkBus<span class="br0">(</span>bus<span class="br0">)</span><span class="sy0">;</span>
+         <span class="br0">}</span>
+     <span class="br0">}</span>
+ <span class="br0">}</span></pre></div></div>
+<h3> <span class="mw-headline" id="Recursive_Scan_With_Bus_Configuration"> Recursive Scan With Bus Configuration </span></h3>
+<p>This is similar to the recursive scan above; except that you set the 
+"secondary bus" field in PCI to PCI bridges (using something like 
+"setSecondaryBus(bus, device, function, nextBusNumber++);" instead of 
+the "getSecondaryBus();"). However; if you are configuring PCI buses you
+ are also responsible for configuring the memory areas/BARs in PCI 
+functions, and ensuring that PCI bridges forward requests from their 
+primary bus to their secondary buses.
+</p><p>Writing code to support this without a deep understanding of PCI 
+specifications is not recommended; and if you have a deep understanding 
+of PCI specifications you have no need for pseudo code. For this reason 
+there will be no example code for this method here.
+</p>
+<h2> <span class="mw-headline" id="IRQ_Handling"> IRQ Handling </span></h2>
+<p>If you're using the old <a href="http://wiki.osdev.org/PIC" title="PIC" class="mw-redirect">PIC</a>, your life is really easy. You have the <i>Interrupt Line</i>
+ field of the header, which is read/write (you can change it's value!) 
+and it says which interrupt will the PCI device fire when it needs 
+attention.
+</p><p>If you plan to use the <a href="http://wiki.osdev.org/I/O_APIC" title="I/O APIC" class="mw-redirect">I/O APIC</a>,
+ your life will be a nightmare. You have 4 new IRQs called INTA#, INTB#,
+ INTC# and INTD#. You can find which IRQ the device will use in the <i>Interrupt Line</i> field. In the ACPI AML Tables you will find (using <a href="http://wiki.osdev.org/ACPICA" title="ACPICA">ACPICA</a>) that INTA# is connected to a specified interrupt line, INTB# to another, etc...
+</p><p>So far so good. You have, say, 20 devices. 10 of those are using 
+INTA#, 5 for INTB#, 5 for INTC#, and none for INTD#. So when the IRQ 
+number related to #INTC you have to scan the 5 devices to understand who
+ was the interested one. So there is a LOT of IRQ sharing, expecially 
+for INTA#.
+</p><p>With time manufacturers started to use mainly INTA#, forgetting 
+the existence of other pins. So you will likely have 18 devices on INTA#
+ and 2 on INTB#. Motherboard manufacturers decided take the situation in
+ control. So at boot the INTx# are remapped, so that you will have 5 
+devices for INTA#, 5 for INTB#, 5 for INTC#, and 5 for INTD# (in the 
+best case). That's great! IRQs are balanced and IRQ sharing is reduced. 
+The only problem is that you don't know what devices where mapped. If 
+you read the <i>Interrupt Pin</i> you still get INTA#. You now need to parse the MP Tables or the <a href="http://wiki.osdev.org/ACPI" title="ACPI">ACPI</a> ones to solve the mess. Good luck.
+</p>
+<h2> <span class="mw-headline" id="Multifunction_Devices"> Multifunction Devices </span></h2>
+<p>Multifunction devices behave in the same manner as normal PCI 
+devices. The easiest way to detect a multifunction device is bit 7 of 
+the header type field. If it is set (value = 0x80), the device is 
+multifunction -- else it is not. Make sure you mask this bit when you 
+determine header type. To detect the number of functions you need to 
+scan the PCI configuration space for every function - unused functions 
+have vendor 0xFFFF. Device IDs and Class codes vary between functions. 
+Functions are not neccesarily in order - you can have function 0x0, 0x1 
+and 0x7 in use.
+</p>
+<h2> <span class="mw-headline" id="Disclaimer"> Disclaimer </span></h2>
+<p>This text originates from "Pentium on VME", unknown author, md5sum 
+d292807a3c56881c6faba7a1ecfd4c79. The original document is apparently no
+ longer present on the Web ...
+</p><p>Closest match: <a rel="nofollow" class="external autonumber" href="http://wayback.archive.org/web/20060423234540/http://www.quicklogic.com/images/appnote10.pdf">[2]</a>
+</p>
+<h2> <span class="mw-headline" id="References">References</span></h2>
+<ul><li>PCI Local Bus Specification, revision 3.0, PCI Special Interest Group, August 12, 2002
+</li></ul>
+<h2> <span class="mw-headline" id="See_Also">See Also</span></h2>
+<ul><li> <a href="http://wiki.osdev.org/PCI_Express" title="PCI Express">PCI Express</a>
+</li></ul>
+<h3> <span class="mw-headline" id="External_Links">External Links</span></h3>
+<ul><li><a rel="nofollow" class="external free" href="http://www.ics.uci.edu/%7Eharris/ics216/pci/PCI_22.pdf">http://www.ics.uci.edu/~harris/ics216/pci/PCI_22.pdf</a>
+</li><li><a rel="nofollow" class="external free" href="http://xillybus.com/tutorials/pci-express-tlp-pcie-primer-tutorial-guide-1">http://xillybus.com/tutorials/pci-express-tlp-pcie-primer-tutorial-guide-1</a>
+</li><li><a rel="nofollow" class="external free" href="http://docs.oracle.com/cd/E19120-01/open.solaris/819-3196/hwovr-22/index.html">http://docs.oracle.com/cd/E19120-01/open.solaris/819-3196/hwovr-22/index.html</a>
+</li><li><a rel="nofollow" class="external free" href="http://tldp.org/LDP/tlk/dd/pci.html">http://tldp.org/LDP/tlk/dd/pci.html</a>
+</li><li><a rel="nofollow" class="external free" href="http://www.pcidatabase.com/">http://www.pcidatabase.com/</a>
+</li><li><a rel="nofollow" class="external free" href="http://pciids.sourceforge.net/">http://pciids.sourceforge.net/</a> (More up to date PCI vendor and device numbers)
+</li><li><a rel="nofollow" class="external free" href="http://www.acm.uiuc.edu/sigops/roll_your_own/7.c.html">http://www.acm.uiuc.edu/sigops/roll_your_own/7.c.html</a>
+</li><li><a rel="nofollow" class="external free" href="http://tldp.org/LDP/tlk/dd/pci.html">http://tldp.org/LDP/tlk/dd/pci.html</a>
+</li><li><a rel="nofollow" class="external free" href="http://msdn.microsoft.com/en-us/library/ms903537.aspx">http://msdn.microsoft.com/en-us/library/ms903537.aspx</a>
+</li><li><a rel="nofollow" class="external free" href="http://www.pcisig.com/specifications/conventional/ECN_SATA_Class_Code.pdf">http://www.pcisig.com/specifications/conventional/ECN_SATA_Class_Code.pdf</a>
+</li></ul>
+
+<!-- 
+NewPP limit report
+Preprocessor node count: 224/1000000
+Post-expand include size: 2268/2097152 bytes
+Template argument size: 0/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key wikidb:pcache:idhash:1485-0!*!0!!en!*!* and timestamp 20170321045216 -->
+</div>				<!-- /bodycontent -->
+								<!-- printfooter -->
+				<div class="printfooter">
+				Retrieved from "<a href="http://wiki.osdev.org/index.php?title=PCI&amp;oldid=19379">http://wiki.osdev.org/index.php?title=PCI&amp;oldid=19379</a>"				</div>
+				<!-- /printfooter -->
+												<!-- catlinks -->
+				<div id="catlinks" class="catlinks"><div id="mw-normal-catlinks"><a href="http://wiki.osdev.org/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="http://wiki.osdev.org/Category:Buses" title="Category:Buses">Buses</a></li></ul></div></div>				<!-- /catlinks -->
+												<div class="visualClear"></div>
+				<!-- debughtml -->
+								<!-- /debughtml -->
+			</div>
+			<!-- /bodyContent -->
+		</div>
+		<!-- /content -->
+		<!-- header -->
+		<div id="mw-head" class="noprint">
+			
+<!-- 0 -->
+<div id="p-personal" class="">
+	<h5>Personal tools</h5>
+	<ul>
+		<li id="pt-login"><a href="http://wiki.osdev.org/index.php?title=Special:UserLogin&amp;returnto=PCI" title="You are encouraged to log in; however, it is not mandatory [alt-shift-o]" accesskey="o">Log in</a></li>
+	</ul>
+</div>
+
+<!-- /0 -->
+			<div id="left-navigation">
+				
+<!-- 0 -->
+<div id="p-namespaces" class="vectorTabs">
+	<h5>Namespaces</h5>
+	<ul>
+					<li id="ca-nstab-main" class="selected"><span><a href="http://wiki.osdev.org/PCI" title="View the content page [alt-shift-c]" accesskey="c">Page</a></span></li>
+					<li id="ca-talk"><span><a href="http://wiki.osdev.org/Talk:PCI" title="Discussion about the content page [alt-shift-t]" accesskey="t">Discussion</a></span></li>
+			</ul>
+</div>
+
+<!-- /0 -->
+
+<!-- 1 -->
+<div id="p-variants" class="vectorMenu emptyPortlet">
+		<h5><span>Variants</span><a href="#"></a></h5>
+	<div class="menu">
+		<ul>
+					</ul>
+	</div>
+</div>
+
+<!-- /1 -->
+			</div>
+			<div id="right-navigation">
+				
+<!-- 0 -->
+<div id="p-views" class="vectorTabs">
+	<h5>Views</h5>
+	<ul>
+					<li id="ca-view" class="selected"><span><a href="http://wiki.osdev.org/PCI">Read</a></span></li>
+					<li id="ca-viewsource"><span><a href="http://wiki.osdev.org/index.php?title=PCI&amp;action=edit" title="This page is protected.
+You can view its source [alt-shift-e]" accesskey="e">View source</a></span></li>
+					<li id="ca-history" class="collapsible"><span><a href="http://wiki.osdev.org/index.php?title=PCI&amp;action=history" title="Past revisions of this page [alt-shift-h]" accesskey="h">View history</a></span></li>
+			</ul>
+</div>
+
+<!-- /0 -->
+
+<!-- 1 -->
+<div id="p-cactions" class="vectorMenu emptyPortlet">
+	<h5><span>Actions</span><a href="#"></a></h5>
+	<div class="menu">
+		<ul>
+					</ul>
+	</div>
+</div>
+
+<!-- /1 -->
+
+<!-- 2 -->
+<div id="p-search">
+	<h5><label for="searchInput">Search</label></h5>
+	<form action="/index.php" id="searchform">
+		<input name="title" value="Special:Search" type="hidden">
+				<input name="search" title="Search OSDev Wiki [alt-shift-f]" accesskey="f" id="searchInput" type="search">		<input name="go" value="Go" title="Go to a page with this exact name if exists" id="searchGoButton" class="searchButton" type="submit">		<input name="fulltext" value="Search" title="Search the pages for this text" id="mw-searchButton" class="searchButton" type="submit">			</form>
+</div>
+
+<!-- /2 -->
+			</div>
+		</div>
+		<!-- /header -->
+		<!-- panel -->
+			<div id="mw-panel" class="noprint">
+				<!-- logo -->
+					<div id="p-logo"><a style="background-image: url(/skins/common/images/osdev.png);" href="http://wiki.osdev.org/Main_Page" title="Visit the main page"></a></div>
+				<!-- /logo -->
+				
+<!-- navigation -->
+<div class="portal" id="p-navigation">
+	<h5>Navigation</h5>
+	<div class="body">
+		<ul>
+			<li id="n-mainpage"><a href="http://wiki.osdev.org/Main_Page" title="Visit the main page [alt-shift-z]" accesskey="z">Main Page</a></li>
+			<li id="n-portal"><a href="http://forum.osdev.org/" rel="nofollow" title="About the project, what you can do, where to find things">Forums</a></li>
+			<li id="n-FAQ"><a href="http://wiki.osdev.org/Category:FAQ">FAQ</a></li>
+			<li id="n-OS-Projects"><a href="http://wiki.osdev.org/Projects">OS Projects</a></li>
+			<li id="n-randompage"><a href="http://wiki.osdev.org/Special:Random" title="Load a random page [alt-shift-x]" accesskey="x">Random page</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /navigation -->
+
+<!-- about -->
+<div class="portal" id="p-about">
+	<h5>About</h5>
+	<div class="body">
+		<ul>
+			<li id="n-This-site"><a href="http://wiki.osdev.org/OSDevWiki:About">This site</a></li>
+			<li id="n-Joining"><a href="http://wiki.osdev.org/OSDevWiki:Joining">Joining</a></li>
+			<li id="n-Editing-help"><a href="http://wiki.osdev.org/OSDevWiki:Editing">Editing help</a></li>
+			<li id="n-recentchanges"><a href="http://wiki.osdev.org/Special:RecentChanges" title="A list of recent changes in the wiki [alt-shift-r]" accesskey="r">Recent changes</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /about -->
+
+<!-- SEARCH -->
+
+<!-- /SEARCH -->
+
+<!-- TOOLBOX -->
+<div class="portal" id="p-tb">
+	<h5>Toolbox</h5>
+	<div class="body">
+		<ul>
+			<li id="t-whatlinkshere"><a href="http://wiki.osdev.org/Special:WhatLinksHere/PCI" title="A list of all wiki pages that link here [alt-shift-j]" accesskey="j">What links here</a></li>
+			<li id="t-recentchangeslinked"><a href="http://wiki.osdev.org/Special:RecentChangesLinked/PCI" title="Recent changes in pages linked from this page [alt-shift-k]" accesskey="k">Related changes</a></li>
+			<li id="t-specialpages"><a href="http://wiki.osdev.org/Special:SpecialPages" title="A list of all special pages [alt-shift-q]" accesskey="q">Special pages</a></li>
+			<li><a href="http://wiki.osdev.org/index.php?title=PCI&amp;printable=yes" rel="alternate">Printable version</a></li>
+			<li id="t-permalink"><a href="http://wiki.osdev.org/index.php?title=PCI&amp;oldid=19379" title="Permanent link to this revision of the page">Permanent link</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /TOOLBOX -->
+
+<!-- LANGUAGES -->
+<div class="portal" id="p-lang">
+	<h5>In other languages</h5>
+	<div class="body">
+		<ul>
+			<li class="interwiki-de"><a href="http://www.lowlevel.eu/wiki/Peripheral_Component_Interconnect" title="Peripheral Component Interconnect">Deutsch</a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- /LANGUAGES -->
+			</div>
+		<!-- /panel -->
+		<!-- footer -->
+		<div id="footer">
+							<ul id="footer-info">
+											<li id="footer-info-lastmod"> This page was last modified on 25 June 2016, at 21:37.</li>
+											<li id="footer-info-viewcount">This page has been accessed 297,200 times.</li>
+									</ul>
+							<ul id="footer-places">
+											<li id="footer-places-privacy"><a href="http://wiki.osdev.org/OSDev_Wiki:Privacy_policy" title="OSDev Wiki:Privacy policy">Privacy policy</a></li>
+											<li id="footer-places-about"><a href="http://wiki.osdev.org/OSDev_Wiki:About" title="OSDev Wiki:About">About OSDev Wiki</a></li>
+											<li id="footer-places-disclaimer"><a href="http://wiki.osdev.org/OSDev_Wiki:General_disclaimer" title="OSDev Wiki:General disclaimer">Disclaimers</a></li>
+									</ul>
+										<ul id="footer-icons" class="noprint">
+					<li id="footer-poweredbyico">
+						<a href="http://www.mediawiki.org/"><img src="PCI%20-%20OSDev%20Wiki_files/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" width="88" height="31"></a>
+					</li>
+				</ul>
+						<div style="clear:both"></div>
+		</div>
+		<!-- /footer -->
+		<!-- fixalpha -->
+		<script type="text/javascript"> if ( window.isMSIE55 ) fixalpha(); </script>
+		<!-- /fixalpha -->
+		<script src="PCI%20-%20OSDev%20Wiki_files/load_006.php"></script>
+<script>if(window.mw){
+	mw.loader.load(["mediawiki.user", "mediawiki.util", 
+"mediawiki.page.ready", "mediawiki.legacy.wikibits", 
+"mediawiki.legacy.ajax"]);
+}
+</script><script type="text/javascript" src="PCI%20-%20OSDev%20Wiki_files/load_003.php"></script>
+<script src="PCI%20-%20OSDev%20Wiki_files/load_004.php"></script>
+<script>if(window.mw){
+	
+mw.user.options.set({"ccmeonemails":0,"cols":80,"date":"default","diffonly":0,"disablemail":0,"disablesuggest":0,"editfont":"default","editondblclick":0,"editsection":1,"editsectiononrightclick":0,"enotifminoredits":0,"enotifrevealaddr":0,"enotifusertalkpages":1,"enotifwatchlistpages":0,"extendwatchlist":0,"externaldiff":0,"externaleditor":0,"fancysig":0,"forceeditsummary":0,"gender":"unknown","hideminor":0,"hidepatrolled":0,"highlightbroken":1,"imagesize":2,"justify":0,"math":1,"minordefault":0,"newpageshidepatrolled":0,"nocache":0,"noconvertlink":0,"norollbackdiff":0,"numberheadings":0,"previewonfirst":0,"previewontop":1,"quickbar":5,"rcdays":7,"rclimit":50,"rememberpassword":0,"rows":25,"searchlimit":20,"showhiddencats":0,"showjumplinks":1,"shownumberswatching":1,"showtoc":1,"showtoolbar":1,"skin":"vector","stubthreshold":0,"thumbsize":2,"underline":2,"uselivepreview":0,"usenewrc":0,"watchcreations":0,"watchdefault":0,"watchdeletion":0,"watchlistdays":3,"watchlisthideanons":0,
+
+	
+"watchlisthidebots":0,"watchlisthideliu":0,"watchlisthideminor":0,"watchlisthideown":0,"watchlisthidepatrolled":0,"watchmoves":0,"wllimit":250,"variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false});;mw.user.tokens.set({"editToken":"+\\","watchToken":false});;mw.loader.state({"user.options":"ready","user.tokens":"ready"});
+
+	
+	/* cache key: 
+wikidb:resourceloader:filter:minify-js:4:19a4b18a9ac79a6b8c60b24af4668814
+ */
+}
+</script><!-- Served in 0.041 secs. -->
+	
+
+</body></html>

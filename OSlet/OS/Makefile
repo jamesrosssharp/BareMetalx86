@@ -10,7 +10,7 @@ main.o:	main.c $(HEADERS)
 	gcc -m32 -fno-stack-protector -c main.c -o main.o
 
 LIBS =  Boot/boot.o Console/libconsole.a BIOS/libbios.a IO/libio.a	\
-	Gfx/libgfx.a
+	Gfx/libgfx.a Mem/libmem.a Lib/libklib.a
 
 libkern.a:	$(LIBS)
 	@printf "CREATE libkern.a\n \
@@ -18,6 +18,8 @@ libkern.a:	$(LIBS)
     		ADDLIB BIOS/libbios.a\n	\
     		ADDLIB IO/libio.a\n	\
 		ADDLIB Gfx/libgfx.a\n	\
+		ADDLIB Mem/libmem.a\n	\
+		ADDLIB Lib/libklib.a\n	\
 		SAVE\n		\
     		END" | ar -M
 	ranlib libkern.a
@@ -40,9 +42,18 @@ IO/libio.a:
 Gfx/libgfx.a:
 	make -C Gfx
 
+Mem/libmem.a:
+	make -C Mem
+
+Lib/libklib.a:
+	make -C Lib
+
 clean:
 	rm *.a *.o
 	make -C BIOS clean
 	make -C IO clean
 	make -C Console clean
 	make -C Boot	clean
+	make -C Gfx 	clean
+	make -C Mem	clean
+	make -C Lib	clean

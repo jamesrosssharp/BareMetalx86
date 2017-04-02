@@ -23,7 +23,8 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 
 	unsigned long long int totalMemory = 0;
 
-	for (int i = 0; i < MAX_MEMORY_ENTRIES; i++)
+	int i;
+	for (i = 0; i < MAX_MEMORY_ENTRIES; i++)
 	{
 	
 		in.EAX = 0xE820;
@@ -64,6 +65,9 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 	}
 
 	kprintf("Detected memory (%d MiB)\n", (int)(totalMemory / 1024 / 1024));
+
+	*entries = gMemoryEntries;
+	*numEntries = i;
 
 	return true;
 }

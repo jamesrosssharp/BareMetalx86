@@ -3,6 +3,8 @@
 
 #include "../kerndefs.h"
 
+#define MEMORY_TYPE_FREE 0x01
+
 struct MemoryEntry
 {
 	unsigned long long int	baseAddress;

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html class="client-js ve-not-available" dir="ltr" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>Buddy memory allocation - Wikipedia</title>
+<script>document.documentElement.className = document.documentElement.className.replace( /(^|\s)client-nojs(\s|$)/, "$1client-js$2" );</script>
+<script>(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Buddy_memory_allocation","wgTitle":"Buddy memory allocation","wgCurRevisionId":741397375,"wgRevisionId":741397375,"wgArticleId":364180,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Use dmy dates from August 2012","Memory management algorithms"],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgMonthNamesShort":["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"wgRelevantPageName":"Buddy_memory_allocation","wgRelevantArticleId":364180,"wgRequestId":"WMw7hgpAME0AAAjDuWAAAABT","wgIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgFlaggedRevsParams":{"tags":{}},"wgStableRevisionId":null,"wgWikiEditorEnabledModules":{"toolbar":true,"dialogs":true,"preview":false,"publish":false},"wgBetaFeaturesFeatures":[],"wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsShouldSendModuleToUser":false,"wgPopupsConflictsWithNavPopupGadget":false,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","usePageImages":true,"usePageDescriptions":true},"wgPreferredVariant":"en","wgMFDisplayWikibaseDescriptions":{"search":true,"nearby":true,"watchlist":true,"tagline":true},"wgRelatedArticles":null,"wgRelatedArticlesBetaFeatureEnabled":false,"wgRelatedArticlesUseCirrusSearch":true,"wgRelatedArticlesOnlyUseCirrusSearch":false,"wgULSCurrentAutonym":"English","wgNoticeProject":"wikipedia","wgCentralNoticeCookiesToDelete":[],"wgCentralNoticeCategoriesUsingLegacy":["Fundraising","fundraising"],"wgCategoryTreePageCategoryOptions":"{\"mode\":0,\"hideprefix\":20,\"showcount\":true,\"namespaces\":false}","wgWikibaseItemId":"Q1001112","wgCentralAuthMobileDomain":false,"wgVisualEditorToolbarScrollOffset":0,"wgEditSubmitButtonLabelPublish":false});mw.loader.state({"ext.globalCssJs.user.styles":"ready","ext.globalCssJs.site.styles":"ready","site.styles":"ready","noscript":"ready","user.styles":"ready","user":"ready","user.options":"loading","user.tokens":"loading","ext.cite.styles":"ready","wikibase.client.init":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","ext.wikimediaBadges":"ready","mediawiki.legacy.shared":"ready","mediawiki.legacy.commonPrint":"ready","mediawiki.sectionAnchor":"ready","mediawiki.skinning.interface":"ready","skins.vector.styles":"ready","ext.globalCssJs.user":"ready","ext.globalCssJs.site":"ready"});mw.loader.implement("user.options@0j3lz3q",function($,jQuery,require,module){mw.user.options.set({"variant":"en"});});mw.loader.implement("user.tokens@1dqfd7l",function ( $, jQuery, require, module ) {
+mw.user.tokens.set({"editToken":"+\\","patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});/*@nomin*/;
+
+});mw.loader.load(["ext.cite.a11y","mediawiki.toc","mediawiki.action.view.postEdit","site","mediawiki.page.startup","mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","mediawiki.legacy.wikibits","mediawiki.searchSuggest","ext.gadget.teahouse","ext.gadget.ReferenceTooltips","ext.gadget.watchlist-notice","ext.gadget.DRN-wizard","ext.gadget.charinsert","ext.gadget.refToolbar","ext.gadget.extra-toolbar-buttons","ext.gadget.switcher","ext.gadget.featured-articles-links","ext.centralauth.centralautologin","ext.visualEditor.desktopArticleTarget.init","ext.visualEditor.targetLoader","ext.eventLogging.subscriber","ext.wikimediaEvents","ext.navigationTiming","ext.uls.eventlogger","ext.uls.init","ext.uls.interface","ext.quicksurveys.init","ext.centralNotice.geoIP","ext.centralNotice.startUp","skins.vector.js"]);});</script>
+<link rel="stylesheet" href="Buddy%20memory%20allocation%20-%20Wikipedia_files/load_002.css">
+<script async="" src="Buddy%20memory%20allocation%20-%20Wikipedia_files/load_002.php"></script>
+<style>
+.cite-accessibility-label{ top:-99999px;clip:rect( 1px 1px 1px 1px ); clip:rect( 1px,1px,1px,1px ); position:absolute !important;padding:0 !important;border:0 !important;height:1px !important;width:1px !important; overflow:hidden}
+.referencetooltip{position:absolute;list-style:none;list-style-image:none;opacity:0;font-size:10px;margin:0;z-index:5;padding:0}.referencetooltip li{border:#080086 2px solid;max-width:260px;padding:10px 8px 13px 8px;margin:0px;background-color:#F7F7F7;-webkit-box-shadow:2px 4px 2px rgba(0,0,0,0.3);-moz-box-shadow:2px 4px 2px rgba(0,0,0,0.3);box-shadow:2px 4px 2px rgba(0,0,0,0.3)}.referencetooltip li+li{margin-left:7px;margin-top:-2px;border:0;padding:0;height:3px;width:0px;background-color:transparent;-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none;border-top:12px #080086 solid;border-right:7px transparent solid;border-left:7px transparent solid}.referencetooltip>li+li::after{content:'';border-top:8px #F7F7F7 solid;border-right:5px transparent solid;border-left:5px transparent solid;margin-top:-12px;margin-left:-5px;z-index:1;height:0px;width:0px;display:block}.client-js body .referencetooltip li li{border:none;-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none;height:auto;width:auto;margin:auto;padding:0;position:static}.RTflipped{padding-top:13px}.referencetooltip.RTflipped li+li{position:absolute;top:2px;border-top:0;border-bottom:12px #080086 solid}.referencetooltip.RTflipped li+li::after{border-top:0;border-bottom:8px #F7F7F7 solid;position:absolute;margin-top:7px}.RTsettings{float:right;height:24px;width:24px;cursor:pointer;background-image:url(//upload.wikimedia.org/wikipedia/commons/thumb/0/05/OOjs_UI_icon_advanced.svg/24px-OOjs_UI_icon_advanced.svg.png);background-image:linear-gradient(transparent,transparent),url(//upload.wikimedia.org/wikipedia/commons/0/05/OOjs_UI_icon_advanced.svg);margin-top:-9px;margin-right:-7px;-webkit-transition:opacity 0.15s;-moz-transition:opacity 0.15s;-ms-transition:opacity 0.15s;-o-transition:opacity 0.15s;transition:opacity 0.15s;opacity:0.6;filter:alpha(opacity=60)}.RTsettings:hover{opacity:1;filter:alpha(opacity=100)}.RTTarget{border:#080086 2px solid}
+.skin-vector li.GA,.skin-monobook li.GA,.skin-modern li.GA{list-style-image:url(//upload.wikimedia.org/wikipedia/commons/4/42/Monobook-bullet-ga.png)} .skin-vector li.FA,.skin-monobook li.FA{list-style-image:url(//upload.wikimedia.org/wikipedia/commons/d/d4/Monobook-bullet-star.png)}.skin-modern li.FA{list-style-image:url(//upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Modern-bullet-star.svg/9px-Modern-bullet-star.svg.png)}
+.wp-teahouse-question-form{position:absolute;margin-left:auto;margin-right:auto;background-color:#f4f3f0;border:1px solid #a7d7f9;padding:1em}#wp-th-question-ask{float:right}.wp-teahouse-ask a.external{background-image:none !important}.wp-teahouse-respond-form{position:absolute;margin-left:auto;margin-right:auto;background-color:#f4f3f0;border:1px solid #a7d7f9;padding:1em}.wp-th-respond{float:right}.wp-teahouse-respond a.external{background-image:none !important}
+.suggestions{overflow:hidden;position:absolute;top:0;left:0;width:0;border:0;z-index:1099;padding:0;margin:-1px 0 0 0}.suggestions-special{position:relative;background-color:#fff;cursor:pointer;border:solid 1px #aaa;margin:0;margin-top:-2px;display:none;padding:0.25em 0.25em;line-height:1.25em}.suggestions-results{background-color:#fff;cursor:pointer;border:solid 1px #aaa;padding:0;margin:0}.suggestions-result{color:#000;margin:0;line-height:1.5em;padding:0.01em 0.25em;text-align:left; overflow:hidden;-o-text-overflow:ellipsis; text-overflow:ellipsis;white-space:nowrap}.suggestions-result-current{background-color:#4c59a6;color:#fff}.suggestions-special .special-label{color:#808080;text-align:left}.suggestions-special .special-query{color:#000;font-style:italic;text-align:left}.suggestions-special .special-hover{background-color:#c0c0c0}.suggestions-result-current .special-label,.suggestions-result-current .special-query{color:#fff}.highlight{font-weight:bold}
+@media screen {
+	.tochidden,.toctoggle{-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}.toctoggle{font-size:94%}}
+@media print {
+	#toc.tochidden,.toctoggle{display:none}}
+.uls-menu{border-radius:4px; font-size:medium}.uls-search,.uls-language-settings-close-block{border-top-right-radius:4px;border-top-left-radius:4px}.uls-language-list{border-bottom-right-radius:4px;border-bottom-left-radius:4px}.uls-menu.callout .caret-before,.uls-menu.callout .caret-after{border-top:10px solid transparent;border-right:10px solid #c9c9c9;border-bottom:10px solid transparent;display:inline-block;left:-11px; top:17px;position:absolute}.uls-menu.callout .caret-after{border-right:10px solid #fcfcfc;display:inline-block;left:-10px}.uls-menu.callout--languageselection .caret-after{border-right:10px solid #fff}.uls-ui-languages button{margin:5px 15px 5px 0;white-space:nowrap;overflow:hidden}.uls-search-wrapper-wrapper{position:relative;padding-left:40px;margin-top:5px;margin-bottom:5px}.uls-icon-back{background:transparent url(/w/extensions/UniversalLanguageSelector/resources/images/back-grey-ltr.png?90e9b) no-repeat scroll center center;background-image:-webkit-linear-gradient( transparent,transparent ),url(/w/extensions/UniversalLanguageSelector/resources/images/back-grey-ltr.svg?ae714);background-image:linear-gradient( transparent,transparent ),url(data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%20standalone%3D%22no%22%3F%3E%0A%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20id%3D%22Layer_1%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M7%2013.1l8.9%208.9c.8-.8.8-2%200-2.8l-6.1-6.1%206-6.1c.8-.8.8-2%200-2.8L7%2013.1z%22%20id%3D%22path3%22%20fill%3D%22%23555%22%2F%3E%0A%3C%2Fsvg%3E%0A);background-size:28px;background-position:center center;height:32px;width:40px;display:block;position:absolute;left:0;border-right:1px solid #c9c9c9;opacity:0.8}.uls-icon-back:hover{opacity:1;cursor:pointer}
+@media print{#centralNotice{display:none}}.cn-closeButton{display:inline-block;zoom:1;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAACeklEQVR4Aa1UM3jkcRBN6qS//tTFttPHqmI359VZ5dm2L1zFtr02YlRx5sX2ft/7ed7O/w1M5ufnt8NZQjCBQXhG+IYZe5zjfju7xcHc3NzEzMwM6xOEqNnZ2ZeVlZW827dv1ycmJnbGx8d3Yr5582Z9eXk5D/d4h/empqYm+K0nw3yKcF4sFmdzOJzGgIAAhb29vc7Ozk6/Atrr/fz8lCwWq6m3tzcb72G3nmzFo/NNTU354eHhIltbW72Tk5M2IyND9P79+8ZPnz7VvXnzpoHBYPS4uLhobGxsDMHBwaLa2tp82MF+PVmUUqnMioiI6LOysjLQLCcPS2ZmZn7Ozc39oPtFYG80GgWpqakSS0tLY1hYmEgikWTBfoXsLD16BT3gUWhoqEKtVheREZ+Qu0IEjI+PZ2k0GqFer+cnJSWJra2tDWw2u2FqauoVeEAW3NzcnBcYGCh3dHTUtba2ltNjLvRJSEiQEQEPRENDQzkMBqPXwsKiXyqVFsFDNzc3LWmoqKmp4YIHZIyHDx9WOzg46GJiYmTk5e/h4eHstLQ0CX2ykXST4JPJ8y7sSVM5/QGMf9y4caMHf3r//v1a8IDsGRm04/D58+dtpNFPPNRqtflXrlzpI8G15IEGc2xsrFSlUglwD+Tk5NRBmuTk5A7wgOxbXFxcF8iysrIa1mskEolKvL29Ne7u7mpXV1dNaWlp9fr7X79+VYMMeQieY/dsv5p1r2g2Nja2vWZ7RXNiYuIA0dwlzwYGBjbkGXmURXeLeUa1ul2ebV8BEH+7CiAiASTYvgJ2qc3MzMzF2vz8+XPd27dvG5hMZg+CsV1tHmfXOP5+dqyddgHOI7v1srTdcwAAAABJRU5ErkJggg==);background:url(/w/extensions/CentralNotice/resources/subscribing/CloseWindow19x19.png?7596b)!ie;width:19px;height:19px;text-indent:19px;white-space:nowrap;overflow:hidden}
+.postedit-container{margin:0 auto;position:fixed;top:0;height:0;left:50%;z-index:1000;font-size:13px}.postedit-container:hover{cursor:pointer}.postedit{position:relative;top:0.6em;left:-50%;padding:0.6em 3.6em 0.6em 1.1em;line-height:1.5625em;color:#626465;background-color:#f4f4f4;border:1px solid #dcd9d9;text-shadow:0 0.0625em 0 rgba( 255,255,255,0.5 );border-radius:5px;box-shadow:0 2px 5px 0 #ccc;-webkit-transition:all 0.25s ease-in-out;-moz-transition:all 0.25s ease-in-out;-ms-transition:all 0.25s ease-in-out;-o-transition:all 0.25s ease-in-out;transition:all 0.25s ease-in-out}.skin-monobook .postedit{top:6em !important; }.postedit-faded{opacity:0}.postedit-icon{padding-left:41px;  line-height:25px;background-repeat:no-repeat;background-position:8px 50%}.postedit-icon-checkmark{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB9ElEQVR4AZWRA3AYURQArxrVHtW2bdu2bdu2zdi2bdu2bWxs7zeehZaw4f70kbs+zI3e/nWK+RWx3aOFlrL56Sy5SxrruG69hlv6OyK+mz+8KDSXdXembj0ispT7tjs4ZTIbpYBvxGSGKzZTeFrb7W/meN002swFs0U8ttpHTkF2BvCqWQrW35929bTsKm5Zb+SEwWwcY8wAngB9m7Z+d+rIPZ/npdy12M5p47n8dXsCYAf0qPy06eGMdktuDu9Qf+JmKl3SWM91qzVcN9tAbEYkwMaq0tyb1m/To5kP170el/BK8/qa6sJr70ydf+T/Uu5ab+Oo/lS0AkUBpIFWlZ9WPhxpse/PHO7YbOOczjL0vZV2lNxPPtG73dYXM+xvm2znrOl83tidoqCwMBgYXsPFB0on5S6pr+eK5TKuW67lgvaKvF8mL1dtfTL32FHxRdyx3cQpg7m4x9sCXKkTIzA4LDH44zWdzaUf71hv5rTG4uyzcusybxSX7aThbMQ8XgCYAp3rzTTQOiIh9PNlzY3FSuZxrzjme1Y7uGS6kjsWO4jPjM4FVjRZsvD4kO9XtTZzQn82NyzWc0B7AmZh6gA/hOYSGhfw9YbOVnarj+S7800AL2BIsxUAbWNToj7bhBuQmZcOsFdoKUC74rGheCwXmqAIQTc9jQcrADIAAAAASUVORK5CYII=);background-image:url(/w/resources/src/mediawiki.action/images/green-checkmark.png?d94f1)!ie;background-position:left}.postedit-close{position:absolute;padding:0 0.8em;right:0;top:0;font-size:1.25em;font-weight:bold;line-height:2.3em;color:#000;text-shadow:0 0.0625em 0 #fff;text-decoration:none;opacity:0.2;filter:alpha( opacity=20 )}.postedit-close:hover{color:#000;text-decoration:none;opacity:0.4;filter:alpha( opacity=40 )}
+@-webkit-keyframes centralAuthPPersonalAnimation{0%{opacity:0;-webkit-transform:translateY(-20px)}100%{opacity:1;-webkit-transform:translateY(0)}}@-moz-keyframes centralAuthPPersonalAnimation{0%{opacity:0;-moz-transform:translateY(-20px)}100%{opacity:1;-moz-transform:translateY(0)}}@-o-keyframes centralAuthPPersonalAnimation{0%{opacity:0;-o-transform:translateY(-20px)}100%{opacity:1;-o-transform:translateY(0)}}@keyframes centralAuthPPersonalAnimation{0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}}.centralAuthPPersonalAnimation{-webkit-animation-duration:1s;-moz-animation-duration:1s;-o-animation-duration:1s;animation-duration:1s;-webkit-animation-fill-mode:both;-moz-animation-fill-mode:both;-o-animation-fill-mode:both;animation-fill-mode:both;-webkit-animation-name:centralAuthPPersonalAnimation;-moz-animation-name:centralAuthPPersonalAnimation;-o-animation-name:centralAuthPPersonalAnimation;animation-name:centralAuthPPersonalAnimation}
+.ext-quick-survey-panel,.ext-qs-loader-bar{width:auto;background-color:#eaecf0} .ext-qs-loader-bar{display:block;height:100px;margin-left:1.4em;clear:right;float:right;background-color:#eaecf0}.ext-qs-loader-bar.mw-ajax-loader{top:0}@media all and (min-width:720px){.ext-qs-loader-bar,.ext-quick-survey-panel{margin-left:1.4em;width:300px;clear:right;float:right}}</style><style>
+.suggestions a.mw-searchSuggest-link,.suggestions a.mw-searchSuggest-link:hover,.suggestions a.mw-searchSuggest-link:active,.suggestions a.mw-searchSuggest-link:focus{color:#000;text-decoration:none}.suggestions-result-current a.mw-searchSuggest-link,.suggestions-result-current a.mw-searchSuggest-link:hover,.suggestions-result-current a.mw-searchSuggest-link:active,.suggestions-result-current a.mw-searchSuggest-link:focus{color:#fff}.suggestions a.mw-searchSuggest-link .special-query{ overflow:hidden;-o-text-overflow:ellipsis; text-overflow:ellipsis;white-space:nowrap}
+#uls-settings-block{border-top:1px solid #c9c9c9;background:#f8f8f8;background:-webkit-gradient( linear,left top,left bottom,from( #fbfbfb ),to( #f0f0f0 ) );background:-webkit-linear-gradient( top,#fbfbfb,#f0f0f0 );background:-moz-linear-gradient( top,#fbfbfb,#f0f0f0 );background:-o-linear-gradient( top,#fbfbfb,#f0f0f0 );background:linear-gradient( #fbfbfb,#f0f0f0 );padding-left:10px;line-height:1.2em;border-radius:0 0 5px 5px}#uls-settings-block div.display-settings-block,#uls-settings-block div.input-settings-block{display:inline-block;margin:8px 15px;color:#565656}#uls-settings-block div.display-settings-block:hover,#uls-settings-block div.input-settings-block:hover{color:#252525}
+.ve-activated #toc,.ve-activated #siteNotice,.ve-activated .mw-indicators,.ve-activated #t-print,.ve-activated #t-permalink,.ve-activated #p-coll-print_export,.ve-activated #t-cite,.ve-deactivating .ve-ui-surface,.ve-active .ve-init-mw-desktopArticleTarget-editableContent{display:none} .ve-activating .ve-ui-surface{height:0;padding:0 !important; overflow:hidden} .ve-loading #content > :not( .ve-init-mw-desktopArticleTarget-loading-overlay ), .ve-activated .ve-init-mw-desktopArticleTarget-uneditableContent{  pointer-events:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none; opacity:0.5}.ve-activated .catlinks{cursor:pointer}.ve-activated .catlinks a{opacity:1} .ve-activated #content{position:relative} .ve-init-mw-desktopArticleTarget-loading-overlay{position:absolute;left:0;right:0;z-index:1;margin-top:-0.5em}.ve-init-mw-desktopArticleTarget-progress{height:1em;overflow:hidden;margin:0 25%}.ve-init-mw-desktopArticleTarget-progress-bar{height:1em;width:0} .mw-editsection{white-space:nowrap; unicode-bidi:-moz-isolate;unicode-bidi:-webkit-isolate;unicode-bidi:isolate}.mw-editsection-divider{color:#555} .ve-init-mw-desktopArticleTarget-progress{height:0.75em;border:1px solid #36c;background:#fff;border-radius:2px;box-shadow:0 0.1em 0 0 rgba( 0,0,0,0.15 )}.ve-init-mw-desktopArticleTarget-progress-bar{height:0.75em;background:#36c}</style><meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="Buddy%20memory%20allocation%20-%20Wikipedia_files/load.css">
+<meta name="generator" content="MediaWiki 1.29.0-wmf.16">
+<meta name="referrer" content="origin-when-cross-origin">
+<link rel="alternate" href="android-app://org.wikipedia/http/en.m.wikipedia.org/wiki/Buddy_memory_allocation">
+<link rel="alternate" type="application/x-wiki" title="Edit this page" href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=edit">
+<link rel="edit" title="Edit this page" href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=edit">
+<link rel="apple-touch-icon" href="https://en.wikipedia.org/static/apple-touch/wikipedia.png">
+<link rel="shortcut icon" href="https://en.wikipedia.org/static/favicon/wikipedia.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="https://en.wikipedia.org/w/opensearch_desc.php" title="Wikipedia (en)">
+<link rel="EditURI" type="application/rsd+xml" href="https://en.wikipedia.org/w/api.php?action=rsd">
+<link rel="copyright" href="https://creativecommons.org/licenses/by-sa/3.0/">
+<link rel="canonical" href="https://en.wikipedia.org/wiki/Buddy_memory_allocation">
+<link rel="dns-prefetch" href="https://login.wikimedia.org/">
+<link rel="dns-prefetch" href="https://meta.wikimedia.org/">
+<script src="Buddy%20memory%20allocation%20-%20Wikipedia_files/load.php"></script></head>
+<body class="mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-Buddy_memory_allocation rootpage-Buddy_memory_allocation skin-vector action-view">		<div id="mw-page-base" class="noprint"></div>
+		<div id="mw-head-base" class="noprint"></div>
+		<div id="content" class="mw-body" role="main">
+			<a id="top"></a>
+
+							<div id="siteNotice" class="mw-body-content"><div id="centralNotice"></div><!-- CentralNotice --></div>
+						<div class="mw-indicators mw-body-content">
+</div>
+			<h1 id="firstHeading" class="firstHeading" lang="en">Buddy memory allocation</h1>
+									<div id="bodyContent" class="mw-body-content">
+									<div id="siteSub">From Wikipedia, the free encyclopedia</div>
+								<div id="contentSub"></div>
+												<div id="jump-to-nav" class="mw-jump">
+					Jump to:					<a href="#mw-head">navigation</a>, 					<a href="#p-search">search</a>
+				</div>
+				<div id="mw-content-text" dir="ltr" class="mw-content-ltr" lang="en"><p>The <b>buddy memory allocation</b> technique is a <a href="https://en.wikipedia.org/wiki/Memory_allocation" class="mw-redirect" title="Memory allocation">memory allocation</a>
+ algorithm that divides memory into partitions to try to satisfy a 
+memory request as suitably as possible. This system makes use of 
+splitting memory into halves to try to give a best-fit. According to <a href="https://en.wikipedia.org/wiki/Donald_Knuth" title="Donald Knuth">Donald Knuth</a>, the buddy system was invented in 1963 by <a href="https://en.wikipedia.org/wiki/Harry_Markowitz" title="Harry Markowitz">Harry Markowitz</a>, who won the 1990 <a href="https://en.wikipedia.org/wiki/Nobel_Memorial_Prize_in_Economics" class="mw-redirect" title="Nobel Memorial Prize in Economics">Nobel Memorial Prize in Economics</a>, and was first described by <a href="https://en.wikipedia.org/wiki/Ken_Knowlton" title="Ken Knowlton">Kenneth C. Knowlton</a> (published 1965).<sup id="cite_ref-1" class="reference"><a href="#cite_note-1">[1]</a></sup> Buddy memory allocation is relatively easy to implement. It supports limited but efficient splitting and <a href="https://en.wikipedia.org/wiki/Coalescing_%28computer_science%29" title="Coalescing (computer science)">coalescing of memory blocks</a>.</p>
+<p></p>
+<div id="toc" class="toc">
+<div id="toctitle">
+<h2>Contents</h2>
+<span class="toctoggle">&nbsp;[<a role="button" tabindex="0" id="togglelink">hide</a>]&nbsp;</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#How_it_works"><span class="tocnumber">1</span> <span class="toctext">How it works</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#In_practice"><span class="tocnumber">2</span> <span class="toctext">In practice</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="#Implementation_and_efficiency"><span class="tocnumber">3</span> <span class="toctext">Implementation and efficiency</span></a></li>
+<li class="toclevel-1 tocsection-4"><a href="#See_also"><span class="tocnumber">4</span> <span class="toctext">See also</span></a></li>
+<li class="toclevel-1 tocsection-5"><a href="#References"><span class="tocnumber">5</span> <span class="toctext">References</span></a></li>
+</ul>
+</div>
+<p></p>
+<h2><span class="mw-headline" id="How_it_works">How it works</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=edit&amp;section=1" title="Edit section: How it works">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<p>There are various forms of the buddy system; those in which each 
+block is subdivided into two smaller blocks are the simplest and most 
+common variety. Every memory block in this system has an <i>order</i>, where the order is an integer ranging from 0 to a specified upper limit. The size of a block of order n is proportional to 2<sup>n</sup>,
+ so that the blocks are exactly twice the size of blocks that are one 
+order lower. Power-of-two block sizes make address computation simple, 
+because all buddies are aligned on memory address boundaries that are 
+powers of two. When a larger block is split, it is divided into two 
+smaller blocks, and each smaller block becomes a unique buddy to the 
+other. A split block can only be merged with its unique buddy block, 
+which then reforms the larger block they were split from.</p>
+<p>Starting off, the size of the smallest possible block is determined, 
+i.e. the smallest memory block that can be allocated. If no lower limit 
+existed at all (e.g., bit-sized allocations were possible), there would 
+be a lot of memory and computational overhead for the system to keep 
+track of which parts of the memory are allocated and unallocated. 
+However, a rather low limit may be desirable, so that the average memory
+ waste per allocation (concerning allocations that are, in size, not 
+multiples of the smallest block) is minimized. Typically the lower limit
+ would be small enough to minimize the average wasted space per 
+allocation, but large enough to avoid excessive overhead. The smallest 
+block size is then taken as the size of an order-0 block, so that all 
+higher orders are expressed as power-of-two multiples of this size.</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Programmer" title="Programmer">programmer</a>
+ then has to decide on, or to write code to obtain, the highest possible
+ order that can fit in the remaining available memory space. Since the 
+total available memory in a given computer system may not be a 
+power-of-two multiple of the minimum block size, the largest block size 
+may not span the entire memory of the system. For instance, if the 
+system had 2000K of physical memory and the order-0 block size was 4K, 
+the upper limit on the order would be 8, since an order-8 block (256 
+order-0 blocks, 1024K) is the biggest block that will fit in memory. 
+Consequently it is impossible to allocate the entire physical memory in a
+ single chunk; the remaining 976K of memory would have to be allocated 
+in smaller blocks.</p>
+<h2><span class="mw-headline" id="In_practice">In practice</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=edit&amp;section=2" title="Edit section: In practice">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<p>The following is an example of what happens when a program makes 
+requests for memory. Let's say in this system, the smallest possible 
+block is 64 kilobytes in size, and the upper limit for the order is 4, 
+which results in a largest possible allocatable block, 2<sup>4</sup> times 64K = 1024K in size. The following shows a possible state of the system after various memory requests.</p>
+<table class="wikitable" width="100%">
+<tbody><tr>
+<th>Step</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+<th>64K</th>
+</tr>
+<tr>
+<td>1</td>
+<td colspan="16">2<sup>4</sup></td>
+</tr>
+<tr>
+<td>2.1</td>
+<td colspan="8">2<sup>3</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>2.2</td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>2.3</td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>2.4</td>
+<td>2<sup>0</sup></td>
+<td>2<sup>0</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>2.5</td>
+<td style="background-color:#cff">A: 2<sup>0</sup></td>
+<td>2<sup>0</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>3</td>
+<td style="background-color:#cff">A: 2<sup>0</sup></td>
+<td>2<sup>0</sup></td>
+<td colspan="2" style="background-color:#9f3">B: 2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>4</td>
+<td style="background-color:#cff">A: 2<sup>0</sup></td>
+<td style="background-color:#f03">C: 2<sup>0</sup></td>
+<td colspan="2" style="background-color:#9f3">B: 2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>5.1</td>
+<td style="background-color:#cff">A: 2<sup>0</sup></td>
+<td style="background-color:#f03">C: 2<sup>0</sup></td>
+<td colspan="2" style="background-color:#9f3">B: 2<sup>1</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>5.2</td>
+<td style="background-color:#cff">A: 2<sup>0</sup></td>
+<td style="background-color:#f03">C: 2<sup>0</sup></td>
+<td colspan="2" style="background-color:#9f3">B: 2<sup>1</sup></td>
+<td colspan="2" style="background-color:#903">D: 2<sup>1</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>6</td>
+<td style="background-color:#cff">A: 2<sup>0</sup></td>
+<td style="background-color:#f03">C: 2<sup>0</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="2" style="background-color:#903">D: 2<sup>1</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>7.1</td>
+<td style="background-color:#cff">A: 2<sup>0</sup></td>
+<td style="background-color:#f03">C: 2<sup>0</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>7.2</td>
+<td style="background-color:#cff">A: 2<sup>0</sup></td>
+<td style="background-color:#f03">C: 2<sup>0</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>8</td>
+<td>2<sup>0</sup></td>
+<td style="background-color:#f03">C: 2<sup>0</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>9.1</td>
+<td>2<sup>0</sup></td>
+<td>2<sup>0</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>9.2</td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="2">2<sup>1</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>9.3</td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="4">2<sup>2</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>9.4</td>
+<td colspan="8">2<sup>3</sup></td>
+<td colspan="8">2<sup>3</sup></td>
+</tr>
+<tr>
+<td>9.5</td>
+<td colspan="16">2<sup>4</sup></td>
+</tr>
+</tbody></table>
+<p>This allocation could have occurred in the following manner</p>
+<ol>
+<li>The initial situation.</li>
+<li>Program A requests memory 34K, order 0.
+<ol>
+<li>No order 0 blocks are available, so an order 4 block is split, creating two order 3 blocks.</li>
+<li>Still no order 0 blocks available, so the first order 3 block is split, creating two order 2 blocks.</li>
+<li>Still no order 0 blocks available, so the first order 2 block is split, creating two order 1 blocks.</li>
+<li>Still no order 0 blocks available, so the first order 1 block is split, creating two order 0 blocks.</li>
+<li>Now an order 0 block is available, so it is allocated to A.</li>
+</ol>
+</li>
+<li>Program B requests memory 66K, order 1. An order 1 block is available, so it is allocated to B.</li>
+<li>Program C requests memory 35K, order 0. An order 0 block is available, so it is allocated to C.</li>
+<li>Program D requests memory 67K, order 1.
+<ol>
+<li>No order 1 blocks are available, so an order 2 block is split, creating two order 1 blocks.</li>
+<li>Now an order 1 block is available, so it is allocated to D.</li>
+</ol>
+</li>
+<li>Program B releases its memory, freeing one order 1 block.</li>
+<li>Program D releases its memory.
+<ol>
+<li>One order 1 block is freed.</li>
+<li>Since the buddy block of the newly freed block is also free, the two are merged into one order 2 block.</li>
+</ol>
+</li>
+<li>Program A releases its memory, freeing one order 0 block.</li>
+<li>Program C releases its memory.
+<ol>
+<li>One order 0 block is freed.</li>
+<li>Since the buddy block of the newly freed block is also free, the two are merged into one order 1 block.</li>
+<li>Since the buddy block of the newly formed order 1 block is also free, the two are merged into one order 2 block.</li>
+<li>Since the buddy block of the newly formed order 2 block is also free, the two are merged into one order 3 block.</li>
+<li>Since the buddy block of the newly formed order 3 block is also free, the two are merged into one order 4 block.</li>
+</ol>
+</li>
+</ol>
+<p>As you can see, what happens when a memory request is made is as follows:</p>
+<ul>
+<li>If memory is to be allocated</li>
+</ul>
+<ol>
+<li>Look for a memory slot of a suitable size (the minimal 2<sup>k</sup> block that is larger or equal to that of the requested memory)
+<ol>
+<li>If it is found, it is allocated to the program</li>
+<li>If not, it tries to make a suitable memory slot. The system does so by trying the following:
+<ol>
+<li>Split a free memory slot larger than the requested memory size into half</li>
+<li>If the lower limit is reached, then allocate that amount of memory</li>
+<li>Go back to step 1 (look for a memory slot of a suitable size)</li>
+<li>Repeat this process until a suitable memory slot is found</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>If memory is to be freed</li>
+</ul>
+<ol>
+<li>Free the block of memory</li>
+<li>Look at the neighboring block - is it free too?</li>
+<li>If it is, combine the two, and go back to step 2 and repeat this 
+process until either the upper limit is reached (all memory is freed), 
+or until a non-free neighbour block is encountered</li>
+</ol>
+<h2><span class="mw-headline" id="Implementation_and_efficiency">Implementation and efficiency</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=edit&amp;section=3" title="Edit section: Implementation and efficiency">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<p>In comparison to other simpler techniques such as <a href="https://en.wikipedia.org/wiki/Dynamic_allocation" class="mw-redirect" title="Dynamic allocation">dynamic allocation</a>, the buddy memory system has little <a href="https://en.wikipedia.org/wiki/Fragmentation_%28computer%29#External_fragmentation" class="mw-redirect" title="Fragmentation (computer)">external fragmentation</a>, and allows for <a href="https://en.wikipedia.org/wiki/Data_compaction" title="Data compaction">compaction</a>
+ of memory with little overhead. The buddy method of freeing memory is 
+fast, with the maximal number of compactions required equal to log<sub>2</sub>(highest order). Typically the buddy memory allocation system is implemented with the use of a <a href="https://en.wikipedia.org/wiki/Binary_tree" title="Binary tree">binary tree</a> to represent used or unused split memory blocks. The "buddy" of each block can be found with an <a href="https://en.wikipedia.org/wiki/Exclusive_OR" class="mw-redirect" title="Exclusive OR">exclusive OR</a> of the block's address and the block's size.</p>
+<p>However, there still exists the problem of <a href="https://en.wikipedia.org/wiki/Fragmentation_%28computer%29#Internal_fragmentation" class="mw-redirect" title="Fragmentation (computer)">internal fragmentation</a>
+ — memory wasted because the memory requested is a little larger than a 
+small block, but a lot smaller than a large block. Because of the way 
+the buddy memory allocation technique works, a program that requests 66K
+ of memory would be allocated 128K, which results in a waste of 62K of 
+memory. This problem can be solved by <a href="https://en.wikipedia.org/wiki/Slab_allocation" title="Slab allocation">slab allocation</a>, which may be layered on top of the more coarse buddy allocator to provide more fine-grained allocation.</p>
+<p>One version of the buddy allocation algorithm was described in detail by Donald Knuth in volume 1 of <i><a href="https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming" title="The Art of Computer Programming">The Art of Computer Programming</a></i>.<sup id="cite_ref-2" class="reference"><a href="#cite_note-2">[2]</a></sup> The <a href="https://en.wikipedia.org/wiki/Linux_kernel" title="Linux kernel">Linux kernel</a>
+ also uses the buddy system, with further modifications to minimise 
+external fragmentation, along with various other allocators to manage 
+the memory within blocks.<sup id="cite_ref-3" class="reference"><a href="#cite_note-3">[3]</a></sup></p>
+<p><code>jemalloc</code><sup id="cite_ref-4" class="reference"><a href="#cite_note-4">[4]</a></sup> is a modern memory allocator that employs, among others, the buddy technique.</p>
+<h2><span class="mw-headline" id="See_also">See also</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=edit&amp;section=4" title="Edit section: See also">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Memory_pool" title="Memory pool">Memory pool</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Stack-based_memory_allocation" title="Stack-based memory allocation">Stack-based memory allocation</a></li>
+</ul>
+<h2><span class="mw-headline" id="References">References</span><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=edit&amp;section=5" title="Edit section: References">edit</a><span class="mw-editsection-bracket">]</span></span></h2>
+<ol class="references">
+<li id="cite_note-1"><span class="mw-cite-backlink"><b><a href="#cite_ref-1"><span class="cite-accessibility-label">Jump up </span>^</a></b></span> <span class="reference-text">Kenneth C. Knowlton. A Fast storage allocator. <a href="https://en.wikipedia.org/wiki/Communications_of_the_ACM" title="Communications of the ACM">Communications of the ACM</a> 8(10):623-625, Oct 1965. <i>also</i> Kenneth C Knowlton. A programmer's description of L6. <a href="https://en.wikipedia.org/wiki/Communications_of_the_ACM" title="Communications of the ACM">Communications of the ACM</a>, 9(8):616-625, Aug. 1966 [see also&nbsp;: Google books <a rel="nofollow" class="external autonumber" href="https://books.google.com/books?id=0uHME7EfjQEC&amp;printsec=frontcover#PPA84,M1">[1]</a> page 85]</span></li>
+<li id="cite_note-2"><span class="mw-cite-backlink"><b><a href="#cite_ref-2"><span class="cite-accessibility-label">Jump up </span>^</a></b></span> <span class="reference-text"><cite class="citation book"><a href="https://en.wikipedia.org/wiki/Donald_Knuth" title="Donald Knuth">Knuth, Donald</a> (1997). <i>Fundamental Algorithms</i>. <a href="https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming" title="The Art of Computer Programming">The Art of Computer Programming</a>. <b>1</b> (Second ed.). Reading, Massachusetts: Addison-Wesley. pp.&nbsp;435–455. <a href="https://en.wikipedia.org/wiki/International_Standard_Book_Number" title="International Standard Book Number">ISBN</a>&nbsp;<a href="https://en.wikipedia.org/wiki/Special:BookSources/0-201-89683-4" title="Special:BookSources/0-201-89683-4">0-201-89683-4</a>.</cite><span title="ctx_ver=Z39.88-2004&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3ABuddy+memory+allocation&amp;rft.aufirst=Donald&amp;rft.aulast=Knuth&amp;rft.btitle=Fundamental+Algorithms&amp;rft.date=1997&amp;rft.edition=Second&amp;rft.genre=book&amp;rft.isbn=0-201-89683-4&amp;rft.pages=435-455&amp;rft.place=Reading%2C+Massachusetts&amp;rft.pub=Addison-Wesley&amp;rft.series=The+Art+of+Computer+Programming&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" class="Z3988"><span style="display:none;">&nbsp;</span></span></span></li>
+<li id="cite_note-3"><span class="mw-cite-backlink"><b><a href="#cite_ref-3"><span class="cite-accessibility-label">Jump up </span>^</a></b></span> <span class="reference-text"><cite class="citation book">Mauerer, Wolfgang (October 2008). <i>Professional Linux Kernel Architecture</i>. <a href="https://en.wikipedia.org/wiki/Wrox_Press" title="Wrox Press">Wrox Press</a>. <a href="https://en.wikipedia.org/wiki/International_Standard_Book_Number" title="International Standard Book Number">ISBN</a>&nbsp;<a href="https://en.wikipedia.org/wiki/Special:BookSources/978-0-470-34343-2" title="Special:BookSources/978-0-470-34343-2">978-0-470-34343-2</a>.</cite><span title="ctx_ver=Z39.88-2004&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3ABuddy+memory+allocation&amp;rft.aufirst=Wolfgang&amp;rft.aulast=Mauerer&amp;rft.btitle=Professional+Linux+Kernel+Architecture&amp;rft.date=2008-10&amp;rft.genre=book&amp;rft.isbn=978-0-470-34343-2&amp;rft.pub=Wrox+Press&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" class="Z3988"><span style="display:none;">&nbsp;</span></span></span></li>
+<li id="cite_note-4"><span class="mw-cite-backlink"><b><a href="#cite_ref-4"><span class="cite-accessibility-label">Jump up </span>^</a></b></span> <span class="reference-text"><cite id="CITEREFEvans2006" class="citation">Evans, Jason (16 April 2006), <a rel="nofollow" class="external text" href="http://people.freebsd.org/%7Ejasone/jemalloc/bsdcan2006/jemalloc.pdf"><i>A Scalable Concurrent <code>malloc(3)</code> Implementation for FreeBSD</i></a> <span style="font-size:85%;">(PDF)</span>, pp.&nbsp;4–5</cite><span title="ctx_ver=Z39.88-2004&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3ABuddy+memory+allocation&amp;rft.aufirst=Jason&amp;rft.aulast=Evans&amp;rft.btitle=A+Scalable+Concurrent+%3Ccode%3Emalloc%283%29%3C%2Fcode%3E+Implementation+for+FreeBSD&amp;rft.date=2006-04-16&amp;rft.genre=book&amp;rft_id=http%3A%2F%2Fpeople.freebsd.org%2F~jasone%2Fjemalloc%2Fbsdcan2006%2Fjemalloc.pdf&amp;rft.pages=4-5&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" class="Z3988"><span style="display:none;">&nbsp;</span></span></span></li>
+</ol>
+
+
+<!-- 
+NewPP limit report
+Parsed by mw1251
+Cached time: 20170304132006
+Cache expiry: 2592000
+Dynamic content: false
+CPU time usage: 0.060 seconds
+Real time usage: 0.079 seconds
+Preprocessor visited node count: 250/1000000
+Preprocessor generated node count: 0/1500000
+Post‐expand include size: 5617/2097152 bytes
+Template argument size: 109/2097152 bytes
+Highest expansion depth: 12/40
+Expensive parser function count: 1/500
+Lua time usage: 0.022/10.000 seconds
+Lua memory usage: 1.65 MB/50 MB
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   56.674      1 -total
+ 50.21%   28.455      2 Template:Cite_book
+ 33.43%   18.944      1 Template:Use_dmy_dates
+ 12.80%    7.252      1 Template:DMCA
+ 10.92%    6.187      1 Template:Dated_maintenance_category
+  9.91%    5.616      1 Template:Citation
+  7.44%    4.219      1 Template:FULLROOTPAGENAME
+  5.05%    2.861      1 Template:Ns_has_subpages
+-->
+
+<!-- Saved in parser cache with key enwiki:pcache:idhash:364180-0!*!0!!en!*!* and timestamp 20170304132006 and revision id 741397375
+ -->
+<noscript><img src="//en.wikipedia.org/wiki/Special:CentralAutoLogin/start?type=1x1" alt="" title="" width="1" height="1" style="border: none; position: absolute;" /></noscript></div>					<div class="printfooter">
+						Retrieved from "<a dir="ltr" href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;oldid=741397375">https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;oldid=741397375</a>"					</div>
+				<div id="catlinks" class="catlinks" data-mw="interface"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="https://en.wikipedia.org/wiki/Help:Category" title="Help:Category">Categories</a>: <ul><li><a href="https://en.wikipedia.org/wiki/Category:Memory_management_algorithms" title="Category:Memory management algorithms">Memory management algorithms</a></li></ul></div><div id="mw-hidden-catlinks" class="mw-hidden-catlinks mw-hidden-cats-hidden">Hidden categories: <ul><li><a href="https://en.wikipedia.org/wiki/Category:Use_dmy_dates_from_August_2012" title="Category:Use dmy dates from August 2012">Use dmy dates from August 2012</a></li></ul></div></div>				<div class="visualClear"></div>
+							</div>
+		</div>
+		<div id="mw-navigation">
+			<h2>Navigation menu</h2>
+
+			<div id="mw-head">
+									<div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label">
+						<h3 id="p-personal-label">Personal tools</h3>
+						<ul>
+							<li id="pt-anonuserpage">Not logged in</li><li id="pt-anontalk"><a href="https://en.wikipedia.org/wiki/Special:MyTalk" title="Discussion about edits from this IP address [Alt+Shift+n]" accesskey="n">Talk</a></li><li id="pt-anoncontribs"><a href="https://en.wikipedia.org/wiki/Special:MyContributions" title="A list of edits made from this IP address [Alt+Shift+y]" accesskey="y">Contributions</a></li><li id="pt-createaccount"><a href="https://en.wikipedia.org/w/index.php?title=Special:CreateAccount&amp;returnto=Buddy+memory+allocation" title="You are encouraged to create an account and log in; however, it is not mandatory">Create account</a></li><li id="pt-login"><a href="https://en.wikipedia.org/w/index.php?title=Special:UserLogin&amp;returnto=Buddy+memory+allocation" title="You're encouraged to log in; however, it's not mandatory. [Alt+Shift+o]" accesskey="o">Log in</a></li>						</ul>
+					</div>
+									<div id="left-navigation">
+										<div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
+						<h3 id="p-namespaces-label">Namespaces</h3>
+						<ul>
+															<li id="ca-nstab-main" class="selected"><span><a href="https://en.wikipedia.org/wiki/Buddy_memory_allocation" title="View the content page [Alt+Shift+c]" accesskey="c">Article</a></span></li>
+															<li id="ca-talk"><span><a href="https://en.wikipedia.org/wiki/Talk:Buddy_memory_allocation" title="Discussion about the content page [Alt+Shift+t]" accesskey="t" rel="discussion">Talk</a></span></li>
+													</ul>
+					</div>
+										<div id="p-variants" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-variants-label">
+												<h3 id="p-variants-label" tabindex="0">
+							<span>Variants</span><a href="#" tabindex="-1"></a>
+						</h3>
+
+						<div class="menu">
+							<ul>
+															</ul>
+						</div>
+					</div>
+									</div>
+				<div id="right-navigation">
+										<div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
+						<h3 id="p-views-label">Views</h3>
+						<ul>
+															<li id="ca-view" class="selected"><span><a href="https://en.wikipedia.org/wiki/Buddy_memory_allocation">Read</a></span></li>
+															<li id="ca-edit"><span><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=edit" title="Edit this page [Alt+Shift+e]" accesskey="e">Edit</a></span></li>
+															<li id="ca-history" class="collapsible"><span><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=history" title="Past revisions of this page [Alt+Shift+h]" accesskey="h">View history</a></span></li>
+													</ul>
+					</div>
+										<div id="p-cactions" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-cactions-label" style="">
+						<h3 id="p-cactions-label" tabindex="0"><span>More</span><a href="#" tabindex="-1"></a></h3>
+
+						<div class="menu">
+							<ul>
+															</ul>
+						</div>
+					</div>
+										<div id="p-search" role="search">
+						<h3>
+							<label for="searchInput">Search</label>
+						</h3>
+
+						<form action="/w/index.php" id="searchform">
+							<div id="simpleSearch">
+							<input name="search" placeholder="Search Wikipedia" title="Search Wikipedia [Alt+Shift+f]" accesskey="f" id="searchInput" tabindex="1" autocomplete="off" type="search"><input value="Special:Search" name="title" type="hidden"><input name="go" value="Go" title="Go to a page with this exact name if it exists" id="searchButton" class="searchButton" type="submit">							</div>
+						</form>
+					</div>
+									</div>
+			</div>
+			<div id="mw-panel">
+				<div id="p-logo" role="banner"><a class="mw-wiki-logo" href="https://en.wikipedia.org/wiki/Main_Page" title="Visit the main page"></a></div>
+						<div class="portal" role="navigation" id="p-navigation" aria-labelledby="p-navigation-label">
+			<h3 id="p-navigation-label">Navigation</h3>
+
+			<div class="body">
+									<ul>
+						<li id="n-mainpage-description"><a href="https://en.wikipedia.org/wiki/Main_Page" title="Visit the main page [Alt+Shift+z]" accesskey="z">Main page</a></li><li id="n-contents"><a href="https://en.wikipedia.org/wiki/Portal:Contents" title="Guides to browsing Wikipedia">Contents</a></li><li id="n-featuredcontent"><a href="https://en.wikipedia.org/wiki/Portal:Featured_content" title="Featured content – the best of Wikipedia">Featured content</a></li><li id="n-currentevents"><a href="https://en.wikipedia.org/wiki/Portal:Current_events" title="Find background information on current events">Current events</a></li><li id="n-randompage"><a href="https://en.wikipedia.org/wiki/Special:Random" title="Load a random article [Alt+Shift+x]" accesskey="x">Random article</a></li><li id="n-sitesupport"><a href="https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&amp;utm_medium=sidebar&amp;utm_campaign=C13_en.wikipedia.org&amp;uselang=en" title="Support us">Donate to Wikipedia</a></li><li id="n-shoplink"><a href="https://shop.wikimedia.org/" title="Visit the Wikipedia store">Wikipedia store</a></li>					</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id="p-interaction" aria-labelledby="p-interaction-label">
+			<h3 id="p-interaction-label">Interaction</h3>
+
+			<div class="body">
+									<ul>
+						<li id="n-help"><a href="https://en.wikipedia.org/wiki/Help:Contents" title="Guidance on how to use and edit Wikipedia">Help</a></li><li id="n-aboutsite"><a href="https://en.wikipedia.org/wiki/Wikipedia:About" title="Find out about Wikipedia">About Wikipedia</a></li><li id="n-portal"><a href="https://en.wikipedia.org/wiki/Wikipedia:Community_portal" title="About the project, what you can do, where to find things">Community portal</a></li><li id="n-recentchanges"><a href="https://en.wikipedia.org/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [Alt+Shift+r]" accesskey="r">Recent changes</a></li><li id="n-contactpage"><a href="https://en.wikipedia.org/wiki/Wikipedia:Contact_us" title="How to contact Wikipedia">Contact page</a></li>					</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id="p-tb" aria-labelledby="p-tb-label">
+			<h3 id="p-tb-label">Tools</h3>
+
+			<div class="body">
+									<ul>
+						<li id="t-whatlinkshere"><a href="https://en.wikipedia.org/wiki/Special:WhatLinksHere/Buddy_memory_allocation" title="List of all English Wikipedia pages containing links to this page [Alt+Shift+j]" accesskey="j">What links here</a></li><li id="t-recentchangeslinked"><a href="https://en.wikipedia.org/wiki/Special:RecentChangesLinked/Buddy_memory_allocation" rel="nofollow" title="Recent changes in pages linked from this page [Alt+Shift+k]" accesskey="k">Related changes</a></li><li id="t-upload"><a href="https://en.wikipedia.org/wiki/Wikipedia:File_Upload_Wizard" title="Upload files [Alt+Shift+u]" accesskey="u">Upload file</a></li><li id="t-specialpages"><a href="https://en.wikipedia.org/wiki/Special:SpecialPages" title="A list of all special pages [Alt+Shift+q]" accesskey="q">Special pages</a></li><li id="t-permalink"><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;oldid=741397375" title="Permanent link to this revision of the page">Permanent link</a></li><li id="t-info"><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;action=info" title="More information about this page">Page information</a></li><li id="t-wikibase"><a href="https://www.wikidata.org/wiki/Q1001112" title="Link to connected data repository item [Alt+Shift+g]" accesskey="g">Wikidata item</a></li><li id="t-cite"><a href="https://en.wikipedia.org/w/index.php?title=Special:CiteThisPage&amp;page=Buddy_memory_allocation&amp;id=741397375" title="Information on how to cite this page">Cite this page</a></li>					</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id="p-coll-print_export" aria-labelledby="p-coll-print_export-label">
+			<h3 id="p-coll-print_export-label">Print/export</h3>
+
+			<div class="body">
+									<ul>
+						<li id="coll-create_a_book"><a href="https://en.wikipedia.org/w/index.php?title=Special:Book&amp;bookcmd=book_creator&amp;referer=Buddy+memory+allocation">Create a book</a></li><li id="coll-download-as-rdf2latex"><a href="https://en.wikipedia.org/w/index.php?title=Special:Book&amp;bookcmd=render_article&amp;arttitle=Buddy+memory+allocation&amp;returnto=Buddy+memory+allocation&amp;oldid=741397375&amp;writer=rdf2latex">Download as PDF</a></li><li id="t-print"><a href="https://en.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;printable=yes" title="Printable version of this page [Alt+Shift+p]" accesskey="p">Printable version</a></li>					</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id="p-lang" aria-labelledby="p-lang-label"><span class="uls-settings-trigger" title="Language settings" tabindex="0" role="button" aria-haspopup="true"></span>
+			<h3 id="p-lang-label">Languages</h3>
+
+			<div class="body">
+									<ul>
+						<li class="interlanguage-link interwiki-de"><a href="https://de.wikipedia.org/wiki/Buddy-Speicherverwaltung" title="Buddy-Speicherverwaltung – German" hreflang="de" class="interlanguage-link-target" lang="de">Deutsch</a></li><li class="interlanguage-link interwiki-fa"><a href="https://fa.wikipedia.org/wiki/%D9%85%D8%AF%DB%8C%D8%B1%DB%8C%D8%AA_%D8%AD%D8%A7%D9%81%D8%B8%D9%87_%D8%AF%D9%88%D8%B3%D8%AA%D8%A7%D9%86%D9%87" title="مدیریت حافظه دوستانه – Persian" hreflang="fa" class="interlanguage-link-target" lang="fa">فارسی</a></li><li class="interlanguage-link interwiki-ko"><a href="https://ko.wikipedia.org/wiki/%EB%B2%84%EB%94%94_%EB%A9%94%EB%AA%A8%EB%A6%AC_%ED%95%A0%EB%8B%B9" title="버디 메모리 할당 – Korean" hreflang="ko" class="interlanguage-link-target" lang="ko">한국어</a></li><li class="interlanguage-link interwiki-it"><a href="https://it.wikipedia.org/wiki/Buddy_memory_allocation" title="Buddy memory allocation – Italian" hreflang="it" class="interlanguage-link-target" lang="it">Italiano</a></li><li class="interlanguage-link interwiki-pl"><a href="https://pl.wikipedia.org/wiki/Algorytm_bli%C5%BAniak%C3%B3w" title="Algorytm bliźniaków – Polish" hreflang="pl" class="interlanguage-link-target" lang="pl">Polski</a></li><li class="interlanguage-link interwiki-pt"><a href="https://pt.wikipedia.org/wiki/Buddy_memory_allocation" title="Buddy memory allocation – Portuguese" hreflang="pt" class="interlanguage-link-target" lang="pt">Português</a></li>					</ul>
+				<div class="after-portlet after-portlet-lang"><span class="wb-langlinks-edit wb-langlinks-link"><a href="https://www.wikidata.org/wiki/Q1001112#sitelinks-wikipedia" title="Edit interlanguage links" class="wbc-editpage">Edit links</a></span></div>			</div>
+		</div>
+				</div>
+		</div>
+		<div id="footer" role="contentinfo">
+							<ul id="footer-info">
+											<li id="footer-info-lastmod"> This page was last modified on 27 September 2016, at 07:21.</li>
+											<li id="footer-info-copyright">Text is available under the <a rel="license" href="https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative Commons Attribution-ShareAlike License</a><a rel="license" href="https://creativecommons.org/licenses/by-sa/3.0/" style="display:none;"></a>;
+additional terms may apply.  By using this site, you agree to the <a href="https://wikimediafoundation.org/wiki/Terms_of_Use">Terms of Use</a> and <a href="https://wikimediafoundation.org/wiki/Privacy_policy">Privacy Policy</a>. Wikipedia® is a registered trademark of the <a href="https://www.wikimediafoundation.org/">Wikimedia Foundation, Inc.</a>, a non-profit organization.</li>
+									</ul>
+							<ul id="footer-places">
+											<li id="footer-places-privacy"><a href="https://wikimediafoundation.org/wiki/Privacy_policy" class="extiw" title="wmf:Privacy policy">Privacy policy</a></li>
+											<li id="footer-places-about"><a href="https://en.wikipedia.org/wiki/Wikipedia:About" title="Wikipedia:About">About Wikipedia</a></li>
+											<li id="footer-places-disclaimer"><a href="https://en.wikipedia.org/wiki/Wikipedia:General_disclaimer" title="Wikipedia:General disclaimer">Disclaimers</a></li>
+											<li id="footer-places-contact"><a href="https://en.wikipedia.org/wiki/Wikipedia:Contact_us">Contact Wikipedia</a></li>
+											<li id="footer-places-developers"><a href="https://www.mediawiki.org/wiki/Special:MyLanguage/How_to_contribute">Developers</a></li>
+											<li id="footer-places-cookiestatement"><a href="https://wikimediafoundation.org/wiki/Cookie_statement">Cookie statement</a></li>
+											<li id="footer-places-mobileview"><a href="https://en.m.wikipedia.org/w/index.php?title=Buddy_memory_allocation&amp;mobileaction=toggle_view_mobile" class="noprint stopMobileRedirectToggle">Mobile view</a></li>
+									</ul>
+										<ul id="footer-icons" class="noprint">
+											<li id="footer-copyrightico">
+							<a href="https://wikimediafoundation.org/"><img src="Buddy%20memory%20allocation%20-%20Wikipedia_files/wikimedia-button.png" srcset="/static/images/wikimedia-button-1.5x.png 1.5x, /static/images/wikimedia-button-2x.png 2x" alt="Wikimedia Foundation" width="88" height="31"></a>						</li>
+											<li id="footer-poweredbyico">
+							<a href="https://www.mediawiki.org/"><img src="Buddy%20memory%20allocation%20-%20Wikipedia_files/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" srcset="/static/images/poweredby_mediawiki_132x47.png 1.5x, /static/images/poweredby_mediawiki_176x62.png 2x" width="88" height="31"></a>						</li>
+									</ul>
+						<div style="clear:both"></div>
+		</div>
+		<script>(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgPageParseReport":{"limitreport":{"cputime":"0.060","walltime":"0.079","ppvisitednodes":{"value":250,"limit":1000000},"ppgeneratednodes":{"value":0,"limit":1500000},"postexpandincludesize":{"value":5617,"limit":2097152},"templateargumentsize":{"value":109,"limit":2097152},"expansiondepth":{"value":12,"limit":40},"expensivefunctioncount":{"value":1,"limit":500},"entityaccesscount":{"value":0,"limit":400},"timingprofile":["100.00%   56.674      1 -total"," 50.21%   28.455      2 Template:Cite_book"," 33.43%   18.944      1 Template:Use_dmy_dates"," 12.80%    7.252      1 Template:DMCA"," 10.92%    6.187      1 Template:Dated_maintenance_category","  9.91%    5.616      1 Template:Citation","  7.44%    4.219      1 Template:FULLROOTPAGENAME","  5.05%    2.861      1 Template:Ns_has_subpages"]},"scribunto":{"limitreport-timeusage":{"value":"0.022","limit":"10.000"},"limitreport-memusage":{"value":1733539,"limit":52428800}},"cachereport":{"origin":"mw1251","timestamp":"20170304132006","ttl":2592000,"transientcontent":false}}});});</script><script>(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":101,"wgHostname":"mw1242"});});</script>
+	
+
+<div style="display: none; font-size: 13px;" class="suggestions"><div class="suggestions-results"></div><div class="suggestions-special"></div></div><a accesskey="v" href="https://en.wikipedia.org/wiki/Buddy_memory_allocation?action=edit" style="display: none;"></a></body></html>

@@ -6,3 +6,4 @@
 #include "realmodeint.h"
 #include "8259PIC.h"
 #include "interrupts.h"
+#include "pci.h"

@@ -29,19 +29,21 @@ void main(void)
 	
 	io_detectCPU();
 
-	// Detect the memory map
+	// Init memory subsystem
 
-	int memMapSize = 0;
-	struct MemoryEntry* memMap = 0; 
+	//int memMapSize = 0;
+	//struct MemoryEntry* memMap = 0; 
 
-	bios_detectMemory(&memMap, &memMapSize);
+	//bios_detectMemory(&memMap, &memMapSize);
+
+	mem_init();
 
 	// Now we have detected memory, init the kernel memory allocator,
 	// so we can kmalloc
 
 	// Detect VESA modes
 
-	gfx_detectVESAModes();
+	//gfx_detectVESAModes();
 
 	// Now we have detected the vesa modes, find the highest resolution
 	// mode and set it; init the vesa framebuffer driver; init the 
@@ -52,11 +54,11 @@ void main(void)
 	
 	// init interrupts using 8259 PIC interrupt system
 
-	if (! io_initInterrupts(INTERRUPTCONTROL_PIC))
-	{
-		kprintf("Could not init interrupts.\n");
-		goto die;
-	}
+	//if (! io_initInterrupts(INTERRUPTCONTROL_PIC))
+	//{
+	//	kprintf("Could not init interrupts.\n");
+	//	goto die;
+	//}
 
 	// init keyboard driver and install its interrupt callback
 
@@ -64,7 +66,7 @@ void main(void)
 
 	// enable interrupts
 
-	io_enableInterrupts();
+	//io_enableInterrupts();
 
 	// Now we have a graphical console (hopefully) and a functioning 
 	// events sub system, we can start to detect hardware and log
@@ -78,6 +80,8 @@ void main(void)
 
 
 	// Scan PCI bus
+
+	//io_probePCIBus();
 
 	// Did we find a ATA/SATA AHCI? If so, add disks
 

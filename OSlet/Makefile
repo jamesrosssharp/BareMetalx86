@@ -16,10 +16,10 @@ hd.vmdk: hd.img
 	@VBoxManage internalcommands createrawvmdk -filename hd.vmdk -rawdisk hd.img 
 
 run:	hd.img
-	@qemu-system-i386 -vga std -drive file=hd.img,index=0,format=raw
+	@qemu-system-i386 -m 256 -vga std -drive file=hd.img,index=0,format=raw
 
 bochs: hd.img
-	@bochs 'ata0-master: type=disk, path="hd.img", cylinders=2, heads=16, spt=63' 'boot: disk'
+	@bochs 'ata0-master: type=disk, path="hd.img", cylinders=2, heads=16, spt=63' 'boot: disk' 'pci: enabled=1, slot1=pcivga, chipset=i440fx'
 
 clean:  
 	rm hd.img stage1_5.bin payload.bin main.o
