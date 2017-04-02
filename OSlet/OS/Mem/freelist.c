@@ -44,7 +44,6 @@ bool	mem_freeList_init(int blockSize, int numberOfBlocks, void* memory)
 	{
 		next = (uintptr_t*)((uintptr_t)head + blockSize); 
 		*head = (uintptr_t)next; 
-		DEBUG("Head: %p Next: %p\n", head, next);
 		head = next;
 	}
 

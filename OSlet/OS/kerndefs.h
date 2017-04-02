@@ -7,9 +7,11 @@
 #define MIN(x,y)	( (x) <= (y) ? (x) : (y) )
 #define MAX(x,y)	( (x) >= (y) ? (x) : (y) )
 
-#define IS_POWER_OF_TWO(x) (x & (x-1))
+#define IS_POWER_OF_TWO(x) ((x & (x-1)) == 0)
 
 #define COUNTOF(x) (sizeof(x) / sizeof(x[0]))
+
+#define ALIGNTO(x,y) ((x + (y-1)) & ~(y-1))
 
 // If we are unit testing the code, need special defines
 

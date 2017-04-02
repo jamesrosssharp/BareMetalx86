@@ -12,11 +12,6 @@
 
 using namespace std;
 
-extern "C"
-{
-	int lib_math_log2(int operand);	
-}
-
 int main(int argc, char** argv)
 {
 

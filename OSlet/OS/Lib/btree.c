@@ -34,8 +34,6 @@ int lib_btree_requiredMemorySize(int maxDepth)
 {
 	int elem = lib_btree_maxElementsRequired(maxDepth);
 
-	DEBUG("Elem: %d (%lu %lu)\n", elem, sizeof(struct BTree), sizeof(struct BTreeNode));
-
 	return sizeof(struct BTree) + mem_freeList_requiredMemorySize(sizeof(struct BTreeNode), elem) + BTREE_ALIGN;
 
 }
@@ -185,3 +183,20 @@ void	lib_btree_debugTree(struct BTree* tree)
 	lib_btree_debugNode(tree->root, 0);
 }
 
+void	lib_btree_traverseNodeWithCallback(struct BTreeNode* node, int depth, bool leavesOnly, BTreeTraverseFunction func, void* data)
+{
+	if (node == NULL)
+		return;
+
+	if (! leavesOnly || IS_LEAF(node))
+		func(data, node->data, depth);
+	
+	lib_btree_traverseNodeWithCallback(node->left, depth + 1, leavesOnly, func, data);
+	lib_btree_traverseNodeWithCallback(node->right, depth + 1, leavesOnly, func, data);
+
+}
+
+void 	lib_btree_traverseTreeWithCallback(struct BTree* tree, bool leavesOnly, BTreeTraverseFunction func, void* data)
+{
+	lib_btree_traverseNodeWithCallback(tree->root, 0, leavesOnly, func, data); 
+}

@@ -34,6 +34,7 @@ BTree structure:
 */
 
 #include "buddy.h"
+#include "../Lib/klib.h"
 
 // This might change. We may want Buddy memory pools to be page aligned, for easy mapping into
 // process memory.
@@ -41,7 +42,7 @@ BTree structure:
 
 int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize)
 {
-	if (! IS_POWER_OF_TWO(blockSize) || ! IS_POWER_OF_TWO(minBlockSize))
+	if (! IS_POWER_OF_TWO(maxBlockSize) || ! IS_POWER_OF_TWO(minBlockSize))
 		return -1;
 
 	if (maxBlockSize == 0 || minBlockSize == 0)
@@ -49,13 +50,19 @@ int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize)
 
 	// compute size memory blocks
 
-	int memSize = maxBlockSize + BUDDY_BLOCK_ALIGN;
+	int memSize = maxBlockSize + 3*BUDDY_BLOCK_ALIGN;	// we pad 3 times
 
 	// compute size of BTree
 
 	int treeDepth = lib_math_log2(maxBlockSize) - lib_math_log2(minBlockSize) + 1;	
 
 	memSize += lib_btree_requiredMemorySize(treeDepth); 		
+
+	// compute size of block freelist
+
+	int numBlocks = lib_btree_maxElementsRequired(treeDepth);
+
+	memSize += mem_freeList_requiredMemorySize(sizeof(struct BuddyBlock), numBlocks);
 
 	return memSize;
 
@@ -74,6 +81,9 @@ int mem_buddy_maxBuddyBlockSizeForMemoryRegion(int memSize, int minBlockSize)
 	{
 	   requiredMem = mem_buddy_requiredMemorySize(1 << blockSizeLog2, minBlockSize);
 
+	   if (requiredMem == -1)
+		return -1;
+
 	   if (requiredMem > memSize)
 		break;
 
@@ -84,7 +94,115 @@ int mem_buddy_maxBuddyBlockSizeForMemoryRegion(int memSize, int minBlockSize)
 	if (i == 0)
 		return -1;
 
-	return 1 << blockSizeLog2;
+	return 1 << (blockSizeLog2 - 1);
 }
 
 
+// Init a Buddy memory allocator. Allocate mem_buddy_requiredMemorySize storage for holding buddy allocator.
+bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memory)
+{
+	
+	// Init the BuddyMemoryAllocator structure 	
+
+	struct BuddyMemoryAllocator* buddy = (struct BuddyMemoryAllocator*)memory;
+
+	buddy->maxBlockSize = maxBlockSize;
+	buddy->minBlockSize = minBlockSize;
+	
+	int treeDepth = lib_math_log2(maxBlockSize) - lib_math_log2(minBlockSize) + 1;
+
+	buddy->btreeMaxDepth = treeDepth;
+
+	// Allocate the storage tree.
+
+	uintptr_t btreeOffset = ALIGNTO((uintptr_t)memory + sizeof(struct BuddyMemoryAllocator), BUDDY_BLOCK_ALIGN);
+
+	int btreeSize = lib_btree_requiredMemorySize(treeDepth);  
+
+	buddy->storageTree = (struct BTree*)btreeOffset;
+
+	if (! lib_btree_init((void *)btreeOffset, treeDepth))
+	{
+		DEBUG("Could not init BTree\n");
+		return false;
+	}
+
+	// Allocate the block record freelist.
+
+	uintptr_t freeListOffset = ALIGNTO(btreeOffset + btreeSize, BUDDY_BLOCK_ALIGN);
+
+	int numberOfBlocks = lib_btree_maxElementsRequired(treeDepth);
+
+	int freeListSize = mem_freeList_requiredMemorySize(sizeof(struct BuddyBlock), numberOfBlocks);
+
+	if (! mem_freeList_init(sizeof(struct BuddyBlock), numberOfBlocks, (void*)freeListOffset))
+	{
+		DEBUG("Could not init freelist!\n");
+		return false;
+	}
+
+	buddy->blockFreeList = (struct FreeList*) freeListOffset;
+
+	// Allocate the memory for the free blocks
+
+	uintptr_t blocksOffset = ALIGNTO(freeListOffset + freeListSize, BUDDY_BLOCK_ALIGN);		
+
+	buddy->blocksBaseAddress = (void*)blocksOffset;
+
+	// Create BTree root
+
+	struct BuddyBlock* block = mem_freeList_allocateBlock(buddy->blockFreeList);
+
+	if (block == NULL)
+	{
+		DEBUG("Could not allocate block from freelist!\n");
+		return false;
+	}
+
+	block->allocated = false;
+	block->pid = 0;
+	block->size = maxBlockSize;		
+	block->baseAddress = (void*)blocksOffset;  
+
+	if (! lib_btree_addElement(buddy->storageTree, maxBlockSize >> 1, (void*) block))
+	{
+		DEBUG("Could not add element to BTree!\n");
+		return false;
+	}
+
+	return true;
+		
+}
+
+void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
+{
+
+	// Find a leaf of the storage tree which has the smallest unallocated block bigger than the required size
+
+		
+
+}
+
+void mem_buddy_printNodes(void* data, void* nodeData, int depth)
+{
+
+	for (int i = 0; i < depth; i ++) DEBUG(" "); 
+
+	struct BuddyBlock* block = (struct BuddyBlock*)nodeData;
+
+	DEBUG("Block: size: %d base address: %p allocated: %s\n", block->size, block->baseAddress, block->allocated ? "true" : "false");
+
+}
+
+void mem_buddy_debug(struct BuddyMemoryAllocator* buddy)
+{
+	DEBUG("============= Buddy Memory Allocator ===============\n");
+	DEBUG("MaxBlockSize: %d MinBlockSize: %d Btree max depth: %d\n", buddy->maxBlockSize, buddy->minBlockSize, buddy->btreeMaxDepth);
+	DEBUG("BTree: %p\n", buddy->storageTree);
+	DEBUG("FreeList: %p\n", buddy->blockFreeList);
+	DEBUG("Block Start: %p\n", buddy->blocksBaseAddress);
+
+	//lib_btree_debugTree(buddy->storageTree);
+
+	lib_btree_traverseTreeWithCallback(buddy->storageTree, false, mem_buddy_printNodes, NULL);
+}
