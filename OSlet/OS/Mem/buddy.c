@@ -9,12 +9,12 @@ In addition to the BTree, space must be reserved for a
 free list of memory block entries, which store the info
 about the block (such as pid, block size etc.)
 
-Memory Layout:
+Sample Memory Layout:
 			256k
 | 4k | 4k | 8k | 16k | 32k |  64k  | 128k    |
   0                         0x10000  0x20000  0x40000
 
-BTree structure:
+corresponding BTree structure:
 
 		   0x20000 (256k)
 		/                  \
@@ -28,10 +28,10 @@ BTree structure:
    /	     \						
  0x1000 (8k)  0x3000
   /   \
-0x800 0xc00 (4k)
+0x800 0x1800 (4k)
 
 
-*/
+							*/
 
 #include "buddy.h"
 #include "../Lib/klib.h"
@@ -174,16 +174,140 @@ bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memory)
 		
 }
 
-void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
+
+void mem_buddy_findCompatibleBlock(void* data, void* nodeData, int bisector, int depth)
 {
 
-	// Find a leaf of the storage tree which has the smallest unallocated block bigger than the required size
+	struct BuddyBlock* block = (struct BuddyBlock*)nodeData;
+	struct BuddySearchInfo* info = (struct BuddySearchInfo*)data;
 
-		
+	if (info == NULL || block == NULL)
+		return;
+
+	if ((! block->allocated) && (block->size < info->minBytesFound) && (block->size >= info->requestedBytes))
+	{
+		info->minBytesFound = block->size;
+		info->minBytesDepth = depth;
+		info->minBlock = block;	
+		info->minBisector = bisector;
+	}
 
 }
 
-void mem_buddy_printNodes(void* data, void* nodeData, int depth)
+void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
+{
+
+	DEBUG("Allocating %d bytes...\n", bytes);
+
+	struct BuddySearchInfo info = {0};
+
+	info.requestedBytes = bytes;
+	info.minBytesFound = 0xffffffff;
+	info.minBlock = NULL;
+
+	// Find a leaf of the storage tree which has the smallest unallocated block bigger than the required size
+
+	lib_btree_traverseTreeWithCallback(buddy->storageTree, true, mem_buddy_findCompatibleBlock, &info); 		
+
+	if (info.minBlock == NULL)
+		return NULL;
+
+	int log2bytes = lib_math_log2(bytes);
+	int log2found = lib_math_log2(info.minBytesFound);
+
+	DEBUG("log2bytes: %d log2found: %d\n", log2bytes, log2found);
+
+	if (log2bytes == log2found)
+	{
+		// The requested block can be contained by the block found, without the need
+		// to sub divide.
+
+		if (info.minBlock == NULL)
+			return NULL;
+
+		info.minBlock->allocated = true;
+
+		DEBUG("Allocated %d byte block\n", info.minBlock->size);
+
+		return info.minBlock->baseAddress;
+
+	}
+	else if (log2bytes < log2found)
+	{
+		DEBUG("Subdividing %d byte block\n", info.minBlock->size);
+
+		int log2blockBytes = log2found;
+
+		struct BuddyBlock* block = info.minBlock;
+		int	bisector = info.minBisector;
+
+
+		while ((log2blockBytes > log2bytes) && (log2blockBytes > lib_math_log2(buddy->minBlockSize)))
+		{
+			block->allocated = true;
+
+			struct BuddyBlock* left = (struct BuddyBlock*)mem_freeList_allocateBlock((void*)buddy->blockFreeList);
+
+		    	if (left == NULL)
+			{
+				DEBUG("Could not allocate left child node.\n");
+				return NULL;
+			}
+
+			struct BuddyBlock* right = (struct BuddyBlock*)mem_freeList_allocateBlock((void*)buddy->blockFreeList);   	
+
+			if (right == NULL)
+			{
+				DEBUG("Could not allocate right child node.\n");
+				mem_freeList_freeBlock((void*)buddy->blockFreeList, (void*)left);
+				return NULL;
+			}
+	
+			// add children
+
+			int leftBisector = bisector - (block->size >> 2);
+			int rightBisector = bisector + (block->size >> 2);
+
+			left->allocated = right->allocated = false;
+
+			DEBUG("Left bisector: %x right: %x\n", leftBisector, rightBisector);
+
+			right->size = left->size = block->size >> 1;
+
+			DEBUG("Left size: %x right: %x\n", left->size, right->size);
+
+			left->baseAddress = (void*)((uintptr_t)block->baseAddress);
+			right->baseAddress = (void*)((uintptr_t)block->baseAddress + (block->size >> 1));
+
+			DEBUG("Left address: %p right: %p\n", left->baseAddress, right->baseAddress);
+
+			lib_btree_addElement(buddy->storageTree, leftBisector, left);
+			lib_btree_addElement(buddy->storageTree, rightBisector, right);
+
+			block = left;
+			bisector = leftBisector;
+
+			log2blockBytes --;
+		}
+
+		block->allocated = true;
+
+		DEBUG("Allocated %d byte block\n", block->size);
+
+		return block->baseAddress;
+
+	
+	}
+	else
+	{
+		DEBUG("requested size greater than block size! r: %d a: %d\n", bytes, info.minBlock->size);
+	}
+
+	return NULL;
+
+}
+
+void mem_buddy_printNodes(void* data, void* nodeData, int bisector, int depth)
 {
 
 	for (int i = 0; i < depth; i ++) DEBUG(" "); 

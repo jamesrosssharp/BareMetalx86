@@ -19,7 +19,11 @@
 
 	// test on 64 bit platform
 
-	#define DEBUG	printf
+	#ifdef QUIET
+		#define DEBUG(...) 	
+	#else
+		#define DEBUG	printf
+	#endif
 
 	#include <stdio.h>
 	#include <stdint.h>

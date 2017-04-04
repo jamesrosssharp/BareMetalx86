@@ -24,7 +24,7 @@ struct BTree
 
 };
 
-typedef void (*BTreeTraverseFunction) (void* data, void* nodeData, int depth);
+typedef void (*BTreeTraverseFunction) (void* data, void* nodeData, int bisector, int depth);
 
 #ifdef __cplusplus
 extern "C" {

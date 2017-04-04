@@ -6,6 +6,7 @@
 //
 
 #include "../../../OS/Mem/buddy.h"
+#include "../../../OS/Lib/math.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -26,6 +27,18 @@ int main(int argc, char** argv)
 	unsigned char* mem = new unsigned char [memSize];
 
 	mem_buddy_init(maxBlockSize, minBlockSize, (void*) mem);
+
+	mem_buddy_debug((struct BuddyMemoryAllocator*)mem);	
+
+	for (int i = 0; i < 100; i++)
+	{
+		int bytes = ((1 << (rand() % (lib_math_log2(maxBlockSize) - 1))) * (1.0 + (rand() % 100) / 100.0));
+
+		void* addr = mem_buddy_allocate((struct BuddyMemoryAllocator*)mem, bytes);
+
+		if (! addr)
+			cout << "Failed to allocate memory!" << endl;
+	}
 
 	mem_buddy_debug((struct BuddyMemoryAllocator*)mem);	
 

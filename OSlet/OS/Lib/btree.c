@@ -189,7 +189,7 @@ void	lib_btree_traverseNodeWithCallback(struct BTreeNode* node, int depth, bool 
 		return;
 
 	if (! leavesOnly || IS_LEAF(node))
-		func(data, node->data, depth);
+		func(data, node->data, node->bisector, depth);
 	
 	lib_btree_traverseNodeWithCallback(node->left, depth + 1, leavesOnly, func, data);
 	lib_btree_traverseNodeWithCallback(node->right, depth + 1, leavesOnly, func, data);
