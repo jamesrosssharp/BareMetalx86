@@ -30,7 +30,11 @@ int main(int argc, char** argv)
 
 	mem_buddy_debug((struct BuddyMemoryAllocator*)mem);	
 
-	for (int i = 0; i < 100; i++)
+	const int blocks = 100;
+
+	void* blockPtr[blocks];
+
+	for (int i = 0; i < blocks; i++)
 	{
 		int bytes = ((1 << (rand() % (lib_math_log2(maxBlockSize) - 1))) * (1.0 + (rand() % 100) / 100.0));
 
@@ -38,8 +42,24 @@ int main(int argc, char** argv)
 
 		if (! addr)
 			cout << "Failed to allocate memory!" << endl;
+
+		blockPtr[i] = addr;
 	}
 
+	cout << "!!!!!!!!!!!!!!!!!!! After alloc !!!!!!!!!!!!!!!!!" << endl;
+
 	mem_buddy_debug((struct BuddyMemoryAllocator*)mem);	
+
+	for (int i = 0; i < blocks; i++)
+	{
+		void* address = blockPtr[i];
+
+		if (address)
+			mem_buddy_free((struct BuddyMemoryAllocator*)mem, address);
+	}
+
+	cout << "!!!!!!!!!!!!!!!!!!! After free !!!!!!!!!!!!!!!!!" << endl;
+
+	mem_buddy_debug((struct BuddyMemoryAllocator*)mem);
 
 }

@@ -162,7 +162,8 @@ bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memory)
 	block->allocated = false;
 	block->pid = 0;
 	block->size = maxBlockSize;		
-	block->baseAddress = (void*)blocksOffset;  
+	block->baseAddress = (void*)blocksOffset; 
+	block->bisector = maxBlockSize >> 1; 
 
 	if (! lib_btree_addElement(buddy->storageTree, maxBlockSize >> 1, (void*) block))
 	{
@@ -175,10 +176,10 @@ bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memory)
 }
 
 
-void mem_buddy_findCompatibleBlock(void* data, void* nodeData, int bisector, int depth)
+void mem_buddy_findCompatibleBlock(struct BTreeNode* node, void* data, int depth)
 {
 
-	struct BuddyBlock* block = (struct BuddyBlock*)nodeData;
+	struct BuddyBlock* block = (struct BuddyBlock*)node->data;
 	struct BuddySearchInfo* info = (struct BuddySearchInfo*)data;
 
 	if (info == NULL || block == NULL)
@@ -189,7 +190,7 @@ void mem_buddy_findCompatibleBlock(void* data, void* nodeData, int bisector, int
 		info->minBytesFound = block->size;
 		info->minBytesDepth = depth;
 		info->minBlock = block;	
-		info->minBisector = bisector;
+		info->minBisector = node->bisector;
 	}
 
 }
@@ -268,6 +269,9 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
 			int leftBisector = bisector - (block->size >> 2);
 			int rightBisector = bisector + (block->size >> 2);
 
+			left->bisector = leftBisector;
+			right->bisector = rightBisector;
+
 			left->allocated = right->allocated = false;
 
 			DEBUG("Left bisector: %x right: %x\n", leftBisector, rightBisector);
@@ -307,12 +311,96 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
 
 }
 
-void mem_buddy_printNodes(void* data, void* nodeData, int bisector, int depth)
+
+void mem_buddy_findBlockWithAddress(struct BTreeNode* node, void* data, int depth)
+{
+
+	struct BuddySearchBlockInfo* info = (struct BuddySearchBlockInfo*)data;
+
+	struct BuddyBlock* block = (struct BuddyBlock*)node->data;
+
+	if (block->baseAddress == info->requestedBaseAddress)
+	{
+		info->block = block;
+		info->btreeNode = node;
+	}
+
+}
+
+void mem_buddy_free(struct BuddyMemoryAllocator* buddy, void* mem)
+{
+
+	struct BuddySearchBlockInfo info;
+
+	info.requestedBaseAddress = mem;
+	info.block = NULL;	
+	info.btreeNode = NULL;
+
+	// Find the block with the baseAddress = mem
+
+	lib_btree_traverseTreeWithCallback(buddy->storageTree, true, mem_buddy_findBlockWithAddress, &info); 		
+	
+	if (info.block == NULL || info.btreeNode == NULL)
+	{
+		DEBUG("Could not free block: %p\n", mem);
+
+		return;
+	}
+
+	DEBUG("Found block for free: %p %p\n", info.block, info.btreeNode);	
+
+	// Deallocate this block.
+
+	info.block->allocated = false;
+
+	// See if we can coalesce blocks
+
+	struct BTreeNode* node = lib_btree_getParent(info.btreeNode);
+
+	while (node != NULL)
+	{
+
+		struct BuddyBlock* block = (struct BuddyBlock*)lib_btree_getNodeData(node);
+
+		if (block == NULL)
+			break;
+	
+		// Check left and right nodes to see if they are allocated
+
+
+		struct BuddyBlock* leftBlock = (struct BuddyBlock*)lib_btree_getLeftNodeData(node);
+		struct BuddyBlock* rightBlock = (struct BuddyBlock*)lib_btree_getRightNodeData(node);
+
+		if (rightBlock->allocated || leftBlock->allocated)
+			break;
+
+		// Children are free? Deallocate their blocks, and remove the node from the tree			
+
+		DEBUG("Coalescing blocks: %p (%x) %p (%x)\n", leftBlock, leftBlock->bisector, rightBlock, rightBlock->bisector);
+
+		if (rightBlock != NULL)
+			mem_freeList_freeBlock(buddy->blockFreeList, rightBlock);
+		
+		if (leftBlock != NULL)
+			mem_freeList_freeBlock(buddy->blockFreeList, leftBlock);
+
+		lib_btree_makeNodeALeaf(buddy->storageTree, node);
+
+		block->allocated = false;	
+
+		node = lib_btree_getParent(node);
+
+	}
+
+}
+
+
+void mem_buddy_printNodes(struct BTreeNode* node, void* data, int depth)
 {
 
 	for (int i = 0; i < depth; i ++) DEBUG(" "); 
 
-	struct BuddyBlock* block = (struct BuddyBlock*)nodeData;
+	struct BuddyBlock* block = (struct BuddyBlock*)node->data;
 
 	DEBUG("Block: size: %d base address: %p allocated: %s\n", block->size, block->baseAddress, block->allocated ? "true" : "false");
 

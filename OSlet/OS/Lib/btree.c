@@ -119,6 +119,8 @@ bool lib_btree_addElement(struct BTree* tree, int bisector, void* data)
 		int depth = 0;
 		struct BTreeNode* node = lib_btree_findLeaf(tree->root, bisector, &depth);
 
+		newNode->parent = node;
+		
 		if (depth > tree->maxDepth)
 		{
 			DEBUG("Tree depth exceeded\n");
@@ -189,7 +191,7 @@ void	lib_btree_traverseNodeWithCallback(struct BTreeNode* node, int depth, bool 
 		return;
 
 	if (! leavesOnly || IS_LEAF(node))
-		func(data, node->data, node->bisector, depth);
+		func(node, data, depth);
 	
 	lib_btree_traverseNodeWithCallback(node->left, depth + 1, leavesOnly, func, data);
 	lib_btree_traverseNodeWithCallback(node->right, depth + 1, leavesOnly, func, data);
@@ -200,3 +202,51 @@ void 	lib_btree_traverseTreeWithCallback(struct BTree* tree, bool leavesOnly, BT
 {
 	lib_btree_traverseNodeWithCallback(tree->root, 0, leavesOnly, func, data); 
 }
+
+void*	lib_btree_getLeftNodeData(struct BTreeNode* node)
+{
+
+	struct BTreeNode* left = node->left;
+
+	return left->data;
+
+}
+
+void*	lib_btree_getRightNodeData(struct BTreeNode* node)
+{
+	struct BTreeNode* right = node->right;
+
+	return right->data;
+}
+
+void*	lib_btree_getParent(struct BTreeNode* node)
+{
+	return node->parent;
+}
+
+void	lib_btree_makeNodeALeaf(struct BTree* tree, struct BTreeNode* node)
+{
+	if (node == NULL)
+		return;
+
+	lib_btree_makeNodeALeaf(tree, node->left);
+	lib_btree_makeNodeALeaf(tree, node->right);
+
+	if (node->left != NULL)
+	{
+		mem_freeList_freeBlock(tree->elementPool, node->left);
+		node->left = NULL;
+	}
+	
+	if (node->right != NULL)
+	{
+		mem_freeList_freeBlock(tree->elementPool, node->right);
+		node->right = NULL;
+	}
+
+}
+
+void*	lib_btree_getNodeData(struct BTreeNode* node)
+{
+	return node->data;
+}		

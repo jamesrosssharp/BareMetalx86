@@ -10,6 +10,8 @@ struct BTreeNode
 
 	void*	data;
 
+	struct BTreeNode* parent;
+
 	struct BTreeNode* left;
 	struct BTreeNode* right;
 
@@ -24,7 +26,7 @@ struct BTree
 
 };
 
-typedef void (*BTreeTraverseFunction) (void* data, void* nodeData, int bisector, int depth);
+typedef void (*BTreeTraverseFunction) (struct BTreeNode* node, void* data, int depth);
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +42,12 @@ void	lib_btree_debugNode(struct BTreeNode* node, int depth);
 void	lib_btree_debugTree(struct BTree* tree);
 
 void 	lib_btree_traverseTreeWithCallback(struct BTree* tree, bool leavesOnly, BTreeTraverseFunction func, void* data);
+
+void*	lib_btree_getLeftNodeData(struct BTreeNode* node);
+void*	lib_btree_getRightNodeData(struct BTreeNode* node);
+void*	lib_btree_getParent(struct BTreeNode* node);
+void	lib_btree_makeNodeALeaf(struct BTree* tree, struct BTreeNode* node);
+void*	lib_btree_getNodeData(struct BTreeNode* node);
 
 #ifdef __cplusplus
 }
