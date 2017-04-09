@@ -11,7 +11,8 @@ enum	FORMAT_CHARS
 	FORMAT_DEC,
 	FORMAT_FLOAT,
 	FORMAT_STRING,
-	FORMAT_CHAR
+	FORMAT_CHAR,
+	FORMAT_PERCENT_ESCAPED,
 };
 
 
@@ -84,6 +85,11 @@ void 	kprintf(char* format, ...)
 
 					console_putch((char)c);
 
+					break;
+				}
+				case FORMAT_PERCENT_ESCAPED:
+				{
+					console_putch('%');
 					break;
 				}
 				default:
@@ -172,6 +178,11 @@ void 	parseFormatString(char **str, enum FORMAT_CHARS* format, bool* padWithZero
 		else if (*ptr == 's')
 		{
 			*format = FORMAT_STRING;
+			break;
+		} 
+		else if (*ptr == '%')
+		{
+			*format = FORMAT_PERCENT_ESCAPED;
 			break;
 		}
 

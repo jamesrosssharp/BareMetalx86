@@ -11,7 +11,11 @@
 
 #define COUNTOF(x) (sizeof(x) / sizeof(x[0]))
 
-#define ALIGNTO(x,y) ((x + (y-1)) & ~(y-1))
+#define ALIGNTO(x,y) (((x) + (y-1)) & ~(y-1))
+
+#define KERNEL_LOAD_ADDRESS 	0x100000
+
+#define KERNEL_PAGE_SIZE	4096
 
 // If we are unit testing the code, need special defines
 

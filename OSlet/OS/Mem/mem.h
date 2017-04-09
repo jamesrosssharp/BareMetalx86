@@ -3,6 +3,7 @@
 #include "../kerndefs.h"
 
 #include "freelist.h"
+#include "buddy.h"
 
 enum MemoryPoolType
 {
@@ -18,17 +19,17 @@ struct MemoryPool
 	void* baseAddress;
 	unsigned int size;
 
-	// Pointer to an allocator structure, e.g. BuddyMemoryAllocator
-	void* allocator; 
+	// Pointer to an allocator structure, e.g. BuddyMemoryAllocator, in physical memory
+	void* allocatorPhys; 
+
+	// virtual address of allocator in Kernel virtual memory space. (The actual allocator structures
+	// must be paged into kernel space so we can access them)
+	void* allocatorVirtual;	
 
 	// Function pointer to allocate from memory pool
 	void* (* allocMemory) (struct MemoryPool* memPool, unsigned int size);		
-
-	void  (* freeMemory) (struct MemoryPool* memPool, void* memory);
+	void  (* freeMemory) (struct MemoryPool* memPool, void* memory);	
 
 };
 
-
-
-bool mem_createMemoryPool(struct MemoryPool* pool, void* baseAddress, unsigned int size, enum MemoryPoolType type);
 bool	mem_init();

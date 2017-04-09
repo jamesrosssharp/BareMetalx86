@@ -3,7 +3,15 @@
 #include "../Console/console.h"
 #include "../BIOS/bios.h"
 
-bool mem_createMemoryPool(struct MemoryPool* pool, void* baseAddress, unsigned int size, enum MemoryPoolType type);
+#define MEMORY_RESERVE_KERNEL		4*1024*1024	// 4MB kernel size
+#define MEMORY_RESERVE_KERNEL_STACK	1*1024*1024	// 1MB kernel stack size
+
+#define MEMORY_MINBLOCKSIZE		KERNEL_PAGE_SIZE		// 4k; later redefine this to "KERNEL_PAGE_SIZE"
+
+#define MEMORY_POOLTYPE			MEMORYPOOLTYPE_BUDDY	
+
+unsigned int mem_createMemoryPool(struct MemoryPool* pool, void* baseAddress, unsigned int size, enum MemoryPoolType type);
+unsigned int mem_estimateNumberOfMemoryPools(enum MemoryPoolType type, unsigned int size);
 
 struct MemoryPool *gMemoryPools;
 int		   gNumMemoryPools = 0;
@@ -26,93 +34,182 @@ bool	mem_init()
 		return false;
 	}
 
-	kprintf("memMap: %08x\n", memMap);
+	int maxMemoryPools = 0;
 
-	int i;
-
-	for (i = 0; i < memMapSize; i ++)
+	for (int i = 0; i < memMapSize; i ++)
 	{
 		// We want memory above 1 Meg.
-		if ((memMap[i].baseAddress >= 0x100000) &&
-		    (memMap[i].baseAddress <  0xffffffff) &&
+		if ((memMap[i].baseAddress >= KERNEL_LOAD_ADDRESS) &&
+		    (memMap[i].baseAddress <  0xffffffffU) &&
   		    (memMap[i].type == MEMORY_TYPE_FREE) )
 		{
 			kprintf("Found usable memory at %08x%08x %d\n", 
 				(unsigned int)(memMap[i].baseAddress >> 32), 
-				(unsigned int)(memMap[i].baseAddress & 0xffffffff), i);
-			break;
+				(unsigned int)(memMap[i].baseAddress & 0xffffffffU), i);
+
+
+			unsigned int addr = memMap[i].baseAddress & 0xffffffffU;
+			unsigned int size = MIN(memMap[i].size, 0xffffffffU - addr);
+
+			maxMemoryPools += mem_estimateNumberOfMemoryPools(MEMORY_POOLTYPE, size); 
 		}		
 	}
+	
+	kprintf("Maximum memory pools for usable memory regions: %d\n", maxMemoryPools);
 
-	if (i < memMapSize)
+	// find the memory at 0x100000, this is the kernel load address. Need to
+	// reserve space for the kernel, it's stack, and the memory pools array.
+	// (we reserve an array of maxMemoryPools in size of struct MemoryPool
+	// for allocating and freeing memory.) 	
+
+	int i;
+
+	for (i = 0; i < memMapSize; i++)
 	{
-		// The first chunk we use to hold an array of memory pools
-
-		// First we need to determine how many memory pools to create
-
-		gNumMemoryPools = 1;
-
-		for (int j = i + 1; j < memMapSize; j ++)
+		if ((memMap[i].baseAddress <= KERNEL_LOAD_ADDRESS) &&
+		    ((memMap[i].baseAddress + memMap[i].size) > KERNEL_LOAD_ADDRESS) &&
+  		    (memMap[i].type == MEMORY_TYPE_FREE) )
 		{
-			if ((memMap[j].baseAddress >= 0x00100000) &&
-			    (memMap[j].baseAddress <  0xffffffff) &&
-			    (memMap[j].type == MEMORY_TYPE_FREE))
-			{
-
-				// we have a useable memory block. Need to determine how many Buddy allocators will fit in
-				// the memory block.
-
-				//	gNumMemoryPools ++;
-			}
+			break;		
 		}
 
-		int reserveBytes = sizeof(struct MemoryPool) * gNumMemoryPools;
+	}
 
-		kprintf("Reserving %d bytes for %d memory pools.\n", reserveBytes, gNumMemoryPools);
+	if (i >= memMapSize)
+	{
+		// panic and halt kernel
+		kpanic("Could not find memory containing kernel load address. How is this kernel even executing?\n");
+	}
 
-		gMemoryPools = (struct MemoryPool*)(unsigned int)(memMap[i].baseAddress & 0xffffffff);
+	// We have the memory block containing the kernel load address.
+	// Now reserve some memory, and partition the remainder into memory pools. 
+			
+	unsigned int address = KERNEL_LOAD_ADDRESS;	// this is a physical address
 
-		// Recursively divide the memory block up into memory pools.
+	unsigned int memSize = (unsigned int)(MIN(0xffffffffU - address, memMap[i].size - (address - memMap[i].baseAddress) ));
 
+	address += MEMORY_RESERVE_KERNEL + MEMORY_RESERVE_KERNEL_STACK;
 
+	memSize -= MEMORY_RESERVE_KERNEL + MEMORY_RESERVE_KERNEL_STACK;
 
-
-		void* firstMemPoolBaseAddress = (void*)(((unsigned int)gMemoryPools + reserveBytes + 3) & ~3); // align memory pool base address 
-
-		// get max size of first memory pool
-
-		unsigned int firstMemBlockSize = MIN((unsigned int)memMap[i].baseAddress + memMap[i].size - (unsigned int)firstMemPoolBaseAddress, 0xffffffff - (unsigned int)memMap[i].baseAddress); 
 	
-		
+	// To do paging: page in memory for memory pool structure.
+	
+	gMemoryPools = (struct MemoryPool*)address; // this should be a virtual address mapped into kernel page table
+	
+	int memPoolReserveBytes = ALIGNTO(sizeof(struct MemoryPool) * maxMemoryPools, MEMORY_MINBLOCKSIZE); 
 
-		// Create a memory pool 
+	address += memPoolReserveBytes;
 
-		bool ret = mem_createMemoryPool(gMemoryPools, firstMemPoolBaseAddress, firstMemPoolSize, MEMORYPOOLTYPE_BUDDY);
+	memSize -= memPoolReserveBytes; 
 
-		if (! ret)
+	unsigned int freeAddress = address;
+
+	unsigned int bytes = memSize;
+
+	gNumMemoryPools = 0;
+
+	// find minimum allocatable bytes
+
+	unsigned int minAllocatableBytes = bytes;
+
+	switch (MEMORY_POOLTYPE)
+	{
+		case MEMORYPOOLTYPE_BUDDY:
 		{
-			kprintf("Could not init memory pool.\n");
+			minAllocatableBytes = mem_buddy_requiredMemorySize(MEMORY_MINBLOCKSIZE, MEMORY_MINBLOCKSIZE);
+
+			break;
+		}
+		default:
+			break;
+	}
+
+	while (bytes > minAllocatableBytes)
+	{
+	
+		unsigned int bytesUsed = mem_createMemoryPool(&gMemoryPools[gNumMemoryPools], (void *)freeAddress, bytes, MEMORY_POOLTYPE);
+
+		if (bytesUsed == 0)
+		{
+			kprintf("Could not create a memory pool...\n");
 			return false;
 		}
 
+		freeAddress += bytesUsed;
 
-	}
-	else
-	{
-		kprintf("System does not have any memory above 1MiB free for use.\n");
-		return false;
-	}
+		bytes -= bytesUsed;
 
-	// Now for all remaining regions, recursively divide up into Memory pools.
-
+		gNumMemoryPools ++;				
 	
+	}	
+
+	// Now add all other memory blocks that are available.
+
+	for (int j = 0; j < memMapSize; j ++)
+	{
+	
+		if (j == i)	// ignore the block we have already partitioned
+			continue;
+
+		if ( ! (memMap[j].baseAddress >= KERNEL_LOAD_ADDRESS) ||
+		     ! (memMap[j].baseAddress <  0xffffffffU) ||
+  		     ! (memMap[j].type == MEMORY_TYPE_FREE) )
+			continue;	// unsuitable memory			
+	
+		freeAddress = memMap[i].baseAddress & 0xffffffffU;
 		
+		bytes = (unsigned int)(MIN(0xffffffffU - freeAddress, memMap[j].size));
+
+		while (bytes > minAllocatableBytes)
+		{
+		
+			unsigned int bytesUsed = mem_createMemoryPool(&gMemoryPools[gNumMemoryPools], (void *)freeAddress, bytes, MEMORY_POOLTYPE);
+
+			if (bytesUsed == 0)
+			{
+				kprintf("Could not create a memory pool...\n");
+				return false;
+			}
+
+			freeAddress += bytesUsed;
+
+			bytes -= bytesUsed;
+
+			gNumMemoryPools ++;				
+		
+		}	
+	
+	}	
+
+	return true;
+
 }
 
+unsigned int mem_estimateNumberOfMemoryPools(enum MemoryPoolType type, unsigned int size)
+{
 
-bool mem_createMemoryPool(struct MemoryPool* pool, void* baseAddress, unsigned int size, enum MemoryPoolType type)
+	switch (type)
+	{
+		case MEMORYPOOLTYPE_BUDDY:
+			return mem_buddy_estimateNumberOfBuddyAllocatorsForRegion(size, MEMORY_MINBLOCKSIZE);
+		default:
+			break;
+	}
+
+	return 0;
+
+}
+
+unsigned int mem_createMemoryPool(struct MemoryPool* pool, void* baseAddress, unsigned int size, enum MemoryPoolType type)
 {
 	kprintf("Creating memory pool: %x, %x, %d, %d\n", pool, baseAddress, size, type);
 
-	return false;
+	switch (type)
+	{
+		case MEMORYPOOLTYPE_BUDDY:
+			return mem_buddy_createBuddyMemoryPool(pool, baseAddress, size, MEMORY_MINBLOCKSIZE);
+		default:
+			return false;
+	}
 }

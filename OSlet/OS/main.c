@@ -3,6 +3,7 @@
 #include "BIOS/bios.h"
 #include "IO/io.h"
 #include "Gfx/gfx.h"
+#include "Mem/mem.h"
 
 void main(void)
 {

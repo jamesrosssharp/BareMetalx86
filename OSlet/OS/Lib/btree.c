@@ -113,6 +113,8 @@ bool lib_btree_addElement(struct BTree* tree, int bisector, void* data)
 
 	   tree->root = newNode;
 
+	   newNode->parent = NULL;
+
 	}
 	else
 	{

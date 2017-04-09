@@ -35,10 +35,11 @@ corresponding BTree structure:
 
 #include "buddy.h"
 #include "../Lib/klib.h"
+#include "../Console/console.h"
 
 // This might change. We may want Buddy memory pools to be page aligned, for easy mapping into
 // process memory.
-#define BUDDY_BLOCK_ALIGN 4
+#define BUDDY_BLOCK_ALIGN 	KERNEL_PAGE_SIZE
 
 int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize)
 {
@@ -50,7 +51,18 @@ int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize)
 
 	// compute size memory blocks
 
-	int memSize = maxBlockSize + 3*BUDDY_BLOCK_ALIGN;	// we pad 3 times
+	int memSize = maxBlockSize + BUDDY_BLOCK_ALIGN;	// we pad 3 times
+
+	memSize += mem_buddy_requiredMemorySizeForAllocatorStructures(maxBlockSize, minBlockSize);
+
+	return memSize;
+
+}
+
+int mem_buddy_requiredMemorySizeForAllocatorStructures(int maxBlockSize, int minBlockSize)
+{
+
+	int memSize = 2 * BUDDY_BLOCK_ALIGN; 
 
 	// compute size of BTree
 
@@ -64,8 +76,7 @@ int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize)
 
 	memSize += mem_freeList_requiredMemorySize(sizeof(struct BuddyBlock), numBlocks);
 
-	return memSize;
-
+	return memSize;	
 }
 
 int mem_buddy_maxBuddyBlockSizeForMemoryRegion(int memSize, int minBlockSize)
@@ -99,12 +110,12 @@ int mem_buddy_maxBuddyBlockSizeForMemoryRegion(int memSize, int minBlockSize)
 
 
 // Init a Buddy memory allocator. Allocate mem_buddy_requiredMemorySize storage for holding buddy allocator.
-bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memory)
+bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memoryForStructures, void* memoryForAllocation)
 {
 	
 	// Init the BuddyMemoryAllocator structure 	
 
-	struct BuddyMemoryAllocator* buddy = (struct BuddyMemoryAllocator*)memory;
+	struct BuddyMemoryAllocator* buddy = (struct BuddyMemoryAllocator*)memoryForStructures;
 
 	buddy->maxBlockSize = maxBlockSize;
 	buddy->minBlockSize = minBlockSize;
@@ -115,7 +126,7 @@ bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memory)
 
 	// Allocate the storage tree.
 
-	uintptr_t btreeOffset = ALIGNTO((uintptr_t)memory + sizeof(struct BuddyMemoryAllocator), BUDDY_BLOCK_ALIGN);
+	uintptr_t btreeOffset = ALIGNTO((uintptr_t)memoryForStructures + sizeof(struct BuddyMemoryAllocator), BUDDY_BLOCK_ALIGN);
 
 	int btreeSize = lib_btree_requiredMemorySize(treeDepth);  
 
@@ -145,7 +156,7 @@ bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memory)
 
 	// Allocate the memory for the free blocks
 
-	uintptr_t blocksOffset = ALIGNTO(freeListOffset + freeListSize, BUDDY_BLOCK_ALIGN);		
+	uintptr_t blocksOffset = (uintptr_t)memoryForAllocation;		
 
 	buddy->blocksBaseAddress = (void*)blocksOffset;
 
@@ -418,3 +429,108 @@ void mem_buddy_debug(struct BuddyMemoryAllocator* buddy)
 
 	lib_btree_traverseTreeWithCallback(buddy->storageTree, false, mem_buddy_printNodes, NULL);
 }
+
+int mem_buddy_estimateNumberOfBuddyAllocatorsForRegion(int size, int minBlockSize)
+{
+
+	int bytes = size;
+	int buddys = 0;
+
+	int minMem = mem_buddy_requiredMemorySize(minBlockSize, minBlockSize); 
+
+	int utilisedBytes = 0;
+
+	while (bytes > minMem)
+	{
+
+		int maxBlockSize = mem_buddy_maxBuddyBlockSizeForMemoryRegion(bytes, minBlockSize); 
+		int requiredBytes = mem_buddy_requiredMemorySize(maxBlockSize, minBlockSize); 
+
+		kprintf("Buddy: %d blocksize %d bytes\n", maxBlockSize, requiredBytes);
+
+		buddys ++;
+		bytes -= requiredBytes;
+		utilisedBytes += maxBlockSize;
+	}
+
+	kprintf("Utilisation: %d%% (%d / %d) \n", (utilisedBytes >> 10) * 100 / (size >> 10), utilisedBytes, size);
+
+	return buddys;
+
+}
+
+
+void* mem_buddy_allocMemoryFromMemoryPool(struct MemoryPool* memPool, unsigned int size)
+{
+	
+	struct BuddyMemoryAllocator* buddy = (struct BuddyMemoryAllocator*) memPool->allocatorVirtual;
+
+	return mem_buddy_allocate(buddy, size);
+
+}
+
+void  mem_buddy_freeMemoryFromMemoryPool(struct MemoryPool* memPool, void* memory)
+{
+	
+	struct BuddyMemoryAllocator* buddy = (struct BuddyMemoryAllocator*) memPool->allocatorVirtual;
+
+	return mem_buddy_free(buddy, memory);
+
+}
+
+unsigned int mem_buddy_createBuddyMemoryPool(struct MemoryPool* pool, uintptr_t baseAddress, unsigned int size, unsigned int minBlockSize)
+{
+
+	// create a MemoryPool structure at given address which points to a BuddyMemoryAllocator.
+
+	// 1. find the maximum sized buddy memory allocator that can fit in the memory block given
+
+	int maxBlockSize = mem_buddy_maxBuddyBlockSizeForMemoryRegion(size, minBlockSize); 
+
+	kprintf("Creating buddy memory pool: %x %d\n", baseAddress, maxBlockSize);
+	
+	// 2. find size of BuddyAllocator, BTree, and FreeList structures, and map these into kernel virtual
+	// address space.
+
+	int memForStructures = mem_buddy_requiredMemorySizeForAllocatorStructures(maxBlockSize, minBlockSize);
+
+	kprintf("Memory required for allocator structures = %d\n", memForStructures);
+
+	uintptr_t addressForBuddyStructures = ALIGNTO(baseAddress, BUDDY_BLOCK_ALIGN);
+
+	uintptr_t addressForBuddyPhysicalMemory = ALIGNTO(addressForBuddyStructures + memForStructures, BUDDY_BLOCK_ALIGN); 		
+
+		// map addressForBuddyStructures here.
+
+	// 3. init allocator with virtual address of BuddyAllocator structure and related data, and 
+	// physical address of physical memory to allocate from.		
+
+	bool success = mem_buddy_init(maxBlockSize, minBlockSize, (void*)addressForBuddyStructures, (void*)addressForBuddyPhysicalMemory);
+
+	if (! success)
+	{
+		kprintf("Could not init Buddy memory allocator!\n");
+		return 0;
+	}
+
+	int buddyBytes = addressForBuddyPhysicalMemory - baseAddress + maxBlockSize;
+
+	// 4. fill out memory pool structure.
+
+	pool->type = MEMORYPOOLTYPE_BUDDY;
+	pool->baseAddress = (void*) baseAddress;
+	pool->size = buddyBytes;	
+
+	pool->allocatorPhys = (void*) addressForBuddyStructures;
+	pool->allocatorVirtual = (void*) addressForBuddyStructures; // this should be the virtual address of the buddy structures.
+
+		// fill in function pointers
+
+	pool->allocMemory = &mem_buddy_allocMemoryFromMemoryPool;
+	pool->freeMemory =  &mem_buddy_freeMemoryFromMemoryPool;
+
+	// 5. return number of bytes of contiguous physical memory used.
+
+	return buddyBytes;
+}
+
