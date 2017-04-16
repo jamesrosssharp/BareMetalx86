@@ -1,0 +1,79 @@
+#!/bin/bash
+
+IMAGESIZE_MB=64
+IMAGEFILE=hd.img
+
+# create a blank image
+
+dd if=/dev/zero of=$IMAGEFILE bs=1M count=$IMAGESIZE_MB
+
+# for debug, we fill the first 1M of the disk with a counting sequence of
+# ascii characters
+
+CNT=$(( 1024*1024 / 8 ))
+for (( i=0; i<CNT; i++ )); do printf "%08x" $(( $i & 0xffffff | 0xaa000000)) >> /tmp/num.txt ; done
+
+dd bs=8 count=$CNT conv=notrunc if=/tmp/num.txt of=$IMAGEFILE
+
+rm /tmp/num.txt
+
+# add MBR
+
+dd bs=512 count=1 conv=notrunc if=Bootloader/MBR/mbr.bin of=$IMAGEFILE 
+
+# add stage1.5
+
+dd bs=512 seek=1 conv=notrunc if=Bootloader/stage1_5/stage1_5.bin of=$IMAGEFILE 
+
+
+# use sfdisk to partition the image (two partitions; first one 
+# FAT 16 (boot partition), second one EXT2 (rootfs)
+
+SECTOR_SIZE=512
+DISK_SECTORS=$(( $IMAGESIZE_MB * 1024 * 1024 / $SECTOR_SIZE))
+
+PART1_START_SECTORS=2048
+PART1_SIZE_MB=16
+PART1_SIZE_SECTORS=$(( $PART1_SIZE_MB*1024*1024/$SECTOR_SIZE - $PART1_START_SECTORS ))
+
+PART2_START_SECTORS=$(( $PART1_START_SECTORS + $PART1_SIZE_SECTORS ))
+PART2_SIZE_SECTORS=$(( $DISK_SECTORS - $PART2_START_SECTORS ))
+
+echo "
+label: dos
+label-id: 0x00000000
+device: hd.img
+unit: sectors
+
+hd.img1 : start=        $PART1_START_SECTORS, size= $PART1_SIZE_SECTORS, type=6, bootable
+hd.img2 : start=       $PART2_START_SECTORS, size= $PART2_SIZE_SECTORS, type=83
+
+" | sfdisk $IMAGEFILE 
+
+# loop mount first partition and create the FAT16 filesystem
+
+sudo losetup -o $(( PART1_START_SECTORS * SECTOR_SIZE )) --sizelimit $(( PART1_SIZE_SECTORS * SECTOR_SIZE)) /dev/loop2 hd.img
+
+sudo mkfs.fat -F 16 -n "OSLETLOADER" /dev/loop2
+
+# load loader binary and kernel binary onto FAT16 filesystem
+
+mkdir /tmp/fat
+
+sudo mount /dev/loop2 /tmp/fat
+
+sudo mkdir /tmp/fat/boot
+
+sudo cp OS/kernel.bin /tmp/fat/boot/KERNEL.BIN
+sudo cp OS/kernel.bin /tmp/fat/boot/LOADER.BIN
+
+# unmount FAT16 filesystem
+
+sudo umount /dev/loop2
+
+rmdir /tmp/fat
+
+sudo losetup -D
+
+# loop mount second partition
+

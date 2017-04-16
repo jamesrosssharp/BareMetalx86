@@ -1,16 +1,15 @@
 all: run
 
-.PHONY: payload.bin
+.PHONY: payload.bin bootloader
 
 payload.bin:
 	make -C OS
-	cp OS/kernel.bin payload.bin
 
-stage1_5.bin: Bootloader/stage1_5.asm
-	cd Bootloader && nasm -f bin -o ../stage1_5.bin stage1_5.asm
+bootloader:
+	make -C Bootloader
 
-hd.img: Bootloader/bl.asm stage1_5.bin payload.bin
-	cd Bootloader && nasm -f bin -o ../hd.img bl.asm
+hd.img: payload.bin bootloader
+	./scripts/makehdimage
 	
 hd.vmdk: hd.img
 	@VBoxManage internalcommands createrawvmdk -filename hd.vmdk -rawdisk hd.img 
@@ -19,7 +18,10 @@ run:	hd.img
 	@qemu-system-i386 -m 256 -vga std -drive file=hd.img,index=0,format=raw
 
 bochs: hd.img
-	@bochs 'ata0-master: type=disk, path="hd.img", cylinders=2, heads=16, spt=63' 'boot: disk' 'pci: enabled=1, slot1=pcivga, chipset=i440fx'
+	#@bochs 'ata0-master: type=disk, path="hd.img", cylinders=2, heads=16, spt=63' 'boot: disk' 'pci: enabled=1, slot1=pcivga, chipset=i440fx'
+	@bochs 'ata0-master: type=disk, path="hd.img"' 'boot: disk' 'pci: enabled=1, slot1=pcivga, chipset=i440fx'
+
+
 
 clean:  
 	rm hd.img stage1_5.bin payload.bin main.o

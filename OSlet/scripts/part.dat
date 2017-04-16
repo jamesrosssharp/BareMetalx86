@@ -1,0 +1,7 @@
+label: dos
+label-id: 0x00000000
+device: hd.img
+unit: sectors
+
+hd.img1 : start=        2048, size=       30720, type=6, bootable
+hd.img2 : start=       32768, size=       32768, type=83

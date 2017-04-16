@@ -2,7 +2,7 @@
  
 	jmp 0000h:Start 
  
-Msg:    db "Bootloadin'... "
+Msg:    db "OSLet MBR... "
 EndMsg:
  
 Start:  
@@ -32,7 +32,7 @@ Start:
 	mov bp,Msg
 		
 	mov bx, 000ch
-	mov cx, 000fh
+	mov cx, 000ch
 
 	int 10h	
 
@@ -102,48 +102,6 @@ JumpToSecondStage:
 
 
 End:
-	times 01BEh - ($ - $$)  db 0    ;Zerofill up to partition entries
-
-Partition0:
-	db 080h	; bootable
-	db 21h	;	 CHS
-	db 03h
-	db 00h
-	db 83h	; Linux
-	db 41h	; CHS end
-	db 0e8h
-	db 0fdh
-	db 00h	; LBA
-	db 08h
-	db 00h
-	db 00h
-	db 40h	; LBA
-	db 0e2h
-	db 0e6h
-	db 00h
-
-Partition1:
-	times 16 db 0
-
-Partition2:
-	times 16 db 0
-
-Partition3:
-	times 16 db 0
+	times 510 - ($ - $$)  db 0    ;Zerofill up to partition entries
 
 	dw 0AA55h       ;Boot Sector signature
-
-; Start of sector stage bootloader
-	incbin	"../stage1_5.bin"
-	
-	times 1000h - ($ - $$)  db 0 
-
-; Payload starts at 4k
- 
-; Start of payload (kernel)
-
-	incbin	"../payload.bin"
- 
-; make it we generate the first 1 Meg, which is reserved by partition table.
-; need to write this to an image, and write filesystem etc.
- times 1024*1024*1 - ($ - $$) db 0
