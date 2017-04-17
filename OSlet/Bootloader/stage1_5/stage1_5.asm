@@ -210,10 +210,7 @@ PrintLBA:
 
 LoadFATPartition:
 
-	mov ax, 2000h
-	mov es, ax
-
-	xor bx,bx
+	mov bx, BPB
 
 	mov ax, 1
 
@@ -229,38 +226,11 @@ LoadFATPartition:
 	; print OEM name
 
 	mov dx, 0800h
-	mov bp,	FAT_BS_VolLab	
+	mov bp,	BPB + FAT_BS_VolLab	
 	mov cx, 11
 
 	call PrintString
 
-	; copy 0x2000:0x0000 to DS:BPB
-
-	push ds
-	push es
-
-	; swap segment registers
-	mov ax, es
-	mov bx, ds
-	mov ds, ax
-	mov es, bx
-
-	xor ax,ax
-	mov si,ax
-
-	mov di, BPB
-
-	mov cx,200h
-
-	rep movsb
-
-	pop es
-	pop ds
-	
-	; set es to ds to access BPB in DS
-	push ds
-	pop es
-		
 	; compute number of clusters on disk
 
 	; 1. compute RootDirSectors = ((BPB_RootEntCnt * 32) + (BPB_BytsPerSec – 1)) / BPB_BytsPerSec;		
@@ -761,10 +731,10 @@ A20Done:
 
 	call PrintString
 	
-	; wait 1 second
+	; wait 10 seconds
 
-	mov cx,000fh
-	mov dx,8240h	; was 4240
+	mov cx,0098h
+	mov dx,9680h	
 	mov ax,8600h
 	int 15h	
 
@@ -803,9 +773,10 @@ A20Done:
 
 	[BITS 32]
 
-	jmp ClearPrefetchQueue
+	jmp ClearPrefetchQueue	; not sure this is necessary...
 	nop
-	nopza
+	nop
+
 ClearPrefetchQueue:
 
 	; long jump to C program start
@@ -1185,12 +1156,12 @@ ComputeCHSFromFATPartition:
 
 CompareStrings:
 	.CmpLoop:
-		cmpsb
-		jnz .Exit
-		loop .CmpLoop
+	cmpsb
+	jnz .Exit
+	loop .CmpLoop
 
 	.Exit:
-		ret
+	ret
 
 	;
 	;	Function: ComputeFATSectorOffset
@@ -1201,34 +1172,34 @@ CompareStrings:
 	;		eax: offset in sectors from partition start
 
 ComputeFATSectorOffset:
-		push ebx
-		push ecx
-		push edx
+	push ebx
+	push ecx
+	push edx
 
-		xor ebx,ebx
+	xor ebx,ebx
 
-		mov bx, [BPB + FAT_BPB_RsvdSecCnt]  	
+	mov bx, [BPB + FAT_BPB_RsvdSecCnt]  	
 
-		add ebx, [FATSectors]
-		add ebx, [FATRootSectors]
+	add ebx, [FATSectors]
+	add ebx, [FATRootSectors]
 
-		sub eax, 2	; clusters - 2
-	
-		xor edx, edx	
-		xor ecx, ecx
+	sub eax, 2	; clusters - 2
 
-		mov cl, [BPB + FAT_BPB_SecPerClus]
-	
-		mul ecx
+	xor edx, edx	
+	xor ecx, ecx
 
-		add eax, ebx
+	mov cl, [BPB + FAT_BPB_SecPerClus]
 
-		pop edx	
-		pop ecx
-		pop ebx
+	mul ecx
 
-		ret
-	
+	add eax, ebx
+
+	pop edx	
+	pop ecx
+	pop ebx
+
+	ret
+
 
 ;==============================================================
 ;	Data
