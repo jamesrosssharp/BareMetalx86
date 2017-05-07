@@ -733,10 +733,10 @@ A20Done:
 	
 	; wait 10 seconds
 
-	mov cx,0098h
-	mov dx,9680h	
-	mov ax,8600h
-	int 15h	
+	;mov cx,0098h
+	;mov dx,9680h	
+	;mov ax,8600h
+	;int 15h	
 
 	;======================================================
 	;	Begin entry into protected mode

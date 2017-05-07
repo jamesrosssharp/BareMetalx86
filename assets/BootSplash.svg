@@ -15,7 +15,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.1 15371"
-   sodipodi:docname="Logo.svg">
+   sodipodi:docname="BootSplash.svg">
   <defs
      id="defs2">
     <filter
@@ -65,11 +65,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.32077605"
-     inkscape:cx="715.8591"
-     inkscape:cy="304.34204"
+     inkscape:zoom="0.22682292"
+     inkscape:cx="304.38951"
+     inkscape:cy="509.75558"
      inkscape:document-units="px"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="BG"
      showgrid="false"
      inkscape:window-width="1366"
      inkscape:window-height="704"
@@ -95,12 +95,12 @@
   </metadata>
   <g
      inkscape:groupmode="layer"
-     id="layer2"
+     id="BG"
      inkscape:label="BG"
      style="display:inline"
      transform="translate(0,-11.249983)">
     <rect
-       style="fill:#391a0a;stroke-width:0.40250471;fill-opacity:1"
+       style="fill:#4d5554;fill-opacity:1;stroke-width:0.40250471"
        id="rect65"
        width="508"
        height="285.75"
@@ -109,7 +109,7 @@
   </g>
   <g
      inkscape:groupmode="layer"
-     id="layer7"
+     id="LoadingTextShadow"
      inkscape:label="LoadingTextShadow"
      sodipodi:insensitive="true">
     <g
@@ -125,7 +125,7 @@
   </g>
   <g
      inkscape:groupmode="layer"
-     id="layer6"
+     id="LoadingText"
      inkscape:label="LoadingText"
      sodipodi:insensitive="true">
     <text
@@ -142,47 +142,51 @@
   </g>
   <g
      inkscape:groupmode="layer"
-     id="layer5"
+     id="ProgressBarShadow"
      inkscape:label="ProgressBarShadow"
      sodipodi:insensitive="true">
     <path
        style="display:inline;fill:#b8e7ff;fill-opacity:1;stroke:none;stroke-width:0.26458064;stroke-opacity:1;filter:url(#filter5611)"
-       d="m 186.43555,136.9082 c -6.50472,-0.27919 -8.05239,9.96939 -1.76953,11.63672 38.55637,0.70882 77.25516,0.091 115.86523,0.29883 7.85573,-0.76038 16.25644,1.37916 23.86719,-0.76758 5.31809,-2.59897 2.99018,-11.52028 -2.92969,-11.16992 -45.01105,0.001 -90.02222,-0.003 -135.0332,0.002 z"
+       d="m 186.43555,144.84575 c -6.50472,-0.27919 -8.05239,9.96939 -1.76953,11.63672 38.55637,0.70882 77.25516,0.091 115.86523,0.29883 7.85573,-0.76038 16.25644,1.37916 23.86719,-0.76758 5.31809,-2.59897 2.99018,-11.52028 -2.92969,-11.16992 -45.01105,0.001 -90.02222,-0.003 -135.0332,0.002 z"
        id="rect5037-5"
        inkscape:connector-curvature="0" />
   </g>
   <g
      inkscape:groupmode="layer"
-     id="layer4"
+     id="ProgressBar"
      inkscape:label="ProgressBar"
      transform="translate(0,-11.249983)"
      sodipodi:insensitive="true">
-    <g
-       id="g5058"
-       transform="translate(-2.6465511,-11.906287)">
-      <rect
-         ry="3.96875"
-         rx="3.96875"
-         y="162.06256"
-         x="185.20978"
-         height="7.9374194"
-         width="142.87355"
-         id="rect5037"
-         style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458064;stroke-opacity:1" />
-      <rect
-         ry="2.5860431"
-         rx="2.6458333"
-         y="163.38539"
-         x="186.53123"
-         height="5.2916698"
-         width="42.311394"
-         id="rect5037-8"
-         style="display:inline;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.11756214;stroke-opacity:1" />
-    </g>
+    <rect
+       style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458064;stroke-opacity:1"
+       id="rect5037"
+       width="142.87355"
+       height="7.9374194"
+       x="182.56323"
+       y="158.09378"
+       rx="3.96875"
+       ry="3.96875" />
   </g>
   <g
      inkscape:groupmode="layer"
-     id="layer3"
+     id="ProgressBarFill"
+     inkscape:label="ProgressBarFill"
+     sodipodi:insensitive="true"
+     style="display:inline">
+    <rect
+       transform="translate(0,-11.249983)"
+       style="display:inline;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.11756214;stroke-opacity:1"
+       id="rect5037-8"
+       width="42.311394"
+       height="5.2916698"
+       x="183.88469"
+       y="159.41661"
+       rx="2.6458333"
+       ry="2.5860431" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="LogoShadow"
      inkscape:label="LogoShadow"
      style="display:inline"
      transform="translate(0,-11.249983)"
@@ -208,18 +212,10 @@
   <g
      inkscape:label="Logo"
      inkscape:groupmode="layer"
-     id="layer1"
+     id="Logo"
      style="display:inline"
      transform="translate(0,-11.249983)"
      sodipodi:insensitive="true">
-    <path
-       id="path33-4"
-       d="m 77.72348,145.30838 c -4.699316,3.52449 -1.142233,12.81198 -7.015701,12.90116 -5.873468,0.0892 -2.599996,-9.30202 -7.40415,-12.68221 -4.804155,-3.38019 -12.537881,2.87279 -14.437698,-2.68565 -1.899818,-5.55844 8.043303,-5.34722 9.773488,-10.96078 1.730185,-5.61356 -6.606604,-11.03649 -1.907288,-14.56098 4.699316,-3.52449 7.571031,5.99725 13.444498,5.90807 5.873468,-0.0892 8.454775,-9.69372 13.25893,-6.31353 4.804155,3.38019 -3.364149,9.05373 -1.464331,14.61217 1.899817,5.55844 11.831941,5.04545 10.101756,10.65901 -1.730184,5.61356 -9.650188,-0.40174 -14.349504,3.12274 z"
-       inkscape:transform-center-y="-4.7590238"
-       inkscape:transform-center-x="2.3025252"
-       style="display:inline;fill:#b8e7ff;fill-opacity:1;stroke:#a7cfff;stroke-width:0.26458332;stroke-opacity:1;filter:url(#filter4974)"
-       inkscape:connector-curvature="0"
-       transform="matrix(0.90254258,-0.63062051,0.63062073,0.90254226,73.625746,43.585712)" />
     <g
        id="g4808"
        transform="matrix(1.118244,0,0,1.1182436,134.81361,-8.1677249)">

@@ -7,7 +7,7 @@ kernel.bin:	Boot/boot.o main.o  libkern.a
 	ld --script link.ld Boot/boot.o  main.o -o kernel.bin -L. -lkern
 
 main.o:	main.c $(HEADERS)
-	gcc -m32 -fno-stack-protector -c main.c -o main.o
+	gcc -m32 -fno-stack-protector -Werror -c main.c -o main.o
 
 LIBS =  Boot/boot.o Console/libconsole.a BIOS/libbios.a IO/libio.a	\
 	Gfx/libgfx.a Mem/libmem.a Lib/libklib.a

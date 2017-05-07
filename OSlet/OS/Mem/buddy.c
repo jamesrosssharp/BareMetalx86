@@ -206,14 +206,16 @@ void mem_buddy_findCompatibleBlock(struct BTreeNode* node, void* data, int depth
 
 }
 
-void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
+void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int* bytes)
 {
 
-	DEBUG("Allocating %d bytes...\n", bytes);
+	int allocBytes = *bytes;
+
+	DEBUG("Allocating %d bytes...\n", allocBytes);
 
 	struct BuddySearchInfo info = {0};
 
-	info.requestedBytes = bytes;
+	info.requestedBytes = allocBytes;
 	info.minBytesFound = 0xffffffff;
 	info.minBlock = NULL;
 
@@ -224,7 +226,7 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
 	if (info.minBlock == NULL)
 		return NULL;
 
-	int log2bytes = lib_math_log2(bytes);
+	int log2bytes = lib_math_log2(allocBytes);
 	int log2found = lib_math_log2(info.minBytesFound);
 
 	DEBUG("log2bytes: %d log2found: %d\n", log2bytes, log2found);
@@ -241,6 +243,7 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
 
 		DEBUG("Allocated %d byte block\n", info.minBlock->size);
 
+		*bytes = info.minBlock->size;
 		return info.minBlock->baseAddress;
 
 	}
@@ -294,7 +297,7 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
 			left->baseAddress = (void*)((uintptr_t)block->baseAddress);
 			right->baseAddress = (void*)((uintptr_t)block->baseAddress + (block->size >> 1));
 
-			DEBUG("Left address: %p right: %p\n", left->baseAddress, right->baseAddress);
+			DEBUG("Left address: %08x right: %08x\n", left->baseAddress, right->baseAddress);
 
 			lib_btree_addElement(buddy->storageTree, leftBisector, left);
 			lib_btree_addElement(buddy->storageTree, rightBisector, right);
@@ -309,6 +312,7 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
 
 		DEBUG("Allocated %d byte block\n", block->size);
 
+		*bytes = block->size;
 		return block->baseAddress;
 
 	
@@ -319,6 +323,7 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes)
 	}
 
 	return NULL;
+
 
 }
 
@@ -421,13 +426,13 @@ void mem_buddy_debug(struct BuddyMemoryAllocator* buddy)
 {
 	DEBUG("============= Buddy Memory Allocator ===============\n");
 	DEBUG("MaxBlockSize: %d MinBlockSize: %d Btree max depth: %d\n", buddy->maxBlockSize, buddy->minBlockSize, buddy->btreeMaxDepth);
-	DEBUG("BTree: %p\n", buddy->storageTree);
-	DEBUG("FreeList: %p\n", buddy->blockFreeList);
-	DEBUG("Block Start: %p\n", buddy->blocksBaseAddress);
+	DEBUG("BTree: %08x\n", buddy->storageTree);
+	DEBUG("FreeList: %08x\n", buddy->blockFreeList);
+	DEBUG("Block Start: %08x\n", buddy->blocksBaseAddress);
 
 	//lib_btree_debugTree(buddy->storageTree);
 
-	lib_btree_traverseTreeWithCallback(buddy->storageTree, false, mem_buddy_printNodes, NULL);
+	//lib_btree_traverseTreeWithCallback(buddy->storageTree, false, mem_buddy_printNodes, NULL);
 }
 
 int mem_buddy_estimateNumberOfBuddyAllocatorsForRegion(int size, int minBlockSize)
@@ -446,21 +451,21 @@ int mem_buddy_estimateNumberOfBuddyAllocatorsForRegion(int size, int minBlockSiz
 		int maxBlockSize = mem_buddy_maxBuddyBlockSizeForMemoryRegion(bytes, minBlockSize); 
 		int requiredBytes = mem_buddy_requiredMemorySize(maxBlockSize, minBlockSize); 
 
-		kprintf("Buddy: %d blocksize %d bytes\n", maxBlockSize, requiredBytes);
+		DEBUG("Buddy: %d blocksize %d bytes\n", maxBlockSize, requiredBytes);
 
 		buddys ++;
 		bytes -= requiredBytes;
 		utilisedBytes += maxBlockSize;
 	}
 
-	kprintf("Utilisation: %d%% (%d / %d) \n", (utilisedBytes >> 10) * 100 / (size >> 10), utilisedBytes, size);
+	DEBUG("Utilisation: %d%% (%d / %d) \n", (utilisedBytes >> 10) * 100 / (size >> 10), utilisedBytes, size);
 
 	return buddys;
 
 }
 
 
-void* mem_buddy_allocMemoryFromMemoryPool(struct MemoryPool* memPool, unsigned int size)
+void* mem_buddy_allocMemoryFromMemoryPool(struct MemoryPool* memPool, unsigned int* size)
 {
 	
 	struct BuddyMemoryAllocator* buddy = (struct BuddyMemoryAllocator*) memPool->allocatorVirtual;
@@ -487,14 +492,14 @@ unsigned int mem_buddy_createBuddyMemoryPool(struct MemoryPool* pool, uintptr_t 
 
 	int maxBlockSize = mem_buddy_maxBuddyBlockSizeForMemoryRegion(size, minBlockSize); 
 
-	kprintf("Creating buddy memory pool: %x %d\n", baseAddress, maxBlockSize);
+	DEBUG("Creating buddy memory pool: %x %d\n", baseAddress, maxBlockSize);
 	
 	// 2. find size of BuddyAllocator, BTree, and FreeList structures, and map these into kernel virtual
 	// address space.
 
 	int memForStructures = mem_buddy_requiredMemorySizeForAllocatorStructures(maxBlockSize, minBlockSize);
 
-	kprintf("Memory required for allocator structures = %d\n", memForStructures);
+	DEBUG("Memory required for allocator structures = %d\n", memForStructures);
 
 	uintptr_t addressForBuddyStructures = ALIGNTO(baseAddress, BUDDY_BLOCK_ALIGN);
 

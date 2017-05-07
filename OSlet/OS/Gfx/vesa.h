@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "../kerndefs.h"
 #include "gfx.h"
 
 struct __attribute__ ((packed)) VESAInfo	
@@ -56,5 +57,21 @@ struct __attribute__ ((packed)) ModeInfo
       unsigned char  Reserved[206];    
 };
 
+struct VesaFrameBuffer
+{
+	int mode;
+	struct ModeInfo* modeInfo;
+
+	void* frameBuffer;	// pointer to a single frame buffer large enough for full display.
+				// This framebuffer will be blitted to VESA window in segments to
+				// swap buffers. 
+
+
+
+};
 
 bool	gfx_detectVESAModes();
+
+bool	gfx_vesa_findCompatibleMode(int* mode, int* xres, int* yres, int* bpp);
+
+struct FrameBuffer* gfx_vesa_createFrameBuffer(int mode);

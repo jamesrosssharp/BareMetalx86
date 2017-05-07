@@ -1,12 +1,14 @@
 
 all:	loader.bin
 
+OBJ = main.o loaderui.o
+HEADERS = loaderui.h
 
-loader.bin:	boot.o main.o  ../../OS/libkern.a
-	ld --script link.ld boot.o main.o -o loader.bin -L../../OS -lkern
+loader.bin:	boot.o $(OBJ) ../../OS/libkern.a
+	ld --script link.ld boot.o $(OBJ) -o loader.bin -L../../OS -lkern
 
-main.o:	main.c
-	gcc -m32 -fno-stack-protector -c main.c -o main.o -I../../OS
+%.o:	%.c $(HEADERS)
+	gcc -m32 -fno-stack-protector -Werror -I../../OS -c $< -o $@
 
 boot.o: boot.asm
 	nasm -f elf boot.asm -o boot.o
@@ -16,3 +18,5 @@ boot.o: boot.asm
 ../../OS/libkern.a:
 	make -C ../../OS
 
+clean:
+	rm loader.bin main.o boot.o

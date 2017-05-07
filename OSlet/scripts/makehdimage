@@ -2,6 +2,7 @@
 
 IMAGESIZE_MB=64
 IMAGEFILE=hd.img
+LOOP_DEV=/dev/loop7
 
 # create a blank image
 
@@ -52,24 +53,24 @@ hd.img2 : start=       $PART2_START_SECTORS, size= $PART2_SIZE_SECTORS, type=83
 
 # loop mount first partition and create the FAT16 filesystem
 
-sudo losetup -o $(( PART1_START_SECTORS * SECTOR_SIZE )) --sizelimit $(( PART1_SIZE_SECTORS * SECTOR_SIZE)) /dev/loop2 hd.img
+sudo losetup -o $(( PART1_START_SECTORS * SECTOR_SIZE )) --sizelimit $(( PART1_SIZE_SECTORS * SECTOR_SIZE)) $LOOP_DEV hd.img
 
-sudo mkfs.fat -F 16 -n "OSLETLOADER" /dev/loop2
+sudo mkfs.fat -F 16 -n "OSLETLOADER" $LOOP_DEV
 
 # load loader binary and kernel binary onto FAT16 filesystem
 
 mkdir /tmp/fat
 
-sudo mount /dev/loop2 /tmp/fat
+sudo mount $LOOP_DEV /tmp/fat -o fat=16
 
 sudo mkdir /tmp/fat/boot
 
 sudo cp OS/kernel.bin /tmp/fat/boot/KERNEL.BIN
-sudo cp OS/kernel.bin /tmp/fat/boot/LOADER.BIN
+sudo cp Bootloader/Loader/loader.bin /tmp/fat/boot/LOADER.BIN
 
 # unmount FAT16 filesystem
 
-sudo umount /dev/loop2
+sudo umount $LOOP_DEV
 
 rmdir /tmp/fat
 

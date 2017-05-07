@@ -24,5 +24,6 @@ bochs: hd.img
 
 
 clean:  
-	rm hd.img stage1_5.bin payload.bin main.o
+	rm hd.img hd.vmdk
 	make -C OS clean
+	make -C Bootloader clean

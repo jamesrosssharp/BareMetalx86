@@ -58,7 +58,7 @@ int mem_buddy_maxBuddyBlockSizeForMemoryRegion(int memSize, int minBlockSize);
 bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memoryForStructures, void* memoryForAllocation);
 
 void mem_buddy_debug(struct BuddyMemoryAllocator* buddy);
-void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int bytes);
+void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int* bytes);
 void mem_buddy_free(struct BuddyMemoryAllocator* buddy, void* mem);
 int mem_buddy_estimateNumberOfBuddyAllocatorsForRegion(int size, int minBlockSize);
 

@@ -2,12 +2,16 @@
 
 #include "../kerndefs.h"
 
-#include "freelist.h"
-#include "buddy.h"
 
 enum MemoryPoolType
 {
 	MEMORYPOOLTYPE_BUDDY,
+};
+
+enum MemoryType
+{
+	MEMORYTYPE_DMA_LOMEM,
+	MEMORYTYPE_HIMEM
 };
 
 struct MemoryPool
@@ -27,9 +31,17 @@ struct MemoryPool
 	void* allocatorVirtual;	
 
 	// Function pointer to allocate from memory pool
-	void* (* allocMemory) (struct MemoryPool* memPool, unsigned int size);		
+	void* (* allocMemory) (struct MemoryPool* memPool, unsigned int* size);		
 	void  (* freeMemory) (struct MemoryPool* memPool, void* memory);	
 
 };
 
+
 bool	mem_init();
+
+void*	kmalloc(unsigned int bytes, enum MemoryType type);
+void	kfree(void* memory);
+
+
+#include "buddy.h"
+#include "freelist.h"

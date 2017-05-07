@@ -5,3 +5,4 @@
 #include "math.h"
 #include "btree.h"
 #include "panic.h"
+#include "string.h"

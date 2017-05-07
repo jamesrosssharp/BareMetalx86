@@ -5,6 +5,8 @@
 #include "Gfx/gfx.h"
 #include "Mem/mem.h"
 
+#include "loaderui.h"
+
 void main(void)
 {
 
@@ -15,98 +17,59 @@ void main(void)
 	unsigned short videoPort = bda->videoIOBase;
 	unsigned short columns   = bda->textModeColumns;
 
-
 	// Set up a video console
 
 	console_init();
 
-	console_addConsole(CONSOLETYPE_VGATEXT, videoPort, columns);
-
-	// Print the BIOS data area
-	
-	bios_printBDA();
-
-	// Detect the CPU
-	
 	io_detectCPU();
-
-	// Init memory subsystem
-
-	//int memMapSize = 0;
-	//struct MemoryEntry* memMap = 0; 
-
-	//bios_detectMemory(&memMap, &memMapSize);
 
 	mem_init();
 
-	// Now we have detected memory, init the kernel memory allocator,
-	// so we can kmalloc
+	console_addConsole(CONSOLETYPE_VGATEXT, videoPort, columns);
 
-	// Detect VESA modes
+	kprintf("Hello from Loader...\n");
 
-	//gfx_detectVESAModes();
+	gfx_detectVESAModes();
 
-	// Now we have detected the vesa modes, find the highest resolution
-	// mode and set it; init the vesa framebuffer driver; init the 
-	// graphics console. If we can't find a suitable graphical mode,
-	// continue in text mode.
+	int xres = GFX_XRESOLUTION_MAX;
+	int yres = GFX_YRESOLUTION_MAX;
+	int bpp = GFX_BPP_MAX;
+	int mode = 0;
 
+	if (! gfx_vesa_findCompatibleMode(&mode, &xres, &yres, &bpp))
+		goto die;
 
-	
-	// init interrupts using 8259 PIC interrupt system
+	kprintf("Using video mode: %d x %d, %d bpp\n", xres, yres, bpp);
 
-	//if (! io_initInterrupts(INTERRUPTCONTROL_PIC))
-	//{
-	//	kprintf("Could not init interrupts.\n");
-	//	goto die;
-	//}
+	struct FrameBuffer* fb = gfx_vesa_createFrameBuffer(mode);	
 
-	// init keyboard driver and install its interrupt callback
+	if (fb == NULL)
+	{
+		kprintf("Could not create a frameBuffer object\n");
+		goto die;
+	}
 
-	// init the mouse driver and install its interrupt callback
+	if (! fb->activateFrameBufferDisplay(fb))
+	{
+		kprintf("Couldn't set video mode\n");
+		goto die;
+	}
 
-	// enable interrupts
+	loaderUI_init(fb);
 
-	//io_enableInterrupts();
+	// 0. enable interrupts
 
-	// Now we have a graphical console (hopefully) and a functioning 
-	// events sub system, we can start to detect hardware and log
-	// the start up. 
+	// 1. init BIOS disk driver
 
-	// Detect ACPI. 
+	// 2. init FAT filesystem
 
-		// Do we need to control the fan?
+	// 3. read BOOT/BOOTARGS.TXT
 
-		// Do we have a battery? 
+	// 4. Read kernel to 0x100000
 
-
-	// Scan PCI bus
-
-	//io_probePCIBus();
-
-	// Did we find a ATA/SATA AHCI? If so, add disks
-
-	// Did we find a USB host device? If so, init the USB subsystem
-
-		// Scan and enumerate USB buses
-
-	// Did we find a graphics card?
-
-	// Did we find a sound card?
-
-	//
-	//	Now we have detected an initialised all supported hardware,
-	//	we want to start the scheduler
-	//		
+	// 5. jump to kernel
 
 
-	// 	Launch init process, which will
-
-	
-	// 	Jump to init process.
-
-
-	// 	Shouldn't get here
 die:
 	asm("hlt");
 	goto die;

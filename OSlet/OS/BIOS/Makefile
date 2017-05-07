@@ -11,7 +11,7 @@ libbios.a:	$(OBJS) $(HEADERS)
 	ranlib $(LIB)
 
 %.o:	%.c $(HEADERS)
-	gcc -m32 -fno-stack-protector -c $< -o $@
+	gcc -m32 -fno-stack-protector -Werror  -c $< -o $@
 
 
 clean:

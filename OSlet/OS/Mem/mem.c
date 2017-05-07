@@ -203,13 +203,71 @@ unsigned int mem_estimateNumberOfMemoryPools(enum MemoryPoolType type, unsigned 
 
 unsigned int mem_createMemoryPool(struct MemoryPool* pool, void* baseAddress, unsigned int size, enum MemoryPoolType type)
 {
-	kprintf("Creating memory pool: %x, %x, %d, %d\n", pool, baseAddress, size, type);
-
 	switch (type)
 	{
 		case MEMORYPOOLTYPE_BUDDY:
-			return mem_buddy_createBuddyMemoryPool(pool, baseAddress, size, MEMORY_MINBLOCKSIZE);
+			return mem_buddy_createBuddyMemoryPool(pool, (uintptr_t)baseAddress, size, MEMORY_MINBLOCKSIZE);
 		default:
 			return false;
 	}
 }
+
+void*	kmalloc(unsigned int bytes, enum MemoryType type)
+{
+
+	unsigned int bytesAllocated = bytes;
+
+	//
+	//	Find a free block that's big enough
+	//
+
+	void* block = NULL;
+
+	for (int i = 0; i < gNumMemoryPools; i ++)
+	{
+		struct MemoryPool* pool = &gMemoryPools[i];
+	
+		kprintf("Trying pool %08x %08x\n", pool, pool->allocMemory);
+	
+		if (pool->allocMemory != NULL)
+			block = pool->allocMemory(pool, &bytesAllocated);
+
+		if (block != NULL)
+			break;
+	}
+
+	if (block == NULL)
+	{
+		return NULL;
+	}
+
+	//
+	//	temporarily page in the memory so we can access it
+	//
+
+
+	// Memory allocated by the kernel could end up in user space,
+	// and it would be a security nightmare if we didn't zero all
+	// the memory.
+
+	void* blockVirtual = block; // map function here.
+
+	lib_bzero(blockVirtual, bytesAllocated);
+
+	//
+	//	remove memory from page tables (if it is needed
+	//	in the kernel, it will be mapped appropriately,
+	//	otherwise if it is to be used in a user process,
+	//	it will be added to that process' page tables.
+	//
+
+	return block;
+}
+
+void	kfree(void* memory)
+{
+
+	// TODO
+
+}
+
