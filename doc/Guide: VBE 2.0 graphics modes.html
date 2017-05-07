@@ -1,0 +1,268 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252"><title>Guide: VBE 2.0 graphics modes</title>
+<!-- base href="http://www.delorie.com/djgpp/doc/ug/graphics/vbe20.html" -->
+</head><body><center><iframe src="http://rcm.amazon.com/e/cm?t=deloriesoftware&amp;o=1&amp;p=48&amp;l=ur1&amp;category=electronicsrot&amp;f=ifr" scrolling="no" border="0" marginwidth="0" style="border:none;" width="728" height="90" frameborder="0"></iframe>
+<table cellspacing="0" cellpadding="3" width="100%" border="0"><tbody><tr><td valign="top" bgcolor="#ffcc99" align="left"><small><font face="itc avant garde gothic,helvetica,arial"><b> &nbsp;
+<a href="http://www.delorie.com/" target="_top">www.delorie.com</a>/<a href="http://www.delorie.com/djgpp/" target="_top">djgpp</a>/<a href="http://www.delorie.com/djgpp/doc/" target="_top">doc</a>/ug/graphics/vbe20.html</b></font></small></td>
+<td valign="top" bgcolor="#ffcc99" align="right"><small><font face="itc avant garde gothic,helvetica,arial"><b> &nbsp;
+<a href="http://www.delorie.com/search/">search</a> &nbsp;
+</b></font></small></td>
+</tr></tbody></table><a href="http://www.delorie.com/djgpp/doc/ug/graphics/bulktrap.html"></a><big><big><b>Guide: VBE 2.0 graphics modes</b></big></big><p></p></center>
+
+
+<p>There is one major problem with the VESA standard. It was designed
+several years ago while people were still using 286 machines, so it is
+a real mode API with a 16 bit interface. You can still use it from a
+32 bit protected mode system like djgpp, but this means that every
+time you call a VESA function the cpu has to switch into real mode in
+order to run the 16 bit driver code, and then it has to switch back
+into protected mode before it can return to your program. These mode
+switches are slow, and can be a real performance problem because you
+will often need to switch banks many hundred times while drawing a
+complex image. The VBE 2.0 API is a more recent extension to the
+original standard, and adds some features designed to improve the
+performance of protected mode programs.</p>
+
+<p> Not every machine will have a VBE 2.0 driver installed. This can
+be detected by checking that the high byte of the
+<tt>vesa_info.VESAVersion</tt> field contains a value greater than or
+equal to two: if it does not, you have an old VESA 1.x driver that
+will not support any of the functions described in this document.</p>
+
+<p> VBE 2.0 provides a new bank switching mechanism that can be used
+in a protected mode environment without the expensive switch to real
+mode. This is implemented as a small stub of relocatable 32 bit code
+provided by the VESA driver, which can be copied into your address
+space and then called directly to perform the bank switch, hardware
+scrolling, and palette setting functions. It is very easy to add
+support for this method into an existing body of VESA 1.x code, and
+the speed improvement can be dramatic.</p>
+
+<p> The 32 bit code stubs are obtained by calling VESA function
+0x4F0A, for example:</p>
+
+<pre>   typedef struct VESA_PM_INFO
+   {
+      unsigned short setWindow            __attribute__ ((packed));
+      unsigned short setDisplayStart      __attribute__ ((packed));
+      unsigned short setPalette           __attribute__ ((packed));
+      unsigned short IOPrivInfo           __attribute__ ((packed));
+   } VESA_PM_INFO;
+
+
+   VESA_PM_INFO *vesa_pm_info;
+
+   void *pm_bank_switcher;
+
+
+   int get_vesa_pm_functions()
+   {
+      __dpmi_regs r;
+
+      /* check that the driver is at least VBE version 2.0 */
+      if (vesa_info.VESAVersion &lt; 0x200) 
+	 return -1;
+
+      /* call the VESA function */
+      r.x.ax = 0x4F0A;
+      r.x.bx = 0;
+      __dpmi_int(0x10, &amp;r);
+      if (r.h.ah)
+	 return -1;
+
+      /* allocate space for the code stubs */
+      vesa_pm_info = malloc(r.x.cx);
+
+      /* copy the code into our address space */
+      dosmemget(r.x.es*16+r.x.di, r.x.cx, vesa_pm_info);
+
+      /* store a pointer to the bank switch routine */
+      pm_bank_switcher = (void *)((char *)vesa_pm_info + 
+				  vesa_pm_info-&gt;setWindow);
+
+      return 0;
+   }
+</pre>
+
+<p>This code will give you a pointer to the protected mode bank
+switching function, but you cannot call this directly from C because
+it uses a special register based argument passing convention. A little
+bit of inline asm is needed to make sure the parameters go into the
+correct registers, eg:</p>
+
+<pre>   void set_vesa_bank_pm(int bank_number)
+   {
+      asm (
+	 " call *%0 "
+      :                             /* no outputs */
+
+      : "r" (pm_bank_switcher),     /* function pointer in any register */
+	"b" (0),                    /* set %ebx to zero */
+	"d" (bank_number)           /* bank number in %edx */
+
+      : "%eax",                     /* clobber list (we have no way of */
+	"%ebx",                     /* knowing which registers the VESA */
+	"%ecx",                     /* code is going to change, so we */
+	"%edx",                     /* have to assume the worst and list */
+	"%esi",                     /* them all here) */
+	"%edi"
+      );
+   }
+</pre>
+
+<p>This routine is an exact drop-in replacement for the
+<tt>set_vesa_bank()</tt> function described in the previous chapter,
+but will run several hundred times faster!</p>
+
+<p> VBE 2.0 also provides the ability to use a linear framebuffer mode
+in which the entire video memory can accessed as a single block at
+some location other than the standard 0xA0000, which gets rid of the
+need for bank switching altogether. This is both the fastest and the
+easiest way to program SVGA graphics, but unfortunately you can't
+count on it being supported by all hardware. Even if the card has a
+VBE 2.0 driver, many older boards don't support linear framebuffers at
+all, and a few of the more recent ones can only use linear addressing
+in certain resolutions.</p>
+
+<p> Setting a linear framebuffer mode is extremely simple. After
+calling the <tt>find_vesa_mode()</tt> function, check that bit 7 of
+<tt>mode_info.ModeAttributes</tt> is set, to make sure that linear
+addressing is possible in this mode. Assuming that it is supported,
+when you call function 0x4F02 to select the mode you should put
+<tt>(mode_number | 0x4000)</tt> into the BX register, instead of just
+<tt>mode_number</tt>, and you will have a linear framebuffer!</p>
+
+<p> The video memory is located at the physical address specified by
+the <tt>mode_info.PhysBasePtr</tt> field, but you must map this area
+into your address space before you can access it. This can be done
+with the code:</p>
+
+<pre>   __dpmi_meminfo mapping;
+   int selector;
+
+   /* map into linear memory */
+   mapping.address = mode_info.PhysBasePtr;
+   mapping.size = vesa_info.TotalMemory &lt;&lt; 16;
+   if (__dpmi_physical_address_mapping(&amp;mapping) != 0)
+      return -1;
+
+   /* allocate an LDT descriptor to access the linear region */
+   selector = __dpmi_allocate_ldt_descriptors(1);
+   if (selector &lt; 0) {
+      __dpmi_free_physical_address_mapping(&amp;mapping);
+      return -1;
+   }
+
+   /* set the descriptor location and size */
+   __dpmi_set_segment_base_address(selector, mapping.address);
+   __dpmi_set_segment_limit(selector, mapping.size-1);
+</pre>
+
+<p>You can now write to any part of the screen using the selector that
+we just created, and without any need for bank switching, eg:</p>
+
+<pre>   void linear_putpixel(int x, int y, int color)
+   {
+      _farpokeb(selector, y*640+x, color);
+   }
+</pre>
+
+<p>Finally, at the end of your program you should free the video
+memory mapping with the code:</p>
+
+<pre>   __dpmi_free_physical_address_mapping(&amp;mapping);
+   __dpmi_free_ldt_descriptor(selector);
+</pre>
+
+<p>It is also possible to use the "Fat DS" trick from
+<tt>&lt;sys/nearptr.h&gt;</tt> to access the framebuffer directly with
+a normal C pointer. This is a very appealing technique because it
+allows you to treat the entire SVGA screen exactly like a normal C
+array, but you should be aware that it won't work under some DPMI
+hosts (notably Windows NT and Linux DOSEMU), plus if you write all
+your code in this way it will be difficult to later add support for
+banked SVGA modes in case you ever need to make your program run on
+hardware without a linear framebuffer. But if you are happy to
+restrict yourself to systems that are capable of linear addressing and
+support the Fat DS method, you can set this up with the code:</p>
+
+<pre>   #include &lt;sys/nearptr.h&gt;
+
+   __dpmi_meminfo mapping;
+
+   if (!__djgpp_nearptr_enable())
+      return -1;
+
+   /* map into linear memory */
+   mapping.address = mode_info.PhysBasePtr;
+   mapping.size = vesa_info.TotalMemory &lt;&lt; 16;
+   if (__dpmi_physical_address_mapping(&amp;mapping) != 0)
+      return -1;
+</pre>
+
+<p>Drawing a pixel is now just a matter of getting a pointer to the
+video memory by adding the framebuffer address onto the
+<tt>__djgpp_conventional_base</tt> value, and then using array syntax
+to access individual pixels, eg:</p>
+
+<pre>   void nearptr_linear_putpixel(int x, int y, int color)
+   {
+      char *video = (char *)(mapping.address + __djgpp_conventional_base);
+      video[y*640+x] = color;
+   }
+</pre>
+
+<p>Before you exit from a program that uses the nearptr system, you
+should call the functions:</p>
+
+<pre>   __dpmi_free_physical_address_mapping(&amp;mapping);
+   __djgpp_nearptr_disable(); 
+</pre>
+
+<hr>
+<p>References</p>
+
+<dl>
+
+<dt>VBE.ZIP - <a href="ftp://clio.rice.edu/djgpp/vbe.zip">
+ftp://clio.rice.edu/djgpp/vbe.zip</a>
+
+</dt><dd>Example source for accessing a linear framebuffer with both near and far 
+pointers, by Charles Sandmann.
+
+</dd><dt>SciTech Software - <a href="http://www.scitechsoft.com/">
+http://www.scitechsoft.com/</a>
+
+</dt><dd>If you don't already have a VBE 2.0 driver, the Display Doctor package 
+provides reliable VESA implementations for a huge range of different 
+cards.
+
+</dd></dl>
+
+
+
+
+<br clear="all"><p></p>
+<a href="http://www.delorie.com/djgpp/doc/ug/graphics/bulktrap.html"></a><table cellspacing="0" cellpadding="3" width="100%" border="0"><tbody><tr>
+<td valign="top" bgcolor="#ffcc99" align="left"><small><font face="itc avant garde gothic,helvetica,arial"><b> &nbsp;
+<a href="http://www.delorie.com/users/dj/" target="_top">webmaster</a> &nbsp;
+<a href="http://www.delorie.com/donations.html" target="_top">donations</a> &nbsp;
+<a href="http://www.delorie.com/store/books/" target="_top">bookstore</a> &nbsp;
+</b></font></small></td>
+<td valign="top" bgcolor="#ffcc99" align="right"><small><font face="itc avant garde gothic,helvetica,arial"><b> &nbsp;
+<a href="http://www.delorie.com/" target="_top">delorie software</a> &nbsp;
+<a href="http://www.delorie.com/privacy.html" target="_top">privacy</a> &nbsp;
+</b></font></small></td>
+</tr><tr><td valign="top" bgcolor="#ffcc99" align="left"><small><font face="itc avant garde gothic,helvetica,arial"><b> &nbsp;
+<a href="http://www.delorie.com/copyright.html" target="_top">Copyright © 2001</a> &nbsp;
+<a href="http://www.delorie.com/users/dj/" target="_top">by DJ Delorie</a> &nbsp;
+</b></font></small></td>
+<td valign="top" bgcolor="#ffcc99" align="right"><small><font face="itc avant garde gothic,helvetica,arial"><b> &nbsp;
+Updated Mar 2001 &nbsp;
+</b></font></small></td>
+</tr></tbody></table>
+<center><iframe src="http://rcm.amazon.com/e/cm?t=deloriesoftware&amp;o=1&amp;p=13&amp;l=ez&amp;f=ifr&amp;f=ifr" scrolling="no" marginwidth="0" marginheight="0" border="0" style="border:none;" width="468" height="60" frameborder="0"></iframe>
+</center>
+
+
+</body></html>

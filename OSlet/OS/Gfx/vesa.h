@@ -20,6 +20,14 @@ struct __attribute__ ((packed)) VESAInfo
       unsigned char  OemData[256];
 };
 
+enum {
+	VESAMODEATTRIBUTES_SUPPORT_LFB	= 0x80
+};
+
+enum {
+	VESAMODE_LFB	= 0x4000
+};
+
 struct __attribute__ ((packed)) ModeInfo
 {
       unsigned short ModeAttributes;      
@@ -62,11 +70,7 @@ struct VesaFrameBuffer
 	int mode;
 	struct ModeInfo* modeInfo;
 
-	void* frameBuffer;	// pointer to a single frame buffer large enough for full display.
-				// This framebuffer will be blitted to VESA window in segments to
-				// swap buffers. 
-
-
+	void* lfb;	// if this is non-null, use LFB not banked mode	
 
 };
 

@@ -46,6 +46,14 @@ bool	gfx_detectVESAModes()
 		(unsigned char*)( CONVERT_REAL_MODE_ADDRESS(gVESAInfo.OEMStringPtr)));
 	DEBUG("Total memory: %d kB\n",gVESAInfo.TotalMemory * 64);
 
+	// If this is a VESA2.0+ BIOS, then we query for the PM bank switch functions
+
+
+	// TODO
+
+
+	//
+
 	unsigned short* modes = (unsigned short*)(CONVERT_REAL_MODE_ADDRESS(gVESAInfo.VideoModePtr));
 
 	gTotalSupportedVESAModes = 0;
@@ -143,9 +151,8 @@ bool	gfx_vesa_setVideoMode(int mode)
 	struct RegisterDescription out = {0};
 
 	in.EAX = 0x4f02;
-	in.EBX = gVESAModeIndex[mode];
 
-	kprintf("Setting mode: %d\n", mode);
+	in.EBX = mode;
 	
 	io_realModeInt(0x10, &in, &out);	
 
@@ -178,33 +185,45 @@ void 	gfx_vesa_swapFrameBuffer(struct FrameBuffer* fb)
 
 	struct VesaFrameBuffer* vfb = fb->privateData;
 
-	unsigned int bytesToCopy = fb->rowStride * fb->height;
-	unsigned int bank = 0;
-
-	unsigned char* pixelData = (unsigned char*)fb->pixelData;
-
-	unsigned char* windowPtr = (unsigned char*)0xa0000;
-
-	unsigned int bankSize = vfb->modeInfo->WinSize * 1024;
-	unsigned int bankGranularity = vfb->modeInfo->WinGranularity * 1024;
-
-	while (bytesToCopy)
+	if (vfb->lfb != NULL)
 	{
+		// Linear Frame Buffer
 
-		gfx_vesa_setBank(bank);
-
-		int bytesThisBank = bytesToCopy > bankSize ? bankSize : bytesToCopy;
-	
-		lib_memcpy(windowPtr, pixelData, bytesThisBank);
-
-		bytesToCopy -= bytesThisBank;
-
-		bank += bankSize / bankGranularity;
-
-		pixelData += bytesThisBank;
+		lib_memcpy(vfb->lfb, fb->pixelData, fb->rowStride * fb->height);
 
 	}
+	else
+	{
+
+		unsigned int bytesToCopy = fb->rowStride * fb->height;
+		unsigned int bank = 0;
+
+		unsigned char* pixelData = (unsigned char*)fb->pixelData;
+
+		unsigned char* windowPtr = (unsigned char*)0xa0000;
+
+		unsigned int bankSize = vfb->modeInfo->WinSize * 1024;
+		unsigned int bankGranularity = vfb->modeInfo->WinGranularity * 1024;
+
+		while (bytesToCopy)
+		{
+
+			gfx_vesa_setBank(bank);
+
+			int bytesThisBank = bytesToCopy > bankSize ? bankSize : bytesToCopy;
 		
+			lib_memcpy(windowPtr, pixelData, bytesThisBank);
+
+			bytesToCopy -= bytesThisBank;
+
+			bank += bankSize / bankGranularity;
+
+			pixelData += bytesThisBank;
+
+		}
+
+	}
+			
 }
 
 bool	gfx_vesa_activateFrameBufferDisplay(struct FrameBuffer* fb)
@@ -212,9 +231,22 @@ bool	gfx_vesa_activateFrameBufferDisplay(struct FrameBuffer* fb)
 
 	struct VesaFrameBuffer* vfb = fb->privateData;
 
-	return gfx_vesa_setVideoMode(vfb->mode);
+	// if the mode supports an LFB, try to set that.
 
+	if ( gVESAInfo.VESAVersion > 0x200 && (vfb->modeInfo->ModeAttributes & VESAMODEATTRIBUTES_SUPPORT_LFB))
+	{
 
+		if (! gfx_vesa_setVideoMode(gVESAModeIndex[vfb->mode] | VESAMODE_LFB))
+			return false;
+
+		vfb->lfb = (void*)vfb->modeInfo->PhysBasePtr;
+		return true;
+	}
+	else
+		return gfx_vesa_setVideoMode(gVESAModeIndex[vfb->mode]);
+
+	// shouldn't get here
+	return false;
 }
 
 struct FrameBuffer* gfx_vesa_createFrameBuffer(int mode)
