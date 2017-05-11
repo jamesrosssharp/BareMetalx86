@@ -2,16 +2,6 @@
 
 #include "gfx.h"
 
-enum PixelFormat
-{
-
-	PIXELFORMAT_INDEXED8	= 	0,
-	PIXELFORMAT_RGB16,
-	PIXELFORMAT_RGB24,
-	PIXELFORMAT_RGB32
-
-};
-
 //
 //	A general framebuffer object. 
 //
@@ -38,6 +28,9 @@ struct FrameBuffer
 	enum PixelFormat pixelFormat;
 
 	bool (*activateFrameBufferDisplay)(struct FrameBuffer* fb);
+
+	void (*blit)(struct FrameBuffer* fb, struct Image* im, int x, int y);
+	void (*alphaBlit)(struct FrameBuffer* fb, struct Image* im, int x, int y);
 
 	void (*clear)(struct FrameBuffer* fb, struct RGBColor* col);
 	void (*swap)(struct FrameBuffer* fb);

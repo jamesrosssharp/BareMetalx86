@@ -1,7 +1,7 @@
 
 
 #include "realmodeint.h"
-
+#include "../Console/console.h"
 
 // Function prototype for assembly function
  int boot_realModeIntWrapper(unsigned char interrupt, struct RegisterDescription *inRegisters, struct RegisterDescription *outRegisters);	
@@ -10,6 +10,8 @@ bool	io_realModeInt(unsigned char interrupt, struct RegisterDescription* inRegis
 {
 
 	int ret;
+
+	kprintf("real mode int: %x %08x %08x %08x\n", interrupt, inRegisters->EAX, inRegisters->ES, inRegisters->EDI);
 
 	//kprintf("calling real mode wrapper EAX=%08x EBX=%08x ECX=%08x EDX=%08x \n", 
 	//		inRegisters->EAX,  inRegisters->EBX,  inRegisters->ECX,  inRegisters->EDX );

@@ -31,9 +31,9 @@ void main(void)
 
 	gfx_detectVESAModes();
 
-	int xres = GFX_XRESOLUTION_MAX;
-	int yres = GFX_YRESOLUTION_MAX;
-	int bpp = GFX_BPP_MAX;
+	int xres = 800; //GFX_XRESOLUTION_MAX;
+	int yres = 600; //GFX_YRESOLUTION_MAX;
+	int bpp = 32; //GFX_BPP_MAX;
 	int mode = 0;
 
 	if (! gfx_vesa_findCompatibleMode(&mode, &xres, &yres, &bpp))

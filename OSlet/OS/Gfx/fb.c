@@ -71,6 +71,124 @@ void gfx_fb_clear_rgb32(struct FrameBuffer* fb, struct RGBColor* col)
 
 }
 
+void gfx_fb_blit_indexed8(struct FrameBuffer* fb, struct Image* im, int x, int y)
+{
+	// TODO
+};
+
+void gfx_fb_blit_rgb16(struct FrameBuffer* fb, struct Image* im, int x, int y)
+{
+	// TODO
+};
+
+void gfx_fb_blit_rgb24(struct FrameBuffer* fb, struct Image* im, int x, int y)
+{
+	// TODO
+};
+
+void gfx_fb_blit_rgb32(struct FrameBuffer* fb, struct Image* im, int x, int y)
+{
+
+	switch (im->pixelFormat)
+	{
+		case PIXELFORMAT_RGB32:
+		{
+
+			unsigned int* dest = (unsigned int*)((uintptr_t)fb->pixelData + x*4 + y*fb->rowStride);
+
+			unsigned int* src = (unsigned int*)im->data;
+
+			for (int i = 0; i < im->height; i++)
+			{
+				lib_memcpy(dest, src, im->width*4);
+
+				dest = (unsigned int*)((uintptr_t)dest + fb->rowStride);
+				src  += im->width;
+			}
+			
+			break;
+		}
+
+	}
+
+};
+
+void gfx_fb_alphaBlit_indexed8(struct FrameBuffer* fb, struct Image* im, int x, int y)
+{
+	// TODO
+};
+
+void gfx_fb_alphaBlit_rgb16(struct FrameBuffer* fb, struct Image* im, int x, int y)
+{
+	// TODO
+};
+
+void gfx_fb_alphaBlit_rgb24(struct FrameBuffer* fb, struct Image* im, int x, int y)
+{
+	// TODO
+};
+
+void gfx_fb_alphaBlit_rgb32(struct FrameBuffer* fb, struct Image* im, int x, int y)
+{
+
+	switch (im->pixelFormat)
+	{
+		case PIXELFORMAT_RGB32:
+		{
+
+			unsigned int* dest = (unsigned int*)((uintptr_t)fb->pixelData + x*4 + y*fb->rowStride);
+
+			unsigned int* src = (unsigned int*)im->data;
+
+			for (int i = 0; i < im->height; i++)
+			{
+				for (int j = 0; j < im->width; j++)
+				{
+	
+					unsigned int destPixel = *(dest + j);
+	
+					unsigned int pixel = *(src + j);
+
+					unsigned int alpha = ((pixel & 0xff000000) >> 24) + 1;
+					unsigned int red   = (pixel & 0x00ff0000) >> 16;
+					unsigned int green = (pixel & 0x0000ff00) >> 8;
+					unsigned int blue  = (pixel & 0x000000ff);
+
+					red *= alpha;
+					green *= alpha;
+					blue  *= alpha;
+
+					unsigned int oneMinusAlpha = 0x100 - alpha;
+
+					unsigned int destRed   = (destPixel & 0x00ff0000) >> 16;
+					unsigned int destGreen = (destPixel & 0x0000ff00) >> 8;
+					unsigned int destBlue  = (destPixel & 0x000000ff);
+					
+					destRed *= oneMinusAlpha;
+					destGreen *= oneMinusAlpha;
+					destBlue  *= oneMinusAlpha;
+
+					red = (red + destRed) >> 8;
+					green = (green + destGreen) >> 8;
+					blue = (blue + destBlue) >> 8;
+
+					unsigned int outPixel = (red << 16) | (green << 8) | (blue << 0); 	
+
+					*(dest + j) = outPixel;
+
+				}
+
+				dest = (unsigned int*)((uintptr_t)dest + fb->rowStride);
+				src  += im->width;
+			}
+			
+			break;
+		}
+
+	}
+
+};
+
 void gfx_fb_swap(struct FrameBuffer* fb)
 {
 	// NOP
@@ -118,15 +236,23 @@ struct FrameBuffer* gfx_fb_createFrameBuffer(unsigned int width, unsigned int he
 	{
 		case PIXELFORMAT_INDEXED8:
 			fb->clear = gfx_fb_clear_indexed8;
+			fb->blit  = gfx_fb_blit_indexed8;
+			fb->alphaBlit  = gfx_fb_alphaBlit_indexed8;
 			break;
 		case PIXELFORMAT_RGB16:
 			fb->clear = gfx_fb_clear_rgb16;
+			fb->blit  = gfx_fb_blit_rgb16;
+			fb->alphaBlit  = gfx_fb_alphaBlit_rgb16;
 			break;
 		case PIXELFORMAT_RGB24:
 			fb->clear = gfx_fb_clear_rgb24;
+			fb->blit  = gfx_fb_blit_rgb24;
+			fb->alphaBlit  = gfx_fb_alphaBlit_rgb24;
 			break;
 		case PIXELFORMAT_RGB32:
 			fb->clear = gfx_fb_clear_rgb32;
+			fb->blit  = gfx_fb_blit_rgb32;
+			fb->alphaBlit  = gfx_fb_alphaBlit_rgb32;
 			break;
 		default:
 			goto error;
