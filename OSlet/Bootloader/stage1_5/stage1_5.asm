@@ -722,7 +722,7 @@ A20Failed:
 
 	call PrintString
 
-	jmp EndLoop ; die
+	jmp EndLoop16 ; die
 A20Done:
 
 	mov dx, 0c00h
@@ -744,14 +744,14 @@ A20Done:
 
 	; move GDT to nice address
 
-	mov si, gdt
-	xor ax,ax
-	mov es,ax
-	mov di, 500h
+	;mov si, gdt
+	;xor ax,ax
+	;mov es,ax
+	;mov di, 500h
 	
-	mov cx, gdt_ptr - gdt
+	;mov cx, gdt_ptr - gdt
 
-	rep movsb	
+	;rep movsb	
 
 	; Load GDT and IDT
 
@@ -1302,7 +1302,7 @@ gdt:
 
 gdt_ptr: 
 	dw gdt_ptr - gdt - 1
-	dd 500h
+	dw gdt, 0001h
 
 idt_ptr:	; dummy idt for now (c program can reconfigure interrupt
 		; descriptor if it needs to)
