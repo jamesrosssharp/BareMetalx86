@@ -21,23 +21,36 @@ void main(void)
 
 	console_init();
 
-	io_detectCPU();
-
-	mem_init();
-
 	console_addConsole(CONSOLETYPE_VGATEXT, videoPort, columns);
 
 	kprintf("Hello from Loader...\n");
 
+	io_detectCPU();
+
+	mem_init();
+
 	gfx_detectVESAModes();
 
-	int xres = 800; //GFX_XRESOLUTION_MAX;
-	int yres = 600; //GFX_YRESOLUTION_MAX;
-	int bpp = 32; //GFX_BPP_MAX;
+	int xres = GFX_XRESOLUTION_MAX;
+	int yres = GFX_YRESOLUTION_MAX;
+	int bpp =  GFX_BPP_MAX;
 	int mode = 0;
 
 	if (! gfx_vesa_findCompatibleMode(&mode, &xres, &yres, &bpp))
+	{
+		kprintf("Could not set video mode\n");
 		goto die;
+	}
+
+	// set up interrupts, to trap exceptions
+
+	if (! io_initInterrupts(INTERRUPTCONTROL_PIC))
+	{
+		kprintf("Could not init interrupts.\n");
+		goto die;
+	}
+
+	io_enableInterrupts();
 
 	kprintf("Using video mode: %d x %d, %d bpp\n", xres, yres, bpp);
 
@@ -48,6 +61,8 @@ void main(void)
 		kprintf("Could not create a frameBuffer object\n");
 		goto die;
 	}
+
+	kprintf("created framebuffer: %08x\n", fb);
 
 	if (! fb->activateFrameBufferDisplay(fb))
 	{
@@ -69,7 +84,7 @@ void main(void)
 
 	// 5. jump to kernel
 
-
+	kprintf("Done with everything!\n");
 die:
 	asm("hlt");
 	goto die;

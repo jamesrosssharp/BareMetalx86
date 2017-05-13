@@ -78,15 +78,16 @@ bool io_addInterruptHandler(unsigned char interrupt, ISRCallback handler)
 void io_handleInterrupt(int errorCode, int interrupt)
 {
 
-	//kprintf("Interrupt: %x %x\n", interrupt, errorCode);
+	if (interrupt != 0x20)
+		kprintf("Interrupt: %x %x\n", interrupt, errorCode);
 
 	if (gInterruptControlMode == INTERRUPTCONTROL_PIC)
 	{
 		io_acknowledgeInterruptPIC(interrupt);
 	}	
 
-	//if (interrupt == 0x21)
-	//	inByte(0x60);
+	if (interrupt == 0x21)
+		inByte(0x60);
 
 }
 

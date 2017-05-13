@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-int lib_math_log2(int operand);
+unsigned int lib_math_log2(unsigned int operand);
 
 
 #ifdef __cplusplus

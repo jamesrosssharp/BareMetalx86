@@ -50,10 +50,10 @@ struct BuddyMemoryAllocator
 extern "C" {
 #endif
 
-int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize);
-int mem_buddy_requiredMemorySizeForAllocatorStructures(int maxBlockSize, int minBlockSize);
+unsigned int mem_buddy_requiredMemorySize(unsigned int maxBlockSize, unsigned int minBlockSize);
+unsigned int mem_buddy_requiredMemorySizeForAllocatorStructures(unsigned int maxBlockSize, unsigned int minBlockSize);
 
-int mem_buddy_maxBuddyBlockSizeForMemoryRegion(int memSize, int minBlockSize);
+unsigned int mem_buddy_maxBuddyBlockSizeForMemoryRegion(unsigned int memSize, unsigned int minBlockSize);
 
 bool mem_buddy_init(int maxBlockSize, int minBlockSize, void* memoryForStructures, void* memoryForAllocation);
 

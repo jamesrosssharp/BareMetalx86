@@ -34,3 +34,5 @@ enum InterruptControlMode
 typedef void (* ISRCallback)(int interrupt, int errorCode);
 
 bool io_initInterrupts(enum InterruptControlMode interruptControl);
+void io_enableInterrupts();
+void io_disableInterrupts();

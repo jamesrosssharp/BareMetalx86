@@ -51,25 +51,6 @@ bool loaderUI_init(struct FrameBuffer* fb)
 			   (void*)&loaderBlob[img_logo_cropped_blobOffset],
 			   PIXELFORMAT_RGB32};
 	
-	/*
-	// Ugly hack to try to debug Qemu's VBE driver.
-	unsigned int* d = logo.data;
-
-	unsigned dBytes = 26639;
-	for (int i = 0; i < logo.width; i++)
-	{
-		for (int j = 0; j < logo.height; j++)
-		{
-
-			unsigned int pixel = d[i + j*logo.width];
-
-			if (i + j*logo.width < dBytes)
-				d[i + j*logo.width] = 0xffff0000;	
-
-		}
-	}
-	*/
-
 	int logoX = fb->width / 2 - logo.width / 2 - logo.width / 40;
 	int logoY = fb->height / 2 - logo.height / 2 - 100;
 

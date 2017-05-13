@@ -233,7 +233,7 @@ bool	gfx_vesa_activateFrameBufferDisplay(struct FrameBuffer* fb)
 
 	// if the mode supports an LFB, try to set that.
 
-	if ( gVESAInfo.VESAVersion > 0x200 && (vfb->modeInfo->ModeAttributes & VESAMODEATTRIBUTES_SUPPORT_LFB))
+	if (gVESAInfo.VESAVersion > 0x200 && (vfb->modeInfo->ModeAttributes & VESAMODEATTRIBUTES_SUPPORT_LFB))
 	{
 
 		if (! gfx_vesa_setVideoMode(gVESAModeIndex[vfb->mode] | VESAMODE_LFB))

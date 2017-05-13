@@ -327,6 +327,10 @@ RealModeEnter:
 
 	mov eax, [InEAX - kernel_entry_point] 
 
+	; enable interrupts
+
+	sti
+
 	; execute interrupt
 
 RealModeExecInt:

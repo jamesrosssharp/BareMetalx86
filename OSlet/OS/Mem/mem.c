@@ -3,10 +3,10 @@
 #include "../Console/console.h"
 #include "../BIOS/bios.h"
 
-#define MEMORY_RESERVE_KERNEL		4*1024*1024	// 4MB kernel size
+#define MEMORY_RESERVE_KERNEL		32*1024*1024	// 4MB kernel size
 #define MEMORY_RESERVE_KERNEL_STACK	1*1024*1024	// 1MB kernel stack size
 
-#define MEMORY_MINBLOCKSIZE		KERNEL_PAGE_SIZE		// 4k; later redefine this to "KERNEL_PAGE_SIZE"
+#define MEMORY_MINBLOCKSIZE		KERNEL_PAGE_SIZE	
 
 #define MEMORY_POOLTYPE			MEMORYPOOLTYPE_BUDDY	
 
@@ -40,7 +40,7 @@ bool	mem_init()
 	{
 		// We want memory above 1 Meg.
 		if ((memMap[i].baseAddress >= KERNEL_LOAD_ADDRESS) &&
-		    (memMap[i].baseAddress <  0xffffffffU) &&
+		    (memMap[i].baseAddress <  0x100000000ULL) &&
   		    (memMap[i].type == MEMORY_TYPE_FREE) )
 		{
 			kprintf("Found usable memory at %08x%08x %d\n", 
@@ -99,6 +99,8 @@ bool	mem_init()
 	
 	int memPoolReserveBytes = ALIGNTO(sizeof(struct MemoryPool) * maxMemoryPools, MEMORY_MINBLOCKSIZE); 
 
+	lib_bzero(gMemoryPools, memPoolReserveBytes);
+
 	address += memPoolReserveBytes;
 
 	memSize -= memPoolReserveBytes; 
@@ -141,10 +143,14 @@ bool	mem_init()
 		bytes -= bytesUsed;
 
 		gNumMemoryPools ++;				
+
+		//if (gNumMemoryPools > 3)
+		//	break;
 	
 	}	
 
 	// Now add all other memory blocks that are available.
+
 
 	for (int j = 0; j < memMapSize; j ++)
 	{
@@ -181,6 +187,7 @@ bool	mem_init()
 		}	
 	
 	}	
+
 
 	return true;
 
@@ -228,13 +235,15 @@ void*	kmalloc(unsigned int bytes, enum MemoryType type)
 		struct MemoryPool* pool = &gMemoryPools[i];
 	
 		kprintf("Trying pool %08x %08x\n", pool, pool->allocMemory);
-	
+
 		if (pool->allocMemory != NULL)
 			block = pool->allocMemory(pool, &bytesAllocated);
 
 		if (block != NULL)
 			break;
 	}
+
+	kprintf("Allocated block %08x %d\n", block, bytesAllocated);
 
 	if (block == NULL)
 	{

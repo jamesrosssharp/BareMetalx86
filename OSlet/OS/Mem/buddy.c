@@ -41,7 +41,7 @@ corresponding BTree structure:
 // process memory.
 #define BUDDY_BLOCK_ALIGN 	KERNEL_PAGE_SIZE
 
-int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize)
+unsigned int mem_buddy_requiredMemorySize(unsigned int maxBlockSize, unsigned int minBlockSize)
 {
 	if (! IS_POWER_OF_TWO(maxBlockSize) || ! IS_POWER_OF_TWO(minBlockSize))
 		return -1;
@@ -51,7 +51,7 @@ int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize)
 
 	// compute size memory blocks
 
-	int memSize = maxBlockSize + BUDDY_BLOCK_ALIGN;	// we pad 3 times
+	unsigned int memSize = maxBlockSize + BUDDY_BLOCK_ALIGN;	// we pad 3 times
 
 	memSize += mem_buddy_requiredMemorySizeForAllocatorStructures(maxBlockSize, minBlockSize);
 
@@ -59,27 +59,27 @@ int mem_buddy_requiredMemorySize(int maxBlockSize, int minBlockSize)
 
 }
 
-int mem_buddy_requiredMemorySizeForAllocatorStructures(int maxBlockSize, int minBlockSize)
+unsigned int mem_buddy_requiredMemorySizeForAllocatorStructures(unsigned int maxBlockSize, unsigned int minBlockSize)
 {
 
-	int memSize = 2 * BUDDY_BLOCK_ALIGN; 
+	unsigned int memSize = 2 * BUDDY_BLOCK_ALIGN; 
 
 	// compute size of BTree
 
-	int treeDepth = lib_math_log2(maxBlockSize) - lib_math_log2(minBlockSize) + 1;	
+	unsigned int treeDepth = lib_math_log2(maxBlockSize) - lib_math_log2(minBlockSize) + 1;	
 
 	memSize += lib_btree_requiredMemorySize(treeDepth); 		
 
 	// compute size of block freelist
 
-	int numBlocks = lib_btree_maxElementsRequired(treeDepth);
+	unsigned int numBlocks = lib_btree_maxElementsRequired(treeDepth);
 
 	memSize += mem_freeList_requiredMemorySize(sizeof(struct BuddyBlock), numBlocks);
 
 	return memSize;	
 }
 
-int mem_buddy_maxBuddyBlockSizeForMemoryRegion(int memSize, int minBlockSize)
+unsigned int mem_buddy_maxBuddyBlockSizeForMemoryRegion(unsigned int memSize, unsigned int minBlockSize)
 {
 
 	int requiredMem = 0;
@@ -209,6 +209,9 @@ void mem_buddy_findCompatibleBlock(struct BTreeNode* node, void* data, int depth
 void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int* bytes)
 {
 
+	#undef DEBUG
+	#define DEBUG kprintf
+
 	int allocBytes = *bytes;
 
 	DEBUG("Allocating %d bytes...\n", allocBytes);
@@ -324,7 +327,8 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int* bytes
 
 	return NULL;
 
-
+	#undef DEBUG
+	#define DEBUG(...) 
 }
 
 
@@ -443,6 +447,8 @@ int mem_buddy_estimateNumberOfBuddyAllocatorsForRegion(int size, int minBlockSiz
 
 	int minMem = mem_buddy_requiredMemorySize(minBlockSize, minBlockSize); 
 
+	kprintf("buddy: minMem: %d\n", minMem);
+
 	int utilisedBytes = 0;
 
 	while (bytes > minMem)
@@ -450,6 +456,8 @@ int mem_buddy_estimateNumberOfBuddyAllocatorsForRegion(int size, int minBlockSiz
 
 		int maxBlockSize = mem_buddy_maxBuddyBlockSizeForMemoryRegion(bytes, minBlockSize); 
 		int requiredBytes = mem_buddy_requiredMemorySize(maxBlockSize, minBlockSize); 
+
+		
 
 		DEBUG("Buddy: %d blocksize %d bytes\n", maxBlockSize, requiredBytes);
 
@@ -531,8 +539,12 @@ unsigned int mem_buddy_createBuddyMemoryPool(struct MemoryPool* pool, uintptr_t 
 
 		// fill in function pointers
 
-	pool->allocMemory = &mem_buddy_allocMemoryFromMemoryPool;
-	pool->freeMemory =  &mem_buddy_freeMemoryFromMemoryPool;
+	kprintf("mem pool allocMemory before: %08x (%08x)\n", pool->allocMemory, pool);
+
+	pool->allocMemory = mem_buddy_allocMemoryFromMemoryPool;
+	pool->freeMemory =  mem_buddy_freeMemoryFromMemoryPool;
+
+	kprintf("mem pool allocMemory after: %08x (%08x)\n", pool->allocMemory, pool);
 
 	// 5. return number of bytes of contiguous physical memory used.
 

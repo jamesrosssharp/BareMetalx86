@@ -674,10 +674,10 @@ ProgramLoaded:
 
 	; attempt to enable A20 gate
 
-	call TestA20
+	;call TestA20
 
-	or al,al
-	jz A20Done
+	;or al,al
+	;jz A20Done
 
 	; 1. attempt to enable via bios
 
