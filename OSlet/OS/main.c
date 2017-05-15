@@ -37,7 +37,7 @@ void main(void)
 
 	//bios_detectMemory(&memMap, &memMapSize);
 
-	mem_init();
+	mem_initHimem();
 
 	// Now we have detected memory, init the kernel memory allocator,
 	// so we can kmalloc

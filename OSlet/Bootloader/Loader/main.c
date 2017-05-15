@@ -7,6 +7,15 @@
 
 #include "loaderui.h"
 
+extern int _low_mem_start;
+extern int _low_mem_end;
+
+extern int _data_start;
+extern int _data_end;
+
+extern int _bss_start;
+extern int _bss_end;
+
 void main(void)
 {
 
@@ -27,7 +36,7 @@ void main(void)
 
 	io_detectCPU();
 
-	mem_init();
+	mem_initHimem();
 
 	gfx_detectVESAModes();
 
@@ -43,6 +52,8 @@ void main(void)
 	}
 
 	// set up interrupts, to trap exceptions
+	// TODO: Move this earlier, and make interrupts
+	// properly reloaded after call to real mode vector
 
 	if (! io_initInterrupts(INTERRUPTCONTROL_PIC))
 	{
@@ -52,7 +63,22 @@ void main(void)
 
 	io_enableInterrupts();
 
-	kprintf("Using video mode: %d x %d, %d bpp\n", xres, yres, bpp);
+	// init low mem
+	// TODO: this is the first thing we should do
+
+	kprintf("Low mem start: %08x end: %08x\n", &_low_mem_start, &_low_mem_end);
+	kprintf("Data start: %08x end: %08x\n", &_data_start, &_data_end);
+	kprintf("BSS start: %08x end: %08x\n", &_bss_start, &_bss_end);
+
+	if (! mem_initLowmem(&_low_mem_start, (uintptr_t)&_low_mem_end - (uintptr_t)&_low_mem_start))
+	{
+		kprintf("Could not init low mem!\n");
+		goto die;
+	}
+
+	//
+
+/*	kprintf("Using video mode: %d x %d, %d bpp\n", xres, yres, bpp);
 
 	struct FrameBuffer* fb = gfx_vesa_createFrameBuffer(mode);	
 
@@ -71,7 +97,7 @@ void main(void)
 	}
 
 	loaderUI_init(fb);
-
+*/
 	// 0. enable interrupts
 
 	// 1. init BIOS disk driver

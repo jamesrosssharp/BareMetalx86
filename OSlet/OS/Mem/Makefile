@@ -4,8 +4,8 @@ LIB = libmem.a
 all:	$(LIB)
 
 
-HEADERS = mem.h freelist.h buddy.h
-OBJS = mem.o freelist.o buddy.o
+HEADERS = mem.h freelist.h buddy.h kr.h
+OBJS = mem.o freelist.o buddy.o kr.o
 
 $(LIB):	$(OBJS) $(HEADERS)
 	ar rc $(LIB) $(OBJS)

@@ -16,10 +16,13 @@ unsigned int mem_estimateNumberOfMemoryPools(enum MemoryPoolType type, unsigned 
 struct MemoryPool *gMemoryPools;
 int		   gNumMemoryPools = 0;
 
-bool	mem_init()
+struct MemoryPool *gLowMemoryPools;
+int		  gNumLowMemoryPools = 0;
+
+bool	mem_initHimem()
 {
 
-	kprintf("Initing memory subsystem...");	
+	kprintf("Initing Hi-memory...");	
 
 	// Query BIOS memory map
 
@@ -230,9 +233,13 @@ void*	kmalloc(unsigned int bytes, enum MemoryType type)
 
 	void* block = NULL;
 
-	for (int i = 0; i < gNumMemoryPools; i ++)
+
+	struct MemoryPool* pools = (type == MEMORYTYPE_HIMEM) ? gMemoryPools : gLowMemoryPools;
+	int count = (type == MEMORYTYPE_HIMEM) ? gNumMemoryPools : gNumLowMemoryPools;
+
+	for (int i = 0; i < count; i ++)
 	{
-		struct MemoryPool* pool = &gMemoryPools[i];
+		struct MemoryPool* pool = &pools[i];
 	
 		kprintf("Trying pool %08x %08x\n", pool, pool->allocMemory);
 
@@ -278,5 +285,28 @@ void	kfree(void* memory)
 
 	// TODO
 
+}
+
+bool	mem_initLowmem(void* lowMemStart, unsigned int lowMemBytes)
+{
+
+	// Paging: we assume the low memory has already been identity mapped in the page tables.
+
+	struct MemoryPool* pool = (struct MemoryPool*) lowMemStart;
+
+	unsigned int reservedBytes = sizeof(struct MemoryPool); 
+ 
+	uintptr_t dataStart = (uintptr_t)pool + reservedBytes;
+
+	if (mem_kr_createMemoryPool(pool, (void*)dataStart, lowMemBytes - reservedBytes) == 0)
+	{
+		kprintf("could not create KR memory pool\n");
+		return false;
+	}
+
+	gLowMemoryPools     = pool;
+	gNumLowMemoryPools  = 1;
+
+	return true;
 }
 

@@ -4,8 +4,11 @@ all:	loader.bin
 OBJ = main.o loaderui.o
 HEADERS = loaderui.h
 
-loader.bin:	boot.o bootsplash.o $(OBJ) ../../OS/libkern.a
+loader.bin:	boot.o bootsplash.o $(OBJ) link.ld ../../OS/libkern.a
 	ld --script link.ld boot.o bootsplash.o $(OBJ) -o loader.bin -L../../OS -lkern
+	@if [ `stat -c%s loader.bin` -gt 262144 ]; then echo "!!!!"; echo "Loader too big!"; echo "!!!!"; exit 1; fi
+
+
 
 %.o:	%.c $(HEADERS)
 	gcc -m32 -fno-stack-protector -Werror -I../../OS \

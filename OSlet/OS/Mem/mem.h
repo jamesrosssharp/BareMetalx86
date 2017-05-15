@@ -6,11 +6,12 @@
 enum MemoryPoolType
 {
 	MEMORYPOOLTYPE_BUDDY,
+	MEMORYPOOLTYPE_KR,
 };
 
 enum MemoryType
 {
-	MEMORYTYPE_DMA_LOMEM,
+	MEMORYTYPE_LOMEM,
 	MEMORYTYPE_HIMEM
 };
 
@@ -37,7 +38,8 @@ struct MemoryPool
 };
 
 
-bool	mem_init();
+bool	mem_initHimem();
+bool	mem_initLowmem(void* lowMemStart, unsigned int lowMemBytes);
 
 void*	kmalloc(unsigned int bytes, enum MemoryType type);
 void	kfree(void* memory);
@@ -45,3 +47,4 @@ void	kfree(void* memory);
 
 #include "buddy.h"
 #include "freelist.h"
+#include "kr.h"
