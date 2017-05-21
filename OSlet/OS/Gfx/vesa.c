@@ -23,28 +23,41 @@ bool	gfx_detectVESAModes()
 	struct RegisterDescription in = {0};
 	struct RegisterDescription out = {0};
 
-	in.ES = (((int)&gVESAInfo) & 0xffff0000) >> 4;
-	in.EDI = (((int)&gVESAInfo) & 0x0000ffff); 
+	struct VESAInfo* vesaInfo = (struct VESAInfo*)kmalloc(sizeof(struct VESAInfo), MEMORYTYPE_LOMEM);
+
+	if (vesaInfo == NULL)
+	{
+		kprintf("Could not allocate low memory\n");
+		return false;
+	}
+
+	in.ES = (((int)vesaInfo) & 0xffff0000) >> 4;
+	in.EDI = (((int)vesaInfo) & 0x0000ffff); 
 	in.EAX = 0x4f00;	
 
 	io_realModeInt(0x10, &in, &out);	
 
 	if (out.EAX & 0x0000ff00)
 	{
-		kprintf("Could not get VESA info block");
+		kprintf("Could not get VESA info block\n");
+		kfree(vesaInfo);
 		return false;
 	}
 
-	DEBUG("VESA Signature: %c%c%c%c (%x)\n", gVESAInfo.VESASignature[0],
+	lib_memcpy(&gVESAInfo, vesaInfo, sizeof(struct VESAInfo));
+
+	kfree(vesaInfo);
+
+	kprintf("VESA Signature: %c%c%c%c (%x)\n", gVESAInfo.VESASignature[0],
 		gVESAInfo.VESASignature[1],
 		gVESAInfo.VESASignature[2],
 		gVESAInfo.VESASignature[3],
 		&gVESAInfo
 	);
 
-	DEBUG("OEM String: %s\n",
+	kprintf("OEM String: %s\n",
 		(unsigned char*)( CONVERT_REAL_MODE_ADDRESS(gVESAInfo.OEMStringPtr)));
-	DEBUG("Total memory: %d kB\n",gVESAInfo.TotalMemory * 64);
+	kprintf("Total memory: %d kB\n",gVESAInfo.TotalMemory * 64);
 
 	// If this is a VESA2.0+ BIOS, then we query for the PM bank switch functions
 
@@ -60,13 +73,21 @@ bool	gfx_detectVESAModes()
 
 	struct ModeInfo* modeInfo = gVESAModeInfo;
 
+	struct ModeInfo* lowMemModeInfo = (struct ModeInfo*)kmalloc(sizeof(struct ModeInfo), MEMORYTYPE_LOMEM);
+
+	if (lowMemModeInfo == NULL)
+	{
+		kprintf("Could not allocate low memory for mode info!\n");
+		return false;
+	}
+
 	while(*modes != 0xffff && gTotalSupportedVESAModes < MAX_VESA_MODES)
 	{
 
 		// Get mode info
 
-		in.ES = (((int)modeInfo) & 0xffff0000) >> 4;
-		in.EDI = (((int)modeInfo) & 0x0000ffff); 
+		in.ES = (((int)lowMemModeInfo) & 0xffff0000) >> 4;
+		in.EDI = (((int)lowMemModeInfo) & 0x0000ffff); 
 		in.EAX = 0x4f01;	
 		in.ECX = (unsigned int)*modes;
 
@@ -75,10 +96,13 @@ bool	gfx_detectVESAModes()
 		if (out.EAX & 0x0000ff00)
 		{
 			kprintf("Could not get mode info block");
+			kfree(lowMemModeInfo);
 			return false;
 		}
 
-		DEBUG("Detected mode: 0x%x %dx%d, %dbpp\n", *modes, 
+		lib_memcpy(modeInfo, lowMemModeInfo, sizeof(struct ModeInfo));
+
+		kprintf("Detected mode: 0x%x %dx%d, %dbpp\n", *modes, 
 				modeInfo->XResolution, 
 				modeInfo->YResolution,
 				modeInfo->BitsPerPixel);
@@ -90,6 +114,7 @@ bool	gfx_detectVESAModes()
 		modeInfo ++;
 	}
 
+	kfree(lowMemModeInfo);
 
 	DEBUG("Detected %d VESA modes.\n", gTotalSupportedVESAModes);
 

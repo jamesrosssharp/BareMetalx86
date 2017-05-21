@@ -22,10 +22,10 @@ void vgaConsole_moveCursor(int x, int y);
 
 struct ConsoleInfo gConsoleInfo = {
 	
-		vgaConsole_init,	// int init(void)
-		vgaConsole_clear,	// void clear()
-		vgaConsole_putch,	// void putch(char c)
-		vgaConsole_puts		// void puts(const char* str)	
+	.init  =	vgaConsole_init,	// int init(void)
+	.clear =	vgaConsole_clear,	// void clear()
+	.putch = 	vgaConsole_putch,	// void putch(char c)
+	.puts  = 	vgaConsole_puts		// void puts(const char* str)	
 
 	};
 
@@ -77,14 +77,14 @@ void vgaConsole_clear(void)
 void vgaConsole_moveCursor(int x, int y)
 {
 
-		unsigned short position = y*gConsoleWidth + x;
+		unsigned short position =  0; //y*gConsoleWidth + x;
  
     		// cursor LOW port to vga INDEX register
-    		outByte(0x3d4, 0x0F);
-    		outByte(0x3d4 + 1, (unsigned char)(position&0xFF));
+    		outByte(gConsolePort, 0x0F);
+    		outByte(gConsolePort + 1, (unsigned char)(position & 0xff));
     		// cursor HIGH port to vga INDEX register
-    		outByte(0x3d4, 0x0E);
-    		outByte(0x3d4 + 1, (unsigned char )((position>>8)&0xFF));
+    		outByte(gConsolePort, 0x0E);
+    		outByte(gConsolePort + 1, (unsigned char)((position >> 8) & 0xff));
 	
 }
 

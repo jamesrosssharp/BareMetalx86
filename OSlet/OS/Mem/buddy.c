@@ -209,9 +209,6 @@ void mem_buddy_findCompatibleBlock(struct BTreeNode* node, void* data, int depth
 void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int* bytes)
 {
 
-	#undef DEBUG
-	#define DEBUG kprintf
-
 	int allocBytes = *bytes;
 
 	DEBUG("Allocating %d bytes...\n", allocBytes);
@@ -327,8 +324,6 @@ void*	mem_buddy_allocate(struct BuddyMemoryAllocator* buddy, unsigned int* bytes
 
 	return NULL;
 
-	#undef DEBUG
-	#define DEBUG(...) 
 }
 
 
@@ -447,8 +442,6 @@ int mem_buddy_estimateNumberOfBuddyAllocatorsForRegion(int size, int minBlockSiz
 
 	int minMem = mem_buddy_requiredMemorySize(minBlockSize, minBlockSize); 
 
-	kprintf("buddy: minMem: %d\n", minMem);
-
 	int utilisedBytes = 0;
 
 	while (bytes > minMem)
@@ -488,6 +481,15 @@ void  mem_buddy_freeMemoryFromMemoryPool(struct MemoryPool* memPool, void* memor
 	struct BuddyMemoryAllocator* buddy = (struct BuddyMemoryAllocator*) memPool->allocatorVirtual;
 
 	return mem_buddy_free(buddy, memory);
+
+}
+
+bool	mem_buddy_belongsToMemoryPool(struct MemoryPool* memPool, void* memory)
+{
+
+	struct BuddyMemoryAllocator* buddy = (struct BuddyMemoryAllocator*) memPool->allocatorVirtual;
+
+	return ((memory >= buddy->blocksBaseAddress) && (memory < buddy->blocksBaseAddress + buddy->maxBlockSize));	
 
 }
 
@@ -539,13 +541,10 @@ unsigned int mem_buddy_createBuddyMemoryPool(struct MemoryPool* pool, uintptr_t 
 
 		// fill in function pointers
 
-	kprintf("mem pool allocMemory before: %08x (%08x)\n", pool->allocMemory, pool);
-
 	pool->allocMemory = mem_buddy_allocMemoryFromMemoryPool;
-	pool->freeMemory =  mem_buddy_freeMemoryFromMemoryPool;
-
-	kprintf("mem pool allocMemory after: %08x (%08x)\n", pool->allocMemory, pool);
-
+	pool->freeMemory  = mem_buddy_freeMemoryFromMemoryPool;
+	pool->belongsTo   = mem_buddy_belongsToMemoryPool;
+	
 	// 5. return number of bytes of contiguous physical memory used.
 
 	return buddyBytes;

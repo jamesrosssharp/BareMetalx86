@@ -6,6 +6,8 @@
 
 	global boot_realModeIntWrapper
 
+	global boot_driveNumber
+
 	; important constants
 
 KERNEL_SEG	equ	02000h
@@ -43,6 +45,10 @@ set_cs:
 
 	finit			; Should really do this once we have detected
 				; that the CPU has an FPU
+
+
+	mov [boot_driveNumber], edx ; preserve drive number
+
 
 	cld			; clear direction flag
 
@@ -88,6 +94,9 @@ kernel_idt_ptr:
 realmode_idt_ptr:
 	dw 400h
 	dw 0,0
+
+boot_driveNumber:
+	dd 0
 
 ;=======================	Real Mode int call wrapper	================
 
@@ -327,6 +336,18 @@ RealModeEnter:
 
 	mov eax, [InEAX - kernel_entry_point] 
 
+	; set data segment
+
+	push ds
+	push eax
+
+	xor eax,eax
+	mov ax, [InDS - kernel_entry_point]
+
+	mov ds,ax
+
+	pop eax
+	
 	; enable interrupts
 
 	sti
@@ -335,6 +356,10 @@ RealModeEnter:
 
 RealModeExecInt:
 	int	55h
+
+	; restore data segment
+
+	pop ds
 
 	; store eax
 

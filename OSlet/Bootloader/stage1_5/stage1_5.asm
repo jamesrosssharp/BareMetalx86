@@ -742,17 +742,6 @@ A20Done:
 	;	Begin entry into protected mode
 	;======================================================
 
-	; move GDT to nice address
-
-	;mov si, gdt
-	;xor ax,ax
-	;mov es,ax
-	;mov di, 500h
-	
-	;mov cx, gdt_ptr - gdt
-
-	;rep movsb	
-
 	; Load GDT and IDT
 
 	lidt [idt_ptr]
@@ -761,6 +750,11 @@ A20Done:
 	; make doubly sure interrupts are disabled
 
 	cli
+
+	; leave drive number in dx for loader
+
+	xor edx, edx
+	mov dx,  [DriveNumber]
 
 	; go into protected mode
 

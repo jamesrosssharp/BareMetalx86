@@ -241,16 +241,12 @@ void*	kmalloc(unsigned int bytes, enum MemoryType type)
 	{
 		struct MemoryPool* pool = &pools[i];
 	
-		kprintf("Trying pool %08x %08x\n", pool, pool->allocMemory);
-
 		if (pool->allocMemory != NULL)
 			block = pool->allocMemory(pool, &bytesAllocated);
 
 		if (block != NULL)
 			break;
 	}
-
-	kprintf("Allocated block %08x %d\n", block, bytesAllocated);
 
 	if (block == NULL)
 	{
@@ -283,7 +279,30 @@ void*	kmalloc(unsigned int bytes, enum MemoryType type)
 void	kfree(void* memory)
 {
 
-	// TODO
+	// try to find memory in lowmem
+
+	struct MemoryPool* pools[] = {gMemoryPools,gLowMemoryPools};
+	int counts[] = {gNumMemoryPools,gNumLowMemoryPools};
+
+	for (int j = 0; j < COUNTOF(pools); j++)
+	{
+
+		int count = counts[j];
+		struct MemoryPool* poolPtr = pools[j];	
+		
+		for (int i = 0; i < count; i ++)
+		{
+			struct MemoryPool* pool = &poolPtr[i];
+		
+			if (pool->belongsTo(pool, memory))
+			{
+				pool->freeMemory(pool, memory);
+
+				return;
+			}
+
+		}
+	}
 
 }
 

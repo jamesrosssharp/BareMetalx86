@@ -2,6 +2,8 @@
 #include "biosmem.h"
 #include "../IO/io.h"
 #include "../Console/console.h"
+#include "../Lib/string.h"
+#include "../Mem/mem.h"
 
 #define MAX_MEMORY_ENTRIES 32
 
@@ -12,6 +14,14 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 {
 
 	kprintf("Detecting memory...\n");
+
+
+	struct MemoryEntry* lowMemEntry = kmalloc(sizeof(struct MemoryEntry), MEMORYTYPE_LOMEM);
+
+	if (lowMemEntry == NULL)
+		return false;
+
+	kprintf("Got low memory: %08x\n", lowMemEntry);
 
 	struct MemoryEntry* curEntry = gMemoryEntries;
 	gNumMemoryEntries = 0;
@@ -32,18 +42,22 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 		in.EBX = out.EBX;
 		in.ECX = 24;
 
-		in.ES = (((int)curEntry) & 0xffff0000) >> 4;
-		in.EDI = (((int)curEntry) & 0x0000ffff); 
+		in.ES = (((uintptr_t)lowMemEntry) & 0xffff0000) >> 4;
+		in.EDI = (((uintptr_t)lowMemEntry) & 0x0000ffff); 
 
 		bool success = io_realModeInt(0x15, &in, &out);	
 
 		if (! success)
 		{
 			kprintf("Failed to detect memory.\n");
+			kfree(lowMemEntry);
 			return false;
 		}
 		else
 		{
+
+			lib_memcpy(curEntry, lowMemEntry, sizeof(struct MemoryEntry));
+
 			kprintf("Found memory: base 0x%08x%08x size 0x%08x%08x flags: 0x%x\n", 
 				(unsigned int)(curEntry->baseAddress >> 32), (unsigned int)(curEntry->baseAddress & 0xffffffff),
 				(unsigned int)(curEntry->size >> 32), (unsigned int)(curEntry->size & 0xffffffff),
@@ -68,6 +82,8 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 
 	*entries = gMemoryEntries;
 	*numEntries = i;
+
+	kfree(lowMemEntry);
 
 	return true;
 }

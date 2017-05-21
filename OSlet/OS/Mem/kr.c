@@ -147,18 +147,25 @@ void	mem_kr_free(struct KRMemoryAllocator* kr, void* address)
 void* mem_kr_allocMemoryFromMemoryPool(struct MemoryPool* memPool, unsigned int* size)
 {
 	
-	struct KRMemoryAllocator* buddy = (struct KRMemoryAllocator*) memPool->allocatorVirtual;
+	struct KRMemoryAllocator* kr = (struct KRMemoryAllocator*) memPool->allocatorVirtual;
 
-	return mem_kr_allocate(buddy, *size);
+	return mem_kr_allocate(kr, *size);
 
 }
 
 void  mem_kr_freeMemoryFromMemoryPool(struct MemoryPool* memPool, void* memory)
 {
 	
-	struct KRMemoryAllocator* buddy = (struct KRMemoryAllocator*) memPool->allocatorVirtual;
+	struct KRMemoryAllocator* kr = (struct KRMemoryAllocator*) memPool->allocatorVirtual;
 
-	return mem_kr_free(buddy, memory);
+	return mem_kr_free(kr, memory);
+
+}
+
+bool mem_kr_belongsToMemoryPool(struct MemoryPool* memPool, void* memory)
+{
+
+	return ((memory >= memPool->baseAddress) && (memory < memPool->baseAddress + memPool->size));		
 
 }
 
@@ -182,6 +189,7 @@ unsigned int mem_kr_createMemoryPool(struct MemoryPool* pool, void* dataStart, u
 
 	pool->allocMemory = mem_kr_allocMemoryFromMemoryPool;
 	pool->freeMemory =  mem_kr_freeMemoryFromMemoryPool;
+	pool->belongsTo  =  mem_kr_belongsToMemoryPool;
 
 	return size;
 

@@ -7,6 +7,8 @@
 
 #include "loaderui.h"
 
+#include "Devices/Block/block.h"
+
 extern int _low_mem_start;
 extern int _low_mem_end;
 
@@ -16,8 +18,18 @@ extern int _data_end;
 extern int _bss_start;
 extern int _bss_end;
 
+extern int boot_driveNumber;
+
 void main(void)
 {
+
+	// init low mem
+
+	if (! mem_initLowmem(&_low_mem_start, (uintptr_t)&_low_mem_end - (uintptr_t)&_low_mem_start))
+	{
+		// can't print a message yet.
+		goto die;
+	}
 
 	// Get BIOS data area.
 
@@ -36,8 +48,70 @@ void main(void)
 
 	io_detectCPU();
 
-	mem_initHimem();
+	if (! mem_initHimem())
+	{
+		kprintf("Could not init himem!\n");
+		goto die;
+	}
 
+	// Now create a block device instance for the drive we got from the bootloaders
+
+	struct BiosBlockDevice* bdev = devices_biosBlock_createBIOSBlockDevice((unsigned char)boot_driveNumber); 	
+
+	if (bdev == NULL)
+	{
+		kprintf("Could not create BIOS block device!\n");
+		goto die;
+	}
+
+	unsigned char buf[4096];
+
+	unsigned int sectors = bdev->blockDev.readSectors((struct BlockDevice*)bdev, buf, 0, 1);  
+
+	if (sectors != 1)
+	{
+		kprintf("Could not read sectors!\n");
+		goto die;
+	}
+
+	unsigned int fsType = buf[0x1be + 4];
+	unsigned int cs	    = buf[0x1be + 2];
+	unsigned int c	    = buf[0x1be + 3];
+	unsigned int h	    = buf[0x1be + 1];
+
+	unsigned int lba    = *(unsigned int*)&buf[0x1be + 8];
+
+	kprintf("MBR 0: FS=%x Start C: %d H: %d S: %d LBA: %08x\n", 
+			fsType,
+			c | (cs & 0xc0)<<2,
+			h,
+			cs & 0x3f,
+			lba);
+
+	goto die;
+
+	// Set up the VFS
+
+
+	// Set up devFS
+
+
+	// Add bios block device
+
+	// Create partitions for bios block device and add to devFS 
+
+
+	// Search for boot partition
+
+
+	// Mount boot partition
+
+
+	// Parse BOOTCONF.TXT
+
+
+	// Detect video modes
+	
 	gfx_detectVESAModes();
 
 	int xres = GFX_XRESOLUTION_MAX;
@@ -62,19 +136,6 @@ void main(void)
 	}
 
 	io_enableInterrupts();
-
-	// init low mem
-	// TODO: this is the first thing we should do
-
-	kprintf("Low mem start: %08x end: %08x\n", &_low_mem_start, &_low_mem_end);
-	kprintf("Data start: %08x end: %08x\n", &_data_start, &_data_end);
-	kprintf("BSS start: %08x end: %08x\n", &_bss_start, &_bss_end);
-
-	if (! mem_initLowmem(&_low_mem_start, (uintptr_t)&_low_mem_end - (uintptr_t)&_low_mem_start))
-	{
-		kprintf("Could not init low mem!\n");
-		goto die;
-	}
 
 	//
 
@@ -110,8 +171,9 @@ void main(void)
 
 	// 5. jump to kernel
 
-	kprintf("Done with everything!\n");
 die:
+	kprintf("Done with everything!\n");
+hlt:
 	asm("hlt");
-	goto die;
+	goto hlt;
 }

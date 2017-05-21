@@ -34,6 +34,7 @@ struct MemoryPool
 	// Function pointer to allocate from memory pool
 	void* (* allocMemory) (struct MemoryPool* memPool, unsigned int* size);		
 	void  (* freeMemory) (struct MemoryPool* memPool, void* memory);	
+	bool  (* belongsTo)  (struct MemoryPool* memPool, void* memory);
 
 };
 
