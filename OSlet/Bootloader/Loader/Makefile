@@ -7,7 +7,7 @@ HEADERS = loaderui.h
 loader.bin:	boot.o bootsplash.o $(OBJ) link.ld ../../OS/libkern.a
 	ld --script link.ld boot.o bootsplash.o $(OBJ) -o loader.bin -L../../OS -lkern
 	@if [ `stat -c%s loader.bin` -gt 262144 ]; then echo "!!!!"; echo "Loader too big!"; echo "!!!!"; exit 1; fi
-
+	ld --script link-elf.ld boot.o bootsplash.o $(OBJ) -o loader.elf -L../../OS -lkern
 
 
 %.o:	%.c $(HEADERS)
@@ -17,7 +17,7 @@ loader.bin:	boot.o bootsplash.o $(OBJ) link.ld ../../OS/libkern.a
 boot.o: boot.asm
 	nasm -f elf boot.asm -o boot.o
 
-.PHONY:	../../OS/libkern.a ../../assets/LoaderScreen/bootsplash.c
+.PHONY:	../../assets/LoaderScreen/bootsplash.c
 
 ../../assets/LoaderScreen/bootsplash.c:
 	make -C ../../assets/LoaderScreen

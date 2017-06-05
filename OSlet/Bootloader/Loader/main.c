@@ -8,6 +8,9 @@
 #include "loaderui.h"
 
 #include "Devices/Block/block.h"
+#include "Devices/Block/mbrpartition.h"
+
+#include "Filesystems/fs.h"
 
 extern int _low_mem_start;
 extern int _low_mem_end;
@@ -64,29 +67,66 @@ void main(void)
 		goto die;
 	}
 
-	unsigned char buf[4096];
+	struct PartitionBlockDevice** partitions;
+	unsigned int nPartitions = 0;
 
-	unsigned int sectors = bdev->blockDev.readSectors((struct BlockDevice*)bdev, buf, 0, 1);  
+	devices_mbrPartition_createPartitionDevices((struct BlockDevice*) bdev, &partitions, &nPartitions);
 
-	if (sectors != 1)
+	kprintf("Created %d partitions\n", nPartitions);
+
+	bool mountedPartition = false;
+	
+	struct FATFileSystem* fatfs; 
+
+	for (int i = 0; i < nPartitions; i++)
 	{
-		kprintf("Could not read sectors!\n");
+		struct PartitionBlockDevice* p = partitions[i];
+
+		if (p->partitionType == 0x06)
+		{
+			kprintf("Found FAT partition: %d %08llx\n", p->partitionNumber, p->startSector);
+		
+			fatfs = fs_fat_createFATFileSystem((struct BlockDevice*)p);  	
+
+			if (fatfs != NULL)
+			{
+
+				// Get compare volume label to loader partition string
+
+				
+				if (lib_strncmp(fatfs->volumeLabel, "OSLETLOADER", 11) == 0)
+				{
+					kprintf("Found boot partition!\n");
+					mountedPartition = true;
+				}
+
+			} 
+			else
+			{
+				kprintf("fatfs was null!\n");
+			}
+	
+		}
+	}
+
+	if (! mountedPartition)
+	{
+		kprintf("Could not mount boot partition!\n");
 		goto die;
 	}
 
-	unsigned int fsType = buf[0x1be + 4];
-	unsigned int cs	    = buf[0x1be + 2];
-	unsigned int c	    = buf[0x1be + 3];
-	unsigned int h	    = buf[0x1be + 1];
+	struct UnicodeString* fname = lib_createUnicodeString();
 
-	unsigned int lba    = *(unsigned int*)&buf[0x1be + 8];
+	fname->appendASCIICString(fname, "/Interesting/EvenMoreInteresting/EvenEvenMoreInteresting/bootopts.txt");
 
-	kprintf("MBR 0: FS=%x Start C: %d H: %d S: %d LBA: %08x\n", 
-			fsType,
-			c | (cs & 0xc0)<<2,
-			h,
-			cs & 0x3f,
-			lba);
+	struct File* bootText = ((struct FileSystem*)fatfs)->open((struct FileSystem*)fatfs, fname, O_RDONLY);
+
+	if (bootText == NULL)
+	{
+		kprintf("Could not open boot config file...\n");
+		goto die;
+	}
+
 
 	goto die;
 

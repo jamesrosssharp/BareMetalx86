@@ -37,6 +37,10 @@
 	#define DEBUG(...) 	
 	typedef unsigned int uintptr_t;
 
+	typedef unsigned int size_t;
+
+	typedef unsigned int off_t;
+
 #endif	/* UNIT_TEST */
 
 

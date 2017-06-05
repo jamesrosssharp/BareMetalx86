@@ -4,8 +4,8 @@ LIB = libklib.a
 all:	$(LIB)
 
 
-HEADERS = klib.h btree.h list.h math.h panic.h string.h
-OBJS = btree.o list.o math.o panic.o string.o
+HEADERS = klib.h btree.h list.h math.h panic.h string.h unicodestring.h
+OBJS = btree.o list.o math.o panic.o string.o unicodestring.o
 
 $(LIB):	$(OBJS) $(HEADERS)
 	ar rc $(LIB) $(OBJS)

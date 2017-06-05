@@ -1,9 +1,9 @@
 
-LIB = libblock.a
+LIB = libfs.a
 all:	$(LIB)
 
-HEADERS = block.h biosblock.h mbrpartition.h partition.h
-OBJS = block.o biosblock.o mbrpartition.o partition.o
+HEADERS = fs.h fat.h
+OBJS    = fs.o fat.o
 
 $(LIB):	$(OBJS) $(HEADERS)
 	ar rc $(LIB) $(OBJS)

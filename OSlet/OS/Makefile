@@ -10,7 +10,8 @@ main.o:	main.c $(HEADERS)
 	gcc -m32 -fno-stack-protector -Werror -c main.c -o main.o
 
 LIBS =  Boot/boot.o Console/libconsole.a BIOS/libbios.a IO/libio.a	\
-	Gfx/libgfx.a Mem/libmem.a Lib/libklib.a Devices/libdevices.a
+	Gfx/libgfx.a Mem/libmem.a Lib/libklib.a Devices/libdevices.a	\
+	Filesystems/libfs.a
 
 libkern.a:	$(LIBS)
 	@printf "CREATE libkern.a\n \
@@ -21,6 +22,7 @@ libkern.a:	$(LIBS)
 		ADDLIB Mem/libmem.a\n	\
 		ADDLIB Lib/libklib.a\n	\
 		ADDLIB Devices/libdevices.a\n	\
+		ADDLIB Filesystems/libfs.a\n	\
 		SAVE\n		\
     		END" | ar -M
 	ranlib libkern.a
@@ -51,6 +53,9 @@ Lib/libklib.a:
 
 Devices/libdevices.a:
 	make -C Devices
+
+Filesystems/libfs.a:
+	make -C Filesystems
 
 clean:
 	rm *.a *.o

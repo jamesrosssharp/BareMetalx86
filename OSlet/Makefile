@@ -19,7 +19,7 @@ run:	hd.img
 
 bochs: hd.img
 	#@bochs 'ata0-master: type=disk, path="hd.img", cylinders=2, heads=16, spt=63' 'boot: disk' 'pci: enabled=1, slot1=pcivga, chipset=i440fx'
-	@bochs 'ata0-master: type=disk, path="hd.img"' 'boot: disk' 'pci: enabled=1, slot1=pcivga, chipset=i440fx'
+	@bochs 'ata0-master: type=disk, path="hd.img"' 'boot: disk' 'pci: enabled=1, slot1=pcivga, chipset=i440fx' 'memory: guest=256, host=256'
 
 
 

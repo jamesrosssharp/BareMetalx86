@@ -93,6 +93,12 @@ bool	mem_initHimem()
 
 	address += MEMORY_RESERVE_KERNEL + MEMORY_RESERVE_KERNEL_STACK;
 
+	if (memSize < MEMORY_RESERVE_KERNEL + MEMORY_RESERVE_KERNEL_STACK)
+	{
+		kpanic("Not enough memory for this kernel!\n");	
+	}
+
+
 	memSize -= MEMORY_RESERVE_KERNEL + MEMORY_RESERVE_KERNEL_STACK;
 
 	

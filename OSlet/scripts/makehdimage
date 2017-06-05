@@ -64,6 +64,12 @@ mkdir /tmp/fat
 sudo mount $LOOP_DEV /tmp/fat -o fat=16
 
 sudo mkdir /tmp/fat/boot
+sudo mkdir /tmp/fat/Interesting
+sudo mkdir /tmp/fat/Interesting/EvenMoreInteresting
+sudo mkdir /tmp/fat/Interesting/EvenMoreInteresting/EvenEvenMoreInteresting
+sudo mkdir /tmp/fat/evenMoreInteresting2
+
+sudo sh -c  'echo "DIS DA Text file" >> /tmp/fat/Interesting/EvenMoreInteresting/EvenEvenMoreInteresting/bootopts.txt'
 
 sudo cp OS/kernel.bin /tmp/fat/boot/KERNEL.BIN
 sudo cp Bootloader/Loader/loader.bin /tmp/fat/boot/LOADER.BIN

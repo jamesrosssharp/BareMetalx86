@@ -7,6 +7,7 @@
 enum	FORMAT_CHARS 
 {
 	FORMAT_NONE,
+	FORMAT_LONGLONG_HEX,
 	FORMAT_HEX,
 	FORMAT_DEC,
 	FORMAT_FLOAT,
@@ -53,6 +54,15 @@ void 	kprintf(char* format, ...)
 
 					convertInt(hex, 16, padWithZeros, preferredLength);
 	
+					break;
+				}
+				case FORMAT_LONGLONG_HEX:
+				{	
+					unsigned long long int hex = va_arg(arg, unsigned long long int);
+
+					convertInt(hex >> 16, 16, true, 8);
+					convertInt(hex & 0xffffffff, 16, true, 8);	
+
 					break;
 				}
 				case FORMAT_DEC:
@@ -114,6 +124,7 @@ void 	parseFormatString(char **str, enum FORMAT_CHARS* format, bool* padWithZero
 
 	enum State {
 		START,
+		GET_LONG,
 		GET_DECIMAL_PLACES
 	};
 
@@ -128,6 +139,9 @@ void 	parseFormatString(char **str, enum FORMAT_CHARS* format, bool* padWithZero
 	*decimalPlaces = 0;
 
 	*format = FORMAT_NONE;
+
+
+	bool longlong = false;
 
 	while (*ptr != 0)
 	{
@@ -150,6 +164,19 @@ void 	parseFormatString(char **str, enum FORMAT_CHARS* format, bool* padWithZero
 			   }
 			
 			}
+		}
+		else if (*ptr == 'l')
+		{
+			if (state == GET_LONG)
+			{
+				longlong = true;
+			}
+			else
+			{
+				longlong = false;
+			}
+
+			state = GET_LONG;
 		}	
 		else if (*ptr == '.')
 		{
@@ -157,7 +184,10 @@ void 	parseFormatString(char **str, enum FORMAT_CHARS* format, bool* padWithZero
 		}
 		else if (*ptr == 'x')
 		{
-			*format = FORMAT_HEX;
+			if (longlong)
+				*format = FORMAT_LONGLONG_HEX;
+			else
+				*format = FORMAT_HEX;
 			break;
 		}
 		else if (*ptr == 'd')
