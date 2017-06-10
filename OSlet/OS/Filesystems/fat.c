@@ -500,6 +500,162 @@ static struct FATFindFileDirEntry findFile(struct FATFileSystem* fs, struct Unic
 
 }
 
+unsigned int getNextFATCluster(struct FATFileSystem* fs, unsigned int cluster)
+{
+
+	unsigned int fatEntry;
+
+	switch (fs->fsType)
+	{
+		case FATFS_FAT12:
+
+			kprintf("FAT12 Not yet supported.\n");	
+			return 0xff8;
+
+			break;
+		case FATFS_FAT16:
+
+			fatEntry = cluster << 1;
+		
+			return *(unsigned short*)&fs->FATs[fatEntry];
+
+		case FATFS_FAT32:
+
+			fatEntry = cluster << 2;
+		
+			return *(unsigned int*)&fs->FATs[fatEntry];
+
+	}
+
+}
+
+unsigned int clusterIsEOC(struct FATFileSystem* fs, unsigned int nextCluster)
+{
+	switch (fs->fsType)
+	{
+		case FATFS_FAT12:
+
+			if (nextCluster >= 0xff8)
+				return true;
+			
+			break;
+		case FATFS_FAT16:
+
+			if (nextCluster >= 0xfff8)
+				return true;
+	
+			break;
+		case FATFS_FAT32:
+
+			if (nextCluster >= 0x0ffffff8)
+				return true;
+	
+			break;
+	}
+
+
+	return false;
+
+}
+
+static size_t read(struct File* file, void* buf, size_t count)
+{
+
+	struct FATFile* ff = (struct FATFile*)file;
+	struct FATFileSystem* ffs = (struct FATFileSystem*)file->fs;
+
+	// find which cluster offset is in
+
+	if (ff->startCluster == FINDFILE_INVALIDCLUSTER)
+		return 0;
+
+	unsigned int cluster = ff->startCluster;
+	unsigned int nextCluster = cluster;
+	off_t	     clusterOffset = 0;
+
+	unsigned int offsetIntoCluster = 0;
+	
+	while (1)
+	{
+
+		nextCluster = getNextFATCluster(ffs, cluster);
+
+		offsetIntoCluster = file->offset - clusterOffset; 
+
+		clusterOffset += ffs->bytesPerSector * ffs->sectorsPerCluster;
+
+		if (clusterOffset >= file->offset)
+		{
+
+			break;
+		}
+
+		if (clusterIsEOC(ffs, nextCluster))
+		{
+			// TODO: error codes
+			return 0;	 // can't find another cluster, and we haven't reached the offset: offset is past end of file
+		}
+
+		cluster = nextCluster;
+
+	} 
+ 
+	// while we have bytes remaining, read into the cluster buffer 
+	// and copy into destination buffer
+		
+	unsigned int bytesRead = 0;
+
+	while (1)
+	{
+
+		if (ffs->bytesPerSector != ffs->fs.bdev->bytesPerSector)
+		{
+			kprintf("Sector size mismatch! %d %d\n", ffs->bytesPerSector,  ffs->fs.bdev->bytesPerSector);
+			return -1;
+		}
+
+		if (ffs->fs.bdev->readSectors(ffs->fs.bdev, ffs->clusterBuffer, sectorForCluster(ffs, cluster), ffs->sectorsPerCluster) 
+					!= ffs->sectorsPerCluster)
+			return bytesRead;
+
+		unsigned int bytesInCluster = ffs->bytesPerSector * ffs->sectorsPerCluster - offsetIntoCluster;
+
+		unsigned int bytesToCopy = bytesInCluster < count ? bytesInCluster : count;
+
+		lib_memcpy(buf, ffs->clusterBuffer + offsetIntoCluster, bytesToCopy);
+
+		bytesRead += bytesToCopy;
+
+		offsetIntoCluster = 0;
+
+		if (bytesRead >= count)
+			break;
+
+
+		nextCluster = getNextFATCluster(ffs, cluster);
+
+		if (clusterIsEOC(ffs, nextCluster))
+			break;
+
+		cluster = nextCluster;
+
+	}
+
+	return bytesRead;
+
+}
+
+static off_t  lseek(struct File* file, off_t offset, int whence)
+{
+
+}
+
+static void   close(struct File* file)
+{
+
+
+}
+
 static struct File* open(struct FileSystem* fs, struct UnicodeString* path, int flags)
 {
 
@@ -511,27 +667,31 @@ static struct File* open(struct FileSystem* fs, struct UnicodeString* path, int 
 	if (file == NULL)
 		return NULL;
 
+	file->file.size = 0;
+	file->file.offset = 0;
+	file->startCluster = FINDFILE_INVALIDCLUSTER;
+
 	// Recurse and find file. If the path doesn't exist, we may have to create the file.
 	struct FATFindFileDirEntry dir = findFile((struct FATFileSystem*)fs, path);	
 
+	kprintf("Item found at cluster %d\n", dir.cluster);
 
-	if (dir.cluster != FINDFILE_INVALIDCLUSTER && ! (dir.dirItem.DIR_Attr & FAT_DIR_ATTR_DIRECTORY))
-		kprintf("Item found at cluster %d\n", dir.cluster);
-	else
-	{
-		kfree(file);
-		// set global errno?
-		return NULL;
-	}
-
-	file->startCluster = dir.cluster;	
 
 	switch (flags & O_ACCMODE)
 	{
 		case O_RDONLY:
 		{
 
+			if (dir.cluster == FINDFILE_INVALIDCLUSTER || (dir.dirItem.DIR_Attr & FAT_DIR_ATTR_DIRECTORY))
+			{
+				kfree(file);
+				return NULL;
+			}
 
+			file->file.mode = FILEMODE_READABLE; 
+
+			file->startCluster = dir.cluster;	
+			file->file.size = dir.dirItem.DIR_FileSize;
 
 			break;
 		}
@@ -539,18 +699,74 @@ static struct File* open(struct FileSystem* fs, struct UnicodeString* path, int 
 		{
 			// If FAT_DIR_ATTR_READONLY, error out.
 
+			if ((dir.dirItem.DIR_Attr & FAT_DIR_ATTR_READ_ONLY) ||
+			    (dir.dirItem.DIR_Attr & FAT_DIR_ATTR_DIRECTORY) || 
+			    ((dir.cluster == FINDFILE_INVALIDCLUSTER) && ! (flags & O_CREAT)))
+			{
+				kfree(file);
+				return NULL;
+			}
+	
+			if (dir.cluster == FINDFILE_INVALIDCLUSTER)
+			{
+				// try to create the file
 
+				kfree(file);
+				return NULL;
+			}
+			else
+			{
+				file->startCluster = dir.cluster;	
+				file->file.size = dir.dirItem.DIR_FileSize;
+			}		
+
+			file->file.mode = FILEMODE_WRITEABLE;
+
+			
 			break;
 		}
 		case O_RDWR:
 		{
 			// If FAT_DIR_ATTR_READONLY, error out.
 
+			if ((dir.dirItem.DIR_Attr & FAT_DIR_ATTR_READ_ONLY) ||
+			    (dir.dirItem.DIR_Attr & FAT_DIR_ATTR_DIRECTORY) || 
+			    ((dir.cluster == FINDFILE_INVALIDCLUSTER) && ! (flags & O_CREAT)))
+			{
+				kfree(file);
+				return NULL;
+			}
+		
+			if (dir.cluster == FINDFILE_INVALIDCLUSTER)
+			{
+				// try to create the file
+
+				kfree(file);
+				return NULL;
+			}
+			else
+			{
+				file->startCluster = dir.cluster;	
+				file->file.size = dir.dirItem.DIR_FileSize;
+			}		
+	
+			file->file.mode = FILEMODE_READABLE | FILEMODE_WRITEABLE;	
+
+
 			break;
 		}
 
 	} 
-			
+
+	// Fill in function pointers
+
+	file->file.read = read;
+	file->file.lseek = lseek;
+	file->file.close = close;	
+
+	file->file.fs = (struct FileSystem*)fs;
+
+	return (struct File*)file;			
 
 }
 

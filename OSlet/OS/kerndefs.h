@@ -39,7 +39,7 @@
 
 	typedef unsigned int size_t;
 
-	typedef unsigned int off_t;
+	typedef unsigned long long int off_t;
 
 #endif	/* UNIT_TEST */
 

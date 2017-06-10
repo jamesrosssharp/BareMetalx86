@@ -1,8 +1,8 @@
 
 all:	loader.bin
 
-OBJ = main.o loaderui.o
-HEADERS = loaderui.h
+OBJ = main.o loaderui.o bootopts.o
+HEADERS = loaderui.h bootopts.h
 
 loader.bin:	boot.o bootsplash.o $(OBJ) link.ld ../../OS/libkern.a
 	ld --script link.ld boot.o bootsplash.o $(OBJ) -o loader.bin -L../../OS -lkern

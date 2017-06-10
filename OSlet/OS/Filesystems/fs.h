@@ -40,6 +40,9 @@ struct File
 {
 
 	unsigned int mode;
+	unsigned long long int size;
+
+	off_t	offset;	
 
 	struct FileSystem* fs;
 

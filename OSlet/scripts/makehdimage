@@ -12,11 +12,11 @@ dd if=/dev/zero of=$IMAGEFILE bs=1M count=$IMAGESIZE_MB
 # ascii characters
 
 CNT=$(( 1024*1024 / 8 ))
-for (( i=0; i<CNT; i++ )); do printf "%08x" $(( $i & 0xffffff | 0xaa000000)) >> /tmp/num.txt ; done
+for (( i=0; i<CNT; i++ )); do printf "%07x\n" $(( $i & 0xffffff | 0xa000000)) >> /tmp/num.txt ; done
 
 dd bs=8 count=$CNT conv=notrunc if=/tmp/num.txt of=$IMAGEFILE
 
-rm /tmp/num.txt
+#rm /tmp/num.txt
 
 # add MBR
 
@@ -71,8 +71,11 @@ sudo mkdir /tmp/fat/evenMoreInteresting2
 
 sudo sh -c  'echo "DIS DA Text file" >> /tmp/fat/Interesting/EvenMoreInteresting/EvenEvenMoreInteresting/bootopts.txt'
 
+sudo cp Bootloader/conf/bootopts.txt /tmp/fat/boot/BOOTOPTS.TXT
 sudo cp OS/kernel.bin /tmp/fat/boot/KERNEL.BIN
 sudo cp Bootloader/Loader/loader.bin /tmp/fat/boot/LOADER.BIN
+
+sudo cp /tmp/num.txt /tmp/fat/Interesting/EvenMoreInteresting/num.txt
 
 # unmount FAT16 filesystem
 
@@ -81,6 +84,8 @@ sudo umount $LOOP_DEV
 rmdir /tmp/fat
 
 sudo losetup -D
+
+#rm /tmp/num.txt
 
 # loop mount second partition
 

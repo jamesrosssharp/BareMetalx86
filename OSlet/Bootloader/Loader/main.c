@@ -6,6 +6,7 @@
 #include "Mem/mem.h"
 
 #include "loaderui.h"
+#include "bootopts.h"
 
 #include "Devices/Block/block.h"
 #include "Devices/Block/mbrpartition.h"
@@ -117,7 +118,7 @@ void main(void)
 
 	struct UnicodeString* fname = lib_createUnicodeString();
 
-	fname->appendASCIICString(fname, "/Interesting/EvenMoreInteresting/EvenEvenMoreInteresting/bootopts.txt");
+	fname->appendASCIICString(fname, "/boot/bootopts.txt");
 
 	struct File* bootText = ((struct FileSystem*)fatfs)->open((struct FileSystem*)fatfs, fname, O_RDONLY);
 
@@ -127,36 +128,39 @@ void main(void)
 		goto die;
 	}
 
+	unsigned int textSize = bootText->size;
 
-	goto die;
+	kprintf("Boot options file size: %d bytes\n", textSize);
 
-	// Set up the VFS
+	if (textSize == 0)
+	{
+		kprintf("Boot options file was zero bytes!\n");
+		goto die;
+	}
 
+	char* text = (char*)kmalloc(textSize + 1, MEMORYTYPE_HIMEM);
 
-	// Set up devFS
-
-
-	// Add bios block device
-
-	// Create partitions for bios block device and add to devFS 
-
-
-	// Search for boot partition
-
-
-	// Mount boot partition
-
+	if (bootText->read(bootText, text, textSize) != textSize)
+	{
+		kprintf("Could not read text file\n");
+		goto die;
+	}
 
 	// Parse BOOTCONF.TXT
 
+	struct BootOpts bootOpts;
+
+	parseBootOpts(&bootOpts, text);
+	
+	kfree(text);
 
 	// Detect video modes
 	
 	gfx_detectVESAModes();
 
-	int xres = GFX_XRESOLUTION_MAX;
-	int yres = GFX_YRESOLUTION_MAX;
-	int bpp =  GFX_BPP_MAX;
+	int xres = bootOpts.bootXRes;
+	int yres = bootOpts.bootYRes;
+	int bpp =  bootOpts.bootBpp;
 	int mode = 0;
 
 	if (! gfx_vesa_findCompatibleMode(&mode, &xres, &yres, &bpp))
