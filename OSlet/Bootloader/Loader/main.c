@@ -150,9 +150,10 @@ void main(void)
 
 	struct BootOpts bootOpts;
 
-	parseBootOpts(&bootOpts, text);
+	parseBootOpts(&bootOpts, text, text + textSize);
 	
 	kfree(text);
+
 
 	// Detect video modes
 	
@@ -169,22 +170,12 @@ void main(void)
 		goto die;
 	}
 
-	// set up interrupts, to trap exceptions
-	// TODO: Move this earlier, and make interrupts
-	// properly reloaded after call to real mode vector
-
-	if (! io_initInterrupts(INTERRUPTCONTROL_PIC))
-	{
-		kprintf("Could not init interrupts.\n");
-		goto die;
-	}
-
-	io_enableInterrupts();
-
 	//
 
-/*	kprintf("Using video mode: %d x %d, %d bpp\n", xres, yres, bpp);
+	kprintf("Using video mode: %d x %d, %d bpp\n", xres, yres, bpp);
 
+
+	
 	struct FrameBuffer* fb = gfx_vesa_createFrameBuffer(mode);	
 
 	if (fb == NULL)
@@ -202,16 +193,10 @@ void main(void)
 	}
 
 	loaderUI_init(fb);
-*/
-	// 0. enable interrupts
-
-	// 1. init BIOS disk driver
-
-	// 2. init FAT filesystem
-
-	// 3. read BOOT/BOOTARGS.TXT
 
 	// 4. Read kernel to 0x100000
+
+	
 
 	// 5. jump to kernel
 

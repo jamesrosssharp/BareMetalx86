@@ -102,10 +102,10 @@ bool	gfx_detectVESAModes()
 
 		lib_memcpy(modeInfo, lowMemModeInfo, sizeof(struct ModeInfo));
 
-		kprintf("Detected mode: 0x%x %dx%d, %dbpp\n", *modes, 
-				modeInfo->XResolution, 
-				modeInfo->YResolution,
-				modeInfo->BitsPerPixel);
+		//kprintf("Detected mode: 0x%x %dx%d, %dbpp\n", *modes, 
+		//		modeInfo->XResolution, 
+		//		modeInfo->YResolution,
+		//		modeInfo->BitsPerPixel);
 
 		gVESAModeIndex[gTotalSupportedVESAModes] = *modes;
 
@@ -148,7 +148,7 @@ bool	gfx_vesa_findCompatibleMode(int* mode, int* xres, int* yres, int* bpp)
 			 ((*bpp == GFX_BPP_MAX) && (gVESAModeInfo[i].XResolution >= foundBPP))) 
 		{
 	
-			DEBUG("Mode: %d %d %d %d\n", i, gVESAModeInfo[i].XResolution, gVESAModeInfo[i].YResolution, gVESAModeInfo[i].BitsPerPixel);
+			//DEBUG("Mode: %d %d %d %d\n", i, gVESAModeInfo[i].XResolution, gVESAModeInfo[i].YResolution, gVESAModeInfo[i].BitsPerPixel);
 
 			foundMode = i;
 			foundXRes = gVESAModeInfo[i].XResolution;

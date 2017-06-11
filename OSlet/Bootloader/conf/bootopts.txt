@@ -1,8 +1,8 @@
-[Bootloader]
+[BootLoader]		
 
 Display = 800x600x32
 
-[Kernel]
+[Kernel]		
 
 FindRootBy = VolumeLabel
 Root 	   = OsletRoot

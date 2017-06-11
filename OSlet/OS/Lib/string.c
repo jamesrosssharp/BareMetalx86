@@ -1,4 +1,5 @@
 
+#include "string.h"
 
 void lib_bzero(void* mem, int bytes)
 {
@@ -39,16 +40,21 @@ void lib_memcpy(void* dest, void* src, unsigned int bytes) // TODO: should be si
 int lib_strncmp(const char* s1, const char* s2, unsigned int len)
 {
 
-	int cmp = 0;
-	int cnt = 0;
-
-	while (cnt < len && s1 && s2 && *s1 && *s2)
+	while (len-- && s1 && s2)
 	{
-		cmp += *s1++; 
-		cmp -= *s2++; 
+	
+		if (*s1 != *s2)
+			return *s1 - *s2;
+
+		if (*s1 == 0 || *s2 == 0)
+			break;
+
+		s1++;
+		s2++;
+
 	}
 
-	return cmp;
+	return 0;
 
 }
 
@@ -76,4 +82,68 @@ void lib_strtoupper(char* s)
 		*s = lib_toupper(*s);
 		s++;
 	}
+}
+
+bool lib_isspace(char c)
+{
+	return (c == '\n' || c == ' ' || c == '\t' || c == '\r');
+}
+
+void lib_trim(char** s)
+{
+
+	char *start = *s, *end = *s;
+
+	while (lib_isspace(*start) && *start)
+		start ++;
+
+	end = start;
+
+	while (*end)
+		end++;
+
+	end--;
+	while (lib_isspace(*end) && end > start)
+		end --;
+
+	end++;
+	*end = '\0';
+
+	*s = start;
+}
+
+bool lib_isdigit(char c)
+{
+	return (c >= '0' && c <= '9');
+}
+
+int lib_atoi(char *s)
+{
+	bool negative = false;
+
+	int num = 0;
+
+	while (*s && lib_isspace(*s))
+		s++;
+
+	if (*s == '-')
+	{
+		s++;
+		negative = true;
+	}
+
+	while (*s && lib_isspace(*s))
+		s++;
+
+	while(*s && lib_isdigit(*s))
+	{	
+		num *= 10;
+		num += *s - '0';
+		s++;
+	}
+
+	if (negative)
+		num = -num;
+
+	return num;
 }

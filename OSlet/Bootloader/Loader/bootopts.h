@@ -14,7 +14,11 @@ struct BootOpts
 
 	// kernel options
 
+	int kernelXRes;
+	int kernelYRes;
+	int kernelBpp;
+
 
 };
 
-bool parseBootOpts(struct BootOpts* bootOps, char* text);
+bool parseBootOpts(struct BootOpts* bootOps, char* text, char* textEnd);
