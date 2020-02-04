@@ -1,6 +1,6 @@
 all: run
 
-.PHONY: payload.bin bootloader
+.PHONY: payload.bin bootloader support
 
 payload.bin:
 	make -C OS
@@ -8,7 +8,10 @@ payload.bin:
 bootloader:
 	make -C Bootloader
 
-hd.img: payload.bin bootloader
+support:
+	make -C support
+
+hd.img: payload.bin bootloader support
 	./scripts/makehdimage
 	
 hd.vmdk: hd.img

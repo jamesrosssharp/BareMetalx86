@@ -163,14 +163,10 @@ struct BiosBlockDevice* devices_biosBlock_createBIOSBlockDevice(unsigned char dr
 
 	bool present = io_realModeInt(0x13, &in, &out);	
 
-	present = false;	// used to test non extended BIOS calls
-
 	if (present)
 	{
 		device->biosExtensionsPresent = true;
 
-		kprintf("BiosBlockDevice: BIOS extensions are present\n");
-		
 		// allocate lomem for parameter buffer
 
 		struct BiosExtendedDriveParameters* parms = 
@@ -209,11 +205,11 @@ struct BiosBlockDevice* devices_biosBlock_createBIOSBlockDevice(unsigned char dr
 
 		bytesPerSector = parms->bytesPerSector; 
 
-		kprintf("Extended parms for drive %02x:\n", device->driveNumber);
-		kprintf("C: %d H: %d S: %d BPS: %d\n", device->physCylinders, 
-							     device->physHeadsPerCylinder, 
-							     device->physSectorsPerHead,
-							     bytesPerSector);	
+		//kprintf("Extended parms for drive %02x:\n", device->driveNumber);
+		//kprintf("C: %d H: %d S: %d BPS: %d\n", device->physCylinders, 
+		//					     device->physHeadsPerCylinder, 
+		//					     device->physSectorsPerHead,
+		//					     bytesPerSector);	
 
 		kfree(parms);
 
@@ -234,7 +230,6 @@ struct BiosBlockDevice* devices_biosBlock_createBIOSBlockDevice(unsigned char dr
 		device->biosExtensionsPresent = false;
 
 		// BIOS extensions are not present - get parameters, and assume default bytes per sector
-		kprintf("BiosBlockDevice: extensions not supported!\n");
 
 		in.EAX = 0x0800;
 		in.EDX = (unsigned int)driveNumber;
@@ -253,10 +248,10 @@ struct BiosBlockDevice* devices_biosBlock_createBIOSBlockDevice(unsigned char dr
 		device->headsPerCylinder = ((out.EDX & 0xff00) >> 8) + 1;
 		device->sectorsPerHead = out.ECX & 0x3f;
 
-		kprintf("Parms for drive %02x:\n", device->driveNumber);
-		kprintf("C: %d H: %d S: %d\n", device->cylinders, 
-							     device->headsPerCylinder, 
-							     device->sectorsPerHead);	
+		//kprintf("Parms for drive %02x:\n", device->driveNumber);
+		//kprintf("C: %d H: %d S: %d\n", device->cylinders, 
+		//					     device->headsPerCylinder, 
+		//					     device->sectorsPerHead);	
 
 		device->biosDAP = NULL;	// overkill
 

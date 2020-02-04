@@ -162,7 +162,6 @@ static bool findLongFileName(struct FATDirectory* dir, struct FATDirectory* head
 			// Does it match the checksum? If not, return false (found an orphan)
 			if (longDir->LDIR_Chksum != sum)
 			{	
-				kprintf("Found orphan! %02x %02x\n", longDir->LDIR_Chksum, sum);
 				return false;
 			}
 			else
@@ -313,13 +312,8 @@ static struct FATFindFileDirEntry parseDirectoryForEntry(struct FATFileSystem* f
 
 				fs->dirItemString->appendUTF16String(fs->dirItemString, longName, longNameLength);
 
-				kprintf("Found long dir item: ");
-				fs->dirItemString->print(fs->dirItemString);
-				kprintf("\n");
-
 				if (entry->compare(entry, fs->dirItemString) == 0)
 				{
-					kprintf("Found matching directory item!\n");
 
 					// return cluster of directory
 
@@ -334,7 +328,6 @@ static struct FATFindFileDirEntry parseDirectoryForEntry(struct FATFileSystem* f
 
 				if (lib_strncmp(dir->DIR_Name, pathName8_3, 11) == 0)
 				{
-					kprintf("Found matching directory (short) item! %s %s\n", dir->DIR_Name, pathName8_3);
 
 					// return cluster of directory
 
@@ -412,10 +405,6 @@ static struct FATFindFileDirEntry findFileRecursive(struct FATFileSystem* fs, un
 
 	getNextPathItem(path, &start, &end, &itemThisLevel);
 	
-	kprintf("Searching (recursive) for path item:");
-	path->print(path);
-	kprintf("\n");
-
 	// enumerate directory entries in this directory
 
 	struct FATFindFileDirEntry dir = parseDirectoryForEntry(fs, fs->clusterBuffer, 
@@ -444,10 +433,6 @@ static struct FATFindFileDirEntry findFileRecursive(struct FATFileSystem* fs, un
 static struct FATFindFileDirEntry findFile(struct FATFileSystem* fs, struct UnicodeString* path)
 {
 
-	kprintf("Finding: ");
-	path->print(path);
-	kprintf("\n");
-	
 	// For FAT32, recurse over cluster chain (root directory is like any other directory)
 
 	if (fs->fsType == FATFS_FAT32)
@@ -473,10 +458,6 @@ static struct FATFindFileDirEntry findFile(struct FATFileSystem* fs, struct Unic
 	bool isRootDirItem = false;
 
 	getNextPathItem(path, &start, &end, &isRootDirItem);
-
-	kprintf("Searching for path item:");
-	path->print(path);
-	kprintf("\n");
 
 	// file (potentially) in the root directory. Find the cluster of the file.
 	
@@ -620,11 +601,15 @@ static size_t read(struct File* file, void* buf, size_t count)
 
 		unsigned int bytesInCluster = ffs->bytesPerSector * ffs->sectorsPerCluster - offsetIntoCluster;
 
-		unsigned int bytesToCopy = bytesInCluster < count ? bytesInCluster : count;
+		unsigned int bytesToCopy = bytesInCluster < (count - bytesRead) ? bytesInCluster : (count - bytesRead);
 
 		lib_memcpy(buf, ffs->clusterBuffer + offsetIntoCluster, bytesToCopy);
 
 		bytesRead += bytesToCopy;
+
+		file->offset += bytesToCopy;
+
+		buf += bytesToCopy;
 
 		offsetIntoCluster = 0;
 
@@ -673,9 +658,6 @@ static struct File* open(struct FileSystem* fs, struct UnicodeString* path, int 
 
 	// Recurse and find file. If the path doesn't exist, we may have to create the file.
 	struct FATFindFileDirEntry dir = findFile((struct FATFileSystem*)fs, path);	
-
-	kprintf("Item found at cluster %d\n", dir.cluster);
-
 
 	switch (flags & O_ACCMODE)
 	{
@@ -820,8 +802,6 @@ struct FATFileSystem* fs_fat_createFATFileSystem(struct BlockDevice* bdev)
 
 	unsigned int rootDirSectors = ((bpb->FAT_BPB_RootEntCnt << 5) + (bpb->FAT_BPB_BytesPerSec - 1)) / bpb->FAT_BPB_BytesPerSec;
 
-	kprintf("rootDirSectors: %d\n", rootDirSectors);
-
 	fs->rootDirNumSectors = rootDirSectors;
 
 	unsigned int fatSize = (bpb->FAT_BPB_FATSz16 != 0) ? bpb->FAT_BPB_FATSz16 : fat32bpb->FAT32_BPB_FATSz32;
@@ -830,27 +810,20 @@ struct FATFileSystem* fs_fat_createFATFileSystem(struct BlockDevice* bdev)
 
 	unsigned int dataSectors = totalSectors - (bpb->FAT_BPB_ResvdSecCnt + (bpb->FAT_BPB_NumFATs * fatSize) + rootDirSectors);
 
-	kprintf("fatSize: %d totalSectors: %d dataSectors: %d\n", fatSize, totalSectors, dataSectors);
-
 	// CountofClusters = DataSec / BPB_SecPerClus;
 
 	unsigned int countOfClusters = dataSectors / bpb->FAT_BPB_SecPerClus;
 
-	kprintf("Clusters: %d\n", countOfClusters);
-
 	if (countOfClusters < 4085)
 	{
-		kprintf("FAT12 Partition\n");
 		fs->fsType = FATFS_FAT12;	
 	}
 	else if (countOfClusters < 65525)
 	{
-		kprintf("FAT16 Partition\n");
 		fs->fsType = FATFS_FAT16;	
 	}
 	else
 	{
-		kprintf("FAT32 Partition\n");
 		fs->fsType = FATFS_FAT32;	
 	}
 
@@ -871,8 +844,6 @@ struct FATFileSystem* fs_fat_createFATFileSystem(struct BlockDevice* bdev)
 	}
 
 	fs->volumeLabel[11] = '\0';
-
-	kprintf("%s %s\n", fs->OEMName, fs->volumeLabel);
 
 	fs->numFATs = bpb->FAT_BPB_NumFATs;
 

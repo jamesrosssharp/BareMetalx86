@@ -22,7 +22,7 @@ int		  gNumLowMemoryPools = 0;
 bool	mem_initHimem()
 {
 
-	kprintf("Initing Hi-memory...");	
+	//kprintf("Initing Hi-memory...");	
 
 	// Query BIOS memory map
 
@@ -46,9 +46,9 @@ bool	mem_initHimem()
 		    (memMap[i].baseAddress <  0x100000000ULL) &&
   		    (memMap[i].type == MEMORY_TYPE_FREE) )
 		{
-			kprintf("Found usable memory at %08x%08x %d\n", 
-				(unsigned int)(memMap[i].baseAddress >> 32), 
-				(unsigned int)(memMap[i].baseAddress & 0xffffffffU), i);
+			//kprintf("Found usable memory at %08x%08x %d\n", 
+			//	(unsigned int)(memMap[i].baseAddress >> 32), 
+			//	(unsigned int)(memMap[i].baseAddress & 0xffffffffU), i);
 
 
 			unsigned int addr = memMap[i].baseAddress & 0xffffffffU;
@@ -58,7 +58,7 @@ bool	mem_initHimem()
 		}		
 	}
 	
-	kprintf("Maximum memory pools for usable memory regions: %d\n", maxMemoryPools);
+	//kprintf("Maximum memory pools for usable memory regions: %d\n", maxMemoryPools);
 
 	// find the memory at 0x100000, this is the kernel load address. Need to
 	// reserve space for the kernel, it's stack, and the memory pools array.

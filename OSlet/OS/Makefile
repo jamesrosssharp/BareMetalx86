@@ -1,10 +1,15 @@
 
-all:	kernel.bin
+all:	kernel.bin kernel.elf
 
 HEADERS= kerndefs.h kernerr.h
 
 kernel.bin:	Boot/boot.o main.o  libkern.a
 	ld --script link.ld Boot/boot.o  main.o -o kernel.bin -L. -lkern
+
+kernel.elf: 	Boot/boot.o main.o  libkern.a
+	ld -melf_i386 --script link_elf.ld Boot/boot.o  main.o -o kernel.elf -L. -lkern
+
+
 
 main.o:	main.c $(HEADERS)
 	gcc -m32 -fno-stack-protector -Werror -c main.c -o main.o

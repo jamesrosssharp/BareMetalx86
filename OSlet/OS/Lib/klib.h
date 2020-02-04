@@ -7,3 +7,4 @@
 #include "panic.h"
 #include "string.h"
 #include "unicodestring.h"
+#include "crc32.h"

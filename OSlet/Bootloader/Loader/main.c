@@ -24,6 +24,8 @@ extern int _bss_end;
 
 extern int boot_driveNumber;
 
+extern void handOff();
+
 void main(void)
 {
 
@@ -73,8 +75,6 @@ void main(void)
 
 	devices_mbrPartition_createPartitionDevices((struct BlockDevice*) bdev, &partitions, &nPartitions);
 
-	kprintf("Created %d partitions\n", nPartitions);
-
 	bool mountedPartition = false;
 	
 	struct FATFileSystem* fatfs; 
@@ -85,7 +85,7 @@ void main(void)
 
 		if (p->partitionType == 0x06)
 		{
-			kprintf("Found FAT partition: %d %08llx\n", p->partitionNumber, p->startSector);
+			//kprintf("Found FAT partition: %d %08llx\n", p->partitionNumber, p->startSector);
 		
 			fatfs = fs_fat_createFATFileSystem((struct BlockDevice*)p);  	
 
@@ -97,7 +97,7 @@ void main(void)
 				
 				if (lib_strncmp(fatfs->volumeLabel, "OSLETLOADER", 11) == 0)
 				{
-					kprintf("Found boot partition!\n");
+					//kprintf("Found boot partition!\n");
 					mountedPartition = true;
 				}
 
@@ -128,9 +128,9 @@ void main(void)
 		goto die;
 	}
 
-	unsigned int textSize = bootText->size;
+	lib_destroyUnicodeString(&fname);
 
-	kprintf("Boot options file size: %d bytes\n", textSize);
+	unsigned int textSize = bootText->size;
 
 	if (textSize == 0)
 	{
@@ -173,10 +173,8 @@ void main(void)
 	//
 
 	kprintf("Using video mode: %d x %d, %d bpp\n", xres, yres, bpp);
-
-
 	
-	struct FrameBuffer* fb = gfx_vesa_createFrameBuffer(mode);	
+	/*struct FrameBuffer* fb = gfx_vesa_createFrameBuffer(mode);	
 
 	if (fb == NULL)
 	{
@@ -193,15 +191,77 @@ void main(void)
 	}
 
 	loaderUI_init(fb);
+	*/
 
 	// 4. Read kernel to 0x100000
 
+	fname = lib_createUnicodeString();
+
+	fname->appendASCIICString(fname, "/boot/kernel.bin");
+
+	struct File* kernelFile = ((struct FileSystem*)fatfs)->open((struct FileSystem*)fatfs, fname, O_RDONLY);
+
+	if (kernelFile == NULL)
+	{
+		kprintf("Could not open kernel binary...\n");
+		goto die;
+	}
+
+	lib_destroyUnicodeString(&fname);
+
+	unsigned int kernelSize = kernelFile->size;
+
+	unsigned int bytesLoaded = 0;
+
+	unsigned char* loadAddress = (unsigned char*)0x1000000;
+
+	kprintf("Loading kernel\n");
+
+	while (bytesLoaded < kernelSize)
+	{
+
+		const int chunkSize = 1<<15;
+		unsigned int bytesToRead = kernelSize - bytesLoaded > chunkSize ? chunkSize : kernelSize - bytesLoaded;
+
+		if (kernelFile->read(kernelFile, loadAddress, bytesToRead) != bytesToRead)
+		{
+			kprintf("Error reading kernel file\n");
+			goto die;
+		}
+
+		kprintf(".");
+
+		bytesLoaded += bytesToRead;
+		loadAddress += bytesToRead;
+
+	}
 	
+	kprintf("Success!\n");
+
+	// Check sum kernel
+
+	lib_crc32_init(CRC32);
+
+	unsigned int crc = ~0;
+
+	unsigned char* data = (unsigned char*)0x1000000;
+
+	for (int i = 0; i < kernelSize; i ++)
+	{
+		crc = lib_crc32_compute(*data, crc);
+		data++;
+	}
+
+	crc = lib_crc32_finalise(crc);
+
+	kprintf("Kernel CRC32: %x\n", crc);
 
 	// 5. jump to kernel
 
+	handOff();
+
 die:
-	kprintf("Done with everything!\n");
+	kprintf("Shouldn't get here!\n");
 hlt:
 	asm("hlt");
 	goto hlt;

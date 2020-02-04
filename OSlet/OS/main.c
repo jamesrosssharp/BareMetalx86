@@ -22,13 +22,15 @@ void main(void)
 
 	console_addConsole(CONSOLETYPE_VGATEXT, videoPort, columns);
 
+	kprintf("Hello world!\n");
+
 	// Print the BIOS data area
 	
-	bios_printBDA();
+	//bios_printBDA();
 
 	// Detect the CPU
 	
-	io_detectCPU();
+	//io_detectCPU();
 
 	// Init memory subsystem
 
@@ -37,7 +39,7 @@ void main(void)
 
 	//bios_detectMemory(&memMap, &memMapSize);
 
-	mem_initHimem();
+	//mem_initHimem();
 
 	// Now we have detected memory, init the kernel memory allocator,
 	// so we can kmalloc

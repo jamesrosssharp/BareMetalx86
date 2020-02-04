@@ -18,7 +18,7 @@ int	gTotalSupportedVESAModes = 0;
 bool	gfx_detectVESAModes()
 {
 
-	DEBUG("Detecting VESA modes...\n");
+	//DEBUG("Detecting VESA modes...\n");
 
 	struct RegisterDescription in = {0};
 	struct RegisterDescription out = {0};
@@ -48,16 +48,16 @@ bool	gfx_detectVESAModes()
 
 	kfree(vesaInfo);
 
-	kprintf("VESA Signature: %c%c%c%c (%x)\n", gVESAInfo.VESASignature[0],
-		gVESAInfo.VESASignature[1],
-		gVESAInfo.VESASignature[2],
-		gVESAInfo.VESASignature[3],
-		&gVESAInfo
-	);
+	//kprintf("VESA Signature: %c%c%c%c (%x)\n", gVESAInfo.VESASignature[0],
+//		gVESAInfo.VESASignature[1],
+//		gVESAInfo.VESASignature[2],
+//		gVESAInfo.VESASignature[3],
+//		&gVESAInfo
+//	);
 
-	kprintf("OEM String: %s\n",
-		(unsigned char*)( CONVERT_REAL_MODE_ADDRESS(gVESAInfo.OEMStringPtr)));
-	kprintf("Total memory: %d kB\n",gVESAInfo.TotalMemory * 64);
+	//kprintf("OEM String: %s\n",
+	//	(unsigned char*)( CONVERT_REAL_MODE_ADDRESS(gVESAInfo.OEMStringPtr)));
+	//kprintf("Total memory: %d kB\n",gVESAInfo.TotalMemory * 64);
 
 	// If this is a VESA2.0+ BIOS, then we query for the PM bank switch functions
 

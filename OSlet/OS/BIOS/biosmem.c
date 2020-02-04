@@ -13,15 +13,13 @@ int	gNumMemoryEntries = 0;
 bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 {
 
-	kprintf("Detecting memory...\n");
+	//kprintf("Detecting memory...\n");
 
 
 	struct MemoryEntry* lowMemEntry = kmalloc(sizeof(struct MemoryEntry), MEMORYTYPE_LOMEM);
 
 	if (lowMemEntry == NULL)
 		return false;
-
-	kprintf("Got low memory: %08x\n", lowMemEntry);
 
 	struct MemoryEntry* curEntry = gMemoryEntries;
 	gNumMemoryEntries = 0;
@@ -58,11 +56,11 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 
 			lib_memcpy(curEntry, lowMemEntry, sizeof(struct MemoryEntry));
 
-			kprintf("Found memory: base 0x%08x%08x size 0x%08x%08x flags: 0x%x\n", 
-				(unsigned int)(curEntry->baseAddress >> 32), (unsigned int)(curEntry->baseAddress & 0xffffffff),
-				(unsigned int)(curEntry->size >> 32), (unsigned int)(curEntry->size & 0xffffffff),
-				curEntry->type	
-			);
+			//kprintf("Found memory: base 0x%08x%08x size 0x%08x%08x flags: 0x%x\n", 
+			//	(unsigned int)(curEntry->baseAddress >> 32), (unsigned int)(curEntry->baseAddress & 0xffffffff),
+			//	(unsigned int)(curEntry->size >> 32), (unsigned int)(curEntry->size & 0xffffffff),
+			//	curEntry->type	
+			//);
 
 		}
 
@@ -78,7 +76,7 @@ bool	bios_detectMemory(struct MemoryEntry** entries, int* numEntries)
 
 	}
 
-	kprintf("Detected memory (%d MiB)\n", (int)(totalMemory / 1024 / 1024));
+	//kprintf("Detected memory (%d MiB)\n", (int)(totalMemory / 1024 / 1024));
 
 	*entries = gMemoryEntries;
 	*numEntries = i;

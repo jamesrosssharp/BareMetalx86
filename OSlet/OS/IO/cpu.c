@@ -15,33 +15,33 @@ void	io_queryCPUFeatures(unsigned int* edx, unsigned int* ecx);
 bool io_detectCPU()
 {
 
-	kprintf("Detecting CPU...\n");
+	//kprintf("Detecting CPU...\n");
 
 	bool	supportsCPUID = io_CPUSupportsCPUID();
 
 	if (supportsCPUID)
 	{
 	
-		kprintf("About to query CPU id\n");
+		//kprintf("About to query CPU id\n");
 	
 		// Query CPU id string
 
 		io_queryCPUIdString(gCPUString);
-		kprintf("CPU String: %s\n", gCPUString);
+		//kprintf("CPU String: %s\n", gCPUString);
 
 		// Query CPU features
 
 		io_queryCPUFeatures(&gCPUFeatEDX, &gCPUFeatECX);			
-		if (gCPUFeatEDX & CPUID_FEAT_EDX_APIC)
-			kprintf("CPU is APIC enabled\n");
-		else
-			kprintf("CPU is not APIC enabled\n");  
+		//if (gCPUFeatEDX & CPUID_FEAT_EDX_APIC)
+		//	kprintf("CPU is APIC enabled\n");
+		//else
+		//	kprintf("CPU is not APIC enabled\n");  
 
 
-		if (gCPUFeatEDX & CPUID_FEAT_EDX_ACPI)
-			kprintf("CPU has ACPI\n");
-		else
-			kprintf("CPU does not have ACPI\n");
+		//if (gCPUFeatEDX & CPUID_FEAT_EDX_ACPI)
+		//	kprintf("CPU has ACPI\n");
+		//else
+		//	kprintf("CPU does not have ACPI\n");
 
 		gCPUDetected = true;
 
@@ -51,7 +51,7 @@ bool io_detectCPU()
 		kprintf("CPU does not support CPUID.");	
 	}
 
-	kprintf("Detected CPU.\n");
+	//kprintf("Detected CPU.\n");
 
 	return true;
 

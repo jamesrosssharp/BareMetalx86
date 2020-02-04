@@ -8,7 +8,7 @@ LOOP_DEV=/dev/loop7
 
 dd if=/dev/zero of=$IMAGEFILE bs=1M count=$IMAGESIZE_MB
 
-# for debug, we fill the first 1M of the disk with a counting sequence of
+# for debug, we fill the first 16M of the disk with a counting sequence of
 # ascii characters
 
 CNT=$(( 1024*1024 / 8 ))
@@ -34,7 +34,7 @@ SECTOR_SIZE=512
 DISK_SECTORS=$(( $IMAGESIZE_MB * 1024 * 1024 / $SECTOR_SIZE))
 
 PART1_START_SECTORS=2048
-PART1_SIZE_MB=16
+PART1_SIZE_MB=32
 PART1_SIZE_SECTORS=$(( $PART1_SIZE_MB*1024*1024/$SECTOR_SIZE - $PART1_START_SECTORS ))
 
 PART2_START_SECTORS=$(( $PART1_START_SECTORS + $PART1_SIZE_SECTORS ))
@@ -72,7 +72,13 @@ sudo mkdir /tmp/fat/evenMoreInteresting2
 sudo sh -c  'echo "DIS DA Text file" >> /tmp/fat/Interesting/EvenMoreInteresting/EvenEvenMoreInteresting/bootopts.txt'
 
 sudo cp Bootloader/conf/bootopts.txt /tmp/fat/boot/BOOTOPTS.TXT
-sudo cp OS/kernel.bin /tmp/fat/boot/KERNEL.BIN
+sudo sh -c 'cat OS/kernel.bin  /tmp/num.txt > /tmp/fat/boot/KERNEL.BIN'
+
+echo -n "KERNEL CRC32: "
+sudo ls -la /tmp/fat/boot/KERNEL.BIN
+sudo support/crc32/crc32 /tmp/fat/boot/KERNEL.BIN
+sudo crc32 /tmp/fat/boot/KERNEL.BIN
+
 sudo cp Bootloader/Loader/loader.bin /tmp/fat/boot/LOADER.BIN
 
 sudo cp /tmp/num.txt /tmp/fat/Interesting/EvenMoreInteresting/num.txt
@@ -85,7 +91,7 @@ rmdir /tmp/fat
 
 sudo losetup -D
 
-#rm /tmp/num.txt
+rm /tmp/num.txt
 
 # loop mount second partition
 
